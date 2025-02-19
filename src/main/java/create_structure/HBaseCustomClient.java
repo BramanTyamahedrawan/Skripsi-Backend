@@ -69,14 +69,12 @@ public class HBaseCustomClient {
 
     }
 
-    public void insertRecord(TableName tableName, String rowKey, String family, String qualifier, String value) {
-
-        try {
-            Table table = connection.getTable(tableName);
+    public void insertRecord(TableName tableName, String rowKey, String family, String qualifier, String value)
+            throws IOException {
+        try (Table table = connection.getTable(tableName)) { // try-with-resources
             Put p = new Put(Bytes.toBytes(rowKey));
             p.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
             table.put(p);
-
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -93,6 +91,20 @@ public class HBaseCustomClient {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+
+    }
+
+    public void truncateTable(TableName tableName, Configuration conf) throws IOException {
+
+        try (Connection connection = ConnectionFactory.createConnection(conf);
+
+                Admin admin = connection.getAdmin()) {
+
+            admin.disableTable(tableName);
+
+            admin.truncateTable(tableName, true);
+
         }
 
     }

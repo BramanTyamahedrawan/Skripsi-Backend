@@ -4,11 +4,11 @@ public class BidangKeahlian {
     private String id;
     private String bidang;
     private School school;
-    
+
     public BidangKeahlian() {
     }
-    
-    public BidangKeahlian(String id, String bidang, School school ){
+
+    public BidangKeahlian(String id, String bidang, School school) {
         this.id = id;
         this.bidang = bidang;
         this.school = school;
@@ -40,16 +40,17 @@ public class BidangKeahlian {
 
     public boolean isValid() {
         return this.id != null &&
-                this.bidang != null && 
-                this.school != null ;
+                this.bidang != null &&
+                this.school != null;
     }
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
             case "id":
                 this.id = value;
                 break;
             case "bidang":
-                this.bidang = value;  
+                this.bidang = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

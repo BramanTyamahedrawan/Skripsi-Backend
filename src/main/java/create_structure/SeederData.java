@@ -21,75 +21,23 @@ public class SeederData {
         Configuration conf = HBaseConfiguration.create();
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        // time now
+        // Waktu sekarang
         ZoneId zoneId = ZoneId.of("Asia/Jakarta");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         Instant instant = zonedDateTime.toInstant();
 
-        // define name all table;
-        TableName tableSubject = TableName.valueOf("subjects");
-        TableName tableChapter = TableName.valueOf("chapters");
-        TableName tableSubjectGroup = TableName.valueOf("subject_groups");
-        TableName tableLecture = TableName.valueOf("lectures");
-        TableName tableStudent = TableName.valueOf("students");
-        TableName tableRPS = TableName.valueOf("rps");
-        TableName tableRPSDetail = TableName.valueOf("rps_details");
-        TableName tableReference = TableName.valueOf("references");
-        TableName tableLearningMedia = TableName.valueOf("learning_medias");
-        TableName tableReligion = TableName.valueOf("religions");
-        TableName tableDepartment = TableName.valueOf("departments");
-        TableName tableStudyProgram = TableName.valueOf("study_programs");
-        TableName tableUser = TableName.valueOf("users");
-        TableName tableAppraisalForm = TableName.valueOf("appraisal_forms");
-        TableName tableAssessmentCriteria = TableName.valueOf("assessment_criterias");
-        TableName tableFormLearning = TableName.valueOf("form_learnings");
-        TableName tableLearningMethod = TableName.valueOf("learning_methods");
-        TableName tableQuestion = TableName.valueOf("questions");
-        TableName tableAnswer = TableName.valueOf("answers");
-        TableName tableExam = TableName.valueOf("exams");
-        TableName tableQuizzes = TableName.valueOf("quizzes");
-        TableName tableExcercise = TableName.valueOf("exercises");
+        // Tabel bidang keahlian
+        TableName tableBidangKeahlian = TableName.valueOf("bidangKeahlians");
 
         // ==============================================================================================
         // INSERT DATA
         // ==============================================================================================
 
-        // for (int i = 1000000; i < 5000000; i++) {
-        // Faker faker = new Faker();
-        // String[] typeQuestion = {"VIDEO", "AUDIO", "IMAGE", "NORMAL"};
-        // String[] typeAnswer = {"MULTIPLE_CHOICE", "BOOLEAN", "COMPLETION",
-        // "MATCHING", "ESSAY"};
-        // String typeQ = typeQuestion[faker.random().nextInt(typeQuestion.length)];
-        // String path = "";
-        // client.insertRecord(tableQuestion, "QST"+i, "main", "id", "QST"+i);
-        // client.insertRecord(tableQuestion, "QST"+i, "main", "title",
-        // faker.lorem().sentence());
-        // client.insertRecord(tableQuestion, "QST"+i, "main", "description",
-        // faker.lorem().sentence());
-        // client.insertRecord(tableQuestion, "QST"+i, "main", "question_type", typeQ);
-        // client.insertRecord(tableQuestion, "QST"+i, "main", "answer_type",
-        // typeAnswer[faker.random().nextInt(typeAnswer.length)]);
-        // switch (typeQ) {
-        // case "VIDEO":
-        // path = "webhdfs/v1/questions/video_dummy.mp4?op=OPEN";
-        // break;
-        // case "AUDIO":
-        // path = "webhdfs/v1/questions/audio_dummy.mp3?op=OPEN";
-        // break;
-        // case "IMAGE":
-        // path = "webhdfs/v1/questions/image_dummy.png?op=OPEN";
-        // break;
-        // case "NORMAL":
-        // path = "none";
-        // break;
-        // }
-        // client.insertRecord(tableQuestion, "QST"+i, "main", "file_path", path);
-        // client.insertRecord(tableQuestion, "QST"+i, "rps_detail", "id", "RPSD001");
-        // client.insertRecord(tableQuestion, "QST"+i, "rps_detail", "sub_cp_mk", "Dummy
-        // Sub CP MK");
-        // client.insertRecord(tableQuestion, "QST"+i, "detail", "rps_id", "RPS001");
-        // client.insertRecord(tableQuestion, "QST"+i, "detail", "created_by",
-        // "Doyatama");
-        // }
+        // Insert Data Table Bidang Keahlian
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Teknik Informatika");
+        client.insertRecord(tableBidangKeahlian, "BK001", "school", "school_id", "RWK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_at", instant.toString());
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
     }
 }
