@@ -32,8 +32,9 @@ public class SemesterController {
     @GetMapping
     public PagedResponse<Semester> getSemester(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return semesterService.getAllSemester(page, size);
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "user", defaultValue = "*") String userID) throws IOException {
+        return semesterService.getAllSemester(page, size, userID);
     }
 
     @PostMapping

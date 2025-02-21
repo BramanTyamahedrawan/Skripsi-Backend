@@ -88,7 +88,7 @@ public class ElemenRepository {
         return client.showDataTable(tableElemen.toString(), columnMapping, elemenId, Elemen.class);
     }
 
-    public Elemen findById(String idElemen) throws IOException {
+    public Elemen findById(String elemenId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableElemen = TableName.valueOf(tableName);
@@ -102,10 +102,7 @@ public class ElemenRepository {
         columnMapping.put("mapel", "mapel");
         columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
 
-        Elemen elemen = client.getDataByColumn(tableElemen.toString(), columnMapping, "main", "idElemen", idElemen,
-                Elemen.class);
-
-        return elemen.getIdElemen() != null ? elemen : null;
+        return client.showDataTable(tableElemen.toString(), columnMapping, elemenId, Elemen.class);
     }
 
     public List<Elemen> findElemenByMapel(String mapelID, int size) throws IOException {

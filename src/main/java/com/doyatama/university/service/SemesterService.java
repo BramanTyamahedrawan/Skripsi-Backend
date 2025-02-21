@@ -21,12 +21,17 @@ public class SemesterService {
 
     private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
 
-    public PagedResponse<Semester> getAllSemester(int page, int size) throws IOException {
+    public PagedResponse<Semester> getAllSemester(int page, int size, String userID) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
         List<Semester> semesterResponse = new ArrayList<>();
-        semesterResponse = semesterRepository.findAll(size);
+
+        if (userID.equalsIgnoreCase("*")) {
+            semesterResponse = semesterRepository.findAll(size);
+        } else {
+            semesterResponse = semesterRepository.findSemesterByUser(userID, size);
+        }
 
         return new PagedResponse<>(semesterResponse, semesterResponse.size(), "Successfully get data", 200);
     }

@@ -1,6 +1,7 @@
 package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
+import com.doyatama.university.model.Acp;
 import com.doyatama.university.model.Semester;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,6 +69,20 @@ public class SemesterRepository {
                     Semester.class);
             semesterList.add(semester);
         }
+        return semesterList;
+    }
+
+    public List<Semester> findSemesterByUser(String userId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableSemester = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+        columnMapping.put("idSemester", "idSemester");
+        columnMapping.put("namaSemester", "namaSemester");
+
+        List<Semester> semesterList = client.getDataListByColumn(tableSemester.toString(), columnMapping, "user", "id",
+                userId, Semester.class, size);
+
         return semesterList;
     }
 

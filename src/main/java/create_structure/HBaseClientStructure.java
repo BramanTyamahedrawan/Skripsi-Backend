@@ -96,10 +96,11 @@ public class HBaseClientStructure {
                 client.createTable(tableElemen, elemen);
 
                 // Create Tabel Capaian Pembelajaran
-                TableName tableCapaianPembelajaran = TableName.valueOf("capaianPembelajaran");
-                String[] capaianPembelajaran = { "main", "elemen", "detail" };
-                client.deleteTable(tableCapaianPembelajaran);
-                client.createTable(tableCapaianPembelajaran, capaianPembelajaran);
+                TableName tableAcp = TableName.valueOf("acp");
+                String[] acp = { "main", "tahunAjaran", "mapel", "kelas", "semester", "konsentrasiKeahlian", "elemen",
+                                "detail" };
+                client.deleteTable(tableAcp);
+                client.createTable(tableAcp, acp);
 
                 // Batas Kode Baru
                 // Kode Lama

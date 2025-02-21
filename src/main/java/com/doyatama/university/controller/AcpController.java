@@ -1,6 +1,7 @@
 package com.doyatama.university.controller;
 
 import com.doyatama.university.model.Acp;
+import com.doyatama.university.model.Elemen;
 import com.doyatama.university.model.Kelas;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.payload.ApiResponse;
@@ -26,84 +27,82 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+@RestController
+@RequestMapping("/api/acp")
 public class AcpController {
-    // private AcpService acpService = new AcpService();
+    private AcpService acpService = new AcpService();
 
-    // @GetMapping
-    // public PagedResponse<Acp> getAcp(
-    // @RequestParam(value = "page", defaultValue =
-    // AppConstants.DEFAULT_PAGE_NUMBER) int page,
-    // @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE)
-    // int size,
-    // @RequestParam(value = "tahunAjaran", defaultValue = "*") String
-    // tahunAjaranID,
-    // @RequestParam(value = "semester", defaultValue = "*") String semesterID,
-    // @RequestParam(value = "kelas", defaultValue = "*") String kelasID,
-    // @RequestParam(value = "mapel", defaultValue = "*") String mapeID,
-    // @RequestParam(value = "konsentrasiKeahlian", defaultValue = "*") String
-    // konsentrasiKeahlianID)
-    // throws IOException {
-    // return acpService.getAllAcp(page, size, tahunAjaranID, semesterID, kelasID,
-    // mapeID,
-    // konsentrasiKeahlianID);
-    // }
+    @GetMapping
+    public PagedResponse<Acp> getAcp(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "tahunAjaran", defaultValue = "*") String tahunAjaranID,
+            @RequestParam(value = "semester", defaultValue = "*") String semesterID,
+            @RequestParam(value = "kelas", defaultValue = "*") String kelasID,
+            @RequestParam(value = "mapel", defaultValue = "*") String mapeID,
+            @RequestParam(value = "konsentrasiKeahlian", defaultValue = "*") String konsentrasiKeahlianID,
+            @RequestParam(value = "elemen", defaultValue = "*") String elemenID)
+            throws IOException {
+        return acpService.getAllAcp(page, size, tahunAjaranID, semesterID, kelasID,
+                mapeID, konsentrasiKeahlianID, elemenID);
+    }
 
-    // @PostMapping
-    // public ResponseEntity<?> createAcp(@Valid @RequestBody AcpRequest acpRequest)
-    // throws IOException {
-    // try {
-    // Acp acp = acpService.createAcp(acpRequest);
+    @PostMapping
+    public ResponseEntity<?> createAcp(@Valid @RequestBody AcpRequest acpRequest) {
+        try {
+            Acp acp = acpService.createAcp(acpRequest);
 
-    // URI location =
-    // ServletUriComponentsBuilder.fromCurrentRequest().path("/{acpId}")
-    // .buildAndExpand(acp.getIdAcp()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{acpId}")
+                    .buildAndExpand(acp.getIdAcp()).toUri();
 
-    // return ResponseEntity.created(location).body(new ApiResponse(true, "Acp
-    // Created Successfully"));
-    // } catch (IllegalArgumentException e) {
-    // return ResponseEntity.badRequest().body(new ApiResponse(false,
-    // e.getMessage()));
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    // .body(new ApiResponse(false, "An unexpected error occurred."));
-    // }
-    // }
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "ACP Created Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
+    }
 
-    // @GetMapping("/{acpId}")
-    // public DefaultResponse<Acp> getAcpById(@PathVariable String acpId) throws
-    // IOException {
-    // return acpService.getAcpById(acpId);
-    // }
+    @GetMapping("/{acpId}")
+    public DefaultResponse<Acp> getAcpById(@PathVariable String acpId) throws IOException {
+        return acpService.getAcpById(acpId);
+    }
 
-    // @PutMapping("/{acpId}")
-    // public ResponseEntity<?> updateAcp(@PathVariable String acpId, @Valid
-    // @RequestBody AcpRequest acpRequest)
-    // throws IOException {
-    // try {
-    // Acp acp = acpService.updateAcp(acpId, acpRequest);
+    @PutMapping("/{acpId}")
+    public ResponseEntity<?> updateAcp(@PathVariable String acpId, @Valid @RequestBody AcpRequest acpRequest) {
+        try {
+            Acp acp = acpService.updateAcp(acpId, acpRequest);
 
-    // URI location =
-    // ServletUriComponentsBuilder.fromCurrentRequest().path("/{acpId}")
-    // .buildAndExpand(acp.getIdAcp()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{acpId}")
+                    .buildAndExpand(acp.getIdAcp()).toUri();
 
-    // return ResponseEntity.created(location).body(new ApiResponse(true, "Acp
-    // Updated Successfully"));
-    // } catch (IllegalArgumentException e) {
-    // return ResponseEntity.badRequest().body(new ApiResponse(false,
-    // e.getMessage()));
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    // .body(new ApiResponse(false, "An unexpected error occurred."));
-    // }
-    // }
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "ACP Updated Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
+    }
 
-    // @DeleteMapping("/{acpId}")
-    // public ResponseEntity<?> deleteAcp(@PathVariable String acpId) throws
-    // IOException {
-    // acpService.deleteAcpById(acpId);
-
-    // return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Acp
-    // Deleted Successfully"));
-    // }
-
+    @DeleteMapping("/{acpId}")
+    public ResponseEntity<?> deleteAcp(@PathVariable String acpId) {
+        try {
+            acpService.deleteAcpById(acpId);
+            return ResponseEntity.ok().body(new ApiResponse(true, "ACP Deleted Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
+    }
 }
