@@ -1,19 +1,15 @@
 package com.doyatama.university.model;
 
-
-
-
 public class KonsentrasiKeahlian {
-    
 
     private String id;
-    private String konsentrasi; 
+    private String konsentrasi;
     private ProgramKeahlian programKeahlian;
-    
+
     public KonsentrasiKeahlian() {
     }
-    
-    public KonsentrasiKeahlian(String id, String konsentrasi, ProgramKeahlian programKeahlian){
+
+    public KonsentrasiKeahlian(String id, String konsentrasi, ProgramKeahlian programKeahlian) {
         this.id = id;
         this.konsentrasi = konsentrasi;
         this.programKeahlian = programKeahlian;
@@ -42,7 +38,7 @@ public class KonsentrasiKeahlian {
     public void setProgramKeahlian(ProgramKeahlian programKeahlian) {
         this.programKeahlian = programKeahlian;
     }
-    
+
     public boolean isValid() {
         return this.id != null && this.konsentrasi != null;
     }
@@ -53,7 +49,7 @@ public class KonsentrasiKeahlian {
                 this.id = value;
                 break;
             case "konsentrasi":
-                this.konsentrasi = value;  
+                this.konsentrasi = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

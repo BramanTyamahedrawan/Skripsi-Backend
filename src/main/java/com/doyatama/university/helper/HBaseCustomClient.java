@@ -94,7 +94,8 @@ public class HBaseCustomClient {
         }
     }
 
-    public void insertListRecord(TableName tableName, String rowKey, String family, String qualifier, List<String> values) {
+    public void insertListRecord(TableName tableName, String rowKey, String family, String qualifier,
+            List<String> values) {
         try {
             Table table = connection.getTable(tableName);
             Put p = new Put(Bytes.toBytes(rowKey));
@@ -126,7 +127,8 @@ public class HBaseCustomClient {
         return connection.getTable(TableName.valueOf(tableName));
     }
 
-    public <T> List<T> showListTable(String tablename, Map<String, String> columnMapping, Class<T> modelClass, int sizeLimit) {
+    public <T> List<T> showListTable(String tablename, Map<String, String> columnMapping, Class<T> modelClass,
+            int sizeLimit) {
         ResultScanner rsObj = null;
 
         try {
@@ -134,7 +136,7 @@ public class HBaseCustomClient {
 
             Scan s = new Scan();
             s.setCaching(100);
-            if(sizeLimit > 0){
+            if (sizeLimit > 0) {
                 s.setLimit(sizeLimit);
             }
 
@@ -162,56 +164,60 @@ public class HBaseCustomClient {
                     String variableName = columnMapping.get(columnName);
 
                     String value = Bytes.toString(CellUtil.cloneValue(cell));
-                        // Get the value of the cell as a string
-                        // Check if the variableName contains "department"
-                        if (columnMapping.containsKey(familyName)) {
-                            // Get the subfield name
-                            String subFieldName = columnName.substring(columnName.indexOf(".") + 1);
-                            // Get the department object from the main object
-                            Field familyField = object.getClass().getDeclaredField(familyName);
-                            familyField.setAccessible(true);
-                            Object familyObject = familyField.get(object);
-                            if (familyObject == null) {
-                                if (familyField.getType() == List.class) {
-                                    familyObject = new ArrayList<>();
-                                    familyField.set(object, familyObject);
-                                } else {
-                                    familyObject = familyField.getType().newInstance();
-                                    familyField.set(object, familyObject);
-                                }
-                            }
-                            // Set the value to the subfield
-                            if (familyObject instanceof List) {
-                                Object currentObject = familyObject;
-                                ObjectMapper mapper = new ObjectMapper();
-                                JsonNode jsonNode = null;
-                                try {
-                                    jsonNode = mapper.readTree((String) value);
-                                } catch (Exception e) {
-                                    // Tidak berformat JSON, lakukan konversi biasa
-                                }
-
-                                if (jsonNode != null && jsonNode.getNodeType() == JsonNodeFactory.instance.objectNode().getNodeType()) {
-                                    // Value berformat JSON, lakukan konversi ke Map
-                                    Map<String, Object> dataList = mapper.readValue((String) value, new TypeReference<Map<String, Object>>(){});
-                                    ((List) currentObject).add(dataList);
-                                } else {
-                                    // Value tidak berformat JSON, lakukan konversi biasa
-                                    ((List) currentObject).add(value);
-                                }
+                    // Get the value of the cell as a string
+                    // Check if the variableName contains "department"
+                    if (columnMapping.containsKey(familyName)) {
+                        // Get the subfield name
+                        String subFieldName = columnName.substring(columnName.indexOf(".") + 1);
+                        // Get the department object from the main object
+                        Field familyField = object.getClass().getDeclaredField(familyName);
+                        familyField.setAccessible(true);
+                        Object familyObject = familyField.get(object);
+                        if (familyObject == null) {
+                            if (familyField.getType() == List.class) {
+                                familyObject = new ArrayList<>();
+                                familyField.set(object, familyObject);
                             } else {
-                                Field subField = familyObject.getClass().getDeclaredField(subFieldName);
-                                subField.setAccessible(true);
-                                setField(subField, familyObject, value);
-                            }
-                        } else {
-                            if (variableName != null) {
-                                // Set the value to the variable
-                                Field field = object.getClass().getDeclaredField(variableName);
-                                field.setAccessible(true);
-                                setField(field, object, value);
+                                familyObject = familyField.getType().newInstance();
+                                familyField.set(object, familyObject);
                             }
                         }
+                        // Set the value to the subfield
+                        if (familyObject instanceof List) {
+                            Object currentObject = familyObject;
+                            ObjectMapper mapper = new ObjectMapper();
+
+                            JsonNode jsonNode = null;
+                            try {
+                                jsonNode = mapper.readTree((String) value);
+                            } catch (Exception e) {
+                                // Tidak berformat JSON, lakukan konversi biasa
+                            }
+
+                            if (jsonNode != null
+                                    && jsonNode.getNodeType() == JsonNodeFactory.instance.objectNode().getNodeType()) {
+                                // Value berformat JSON, lakukan konversi ke Map
+                                Map<String, Object> dataList = mapper.readValue((String) value,
+                                        new TypeReference<Map<String, Object>>() {
+                                        });
+                                ((List) currentObject).add(dataList);
+                            } else {
+                                // Value tidak berformat JSON, lakukan konversi biasa
+                                ((List) currentObject).add(value);
+                            }
+                        } else {
+                            Field subField = familyObject.getClass().getDeclaredField(subFieldName);
+                            subField.setAccessible(true);
+                            setField(subField, familyObject, value);
+                        }
+                    } else {
+                        if (variableName != null) {
+                            // Set the value to the variable
+                            Field field = object.getClass().getDeclaredField(variableName);
+                            field.setAccessible(true);
+                            setField(field, object, value);
+                        }
+                    }
                 }
                 objects.add(object);
             }
@@ -221,7 +227,9 @@ public class HBaseCustomClient {
             return objects;
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            rsObj.close();
+            if (rsObj != null) {
+
+            }
             e.printStackTrace();
         } catch (InstantiationException | IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
@@ -229,121 +237,122 @@ public class HBaseCustomClient {
 
         return null;
     }
-    
-public <T> List<T> showListTableFiltered(String tablename, Map<String, String> columnMapping, Class<T> modelClass, int sizeLimit, String familyName, String columnName, String columnValue) {
-    ResultScanner rsObj = null;
 
-    try {
-        Table table = connection.getTable(TableName.valueOf(tablename));
-        Scan s = new Scan();
-        s.setCaching(100);
+    public <T> List<T> showListTableFiltered(String tablename, Map<String, String> columnMapping, Class<T> modelClass,
+            int sizeLimit, String familyName, String columnName, String columnValue) {
+        ResultScanner rsObj = null;
 
-        if (sizeLimit > 0) {
-            s.setLimit(sizeLimit);
-        }
+        try {
+            Table table = connection.getTable(TableName.valueOf(tablename));
+            Scan s = new Scan();
+            s.setCaching(100);
 
-        // Menambahkan keluarga kolom
-        TableDescriptor tableDescriptor = connection.getAdmin().getDescriptor(TableName.valueOf(tablename));
-        ColumnFamilyDescriptor[] columnFamilies = tableDescriptor.getColumnFamilies();
-        for (ColumnFamilyDescriptor columnFamily : columnFamilies) {
-            byte[] family = columnFamily.getName();
-            s.addFamily(family);
-        }
+            if (sizeLimit > 0) {
+                s.setLimit(sizeLimit);
+            }
 
-        // Memastikan bahwa familyName, columnName, dan columnValue tidak null
-        if (familyName != null && columnName != null && columnValue != null) {
-            Filter filter = new SingleColumnValueFilter(
-                Bytes.toBytes(familyName),
-                Bytes.toBytes(columnName),
-                CompareOperator.EQUAL,
-                Bytes.toBytes(columnValue)
-            );
-            s.setFilter(filter);
-        }
+            // Menambahkan keluarga kolom
+            TableDescriptor tableDescriptor = connection.getAdmin().getDescriptor(TableName.valueOf(tablename));
+            ColumnFamilyDescriptor[] columnFamilies = tableDescriptor.getColumnFamilies();
+            for (ColumnFamilyDescriptor columnFamily : columnFamilies) {
+                byte[] family = columnFamily.getName();
+                s.addFamily(family);
+            }
 
-        // Mengambil scanner
-        rsObj = table.getScanner(s);
-        List<T> objects = new ArrayList<>();
+            // Memastikan bahwa familyName, columnName, dan columnValue tidak null
+            if (familyName != null && columnName != null && columnValue != null) {
+                Filter filter = new SingleColumnValueFilter(
+                        Bytes.toBytes(familyName),
+                        Bytes.toBytes(columnName),
+                        CompareOperator.EQUAL,
+                        Bytes.toBytes(columnValue));
+                s.setFilter(filter);
+            }
 
-        // Mengiterasi hasil
-        for (Result result : rsObj) {
-            T object = modelClass.getDeclaredConstructor().newInstance(); // Menggunakan Constructor
+            // Mengambil scanner
+            rsObj = table.getScanner(s);
+            List<T> objects = new ArrayList<>();
 
-            for (Cell cell : result.listCells()) {
-                String familyNameCell = Bytes.toString(CellUtil.cloneFamily(cell));
-                String columnNameCell = Bytes.toString(CellUtil.cloneQualifier(cell));
-                String variableName = columnMapping.get(columnNameCell);
-                String value = Bytes.toString(CellUtil.cloneValue(cell));
+            // Mengiterasi hasil
+            for (Result result : rsObj) {
+                T object = modelClass.getDeclaredConstructor().newInstance(); // Menggunakan Constructor
 
-                // Mengisi objek dengan data yang diambil
-                if (columnMapping.containsKey(familyNameCell)) {
-                    String subFieldName = columnNameCell.substring(columnNameCell.indexOf(".") + 1);
-                    Field familyField = object.getClass().getDeclaredField(familyNameCell);
-                    familyField.setAccessible(true);
-                    Object familyObject = familyField.get(object);
+                for (Cell cell : result.listCells()) {
+                    String familyNameCell = Bytes.toString(CellUtil.cloneFamily(cell));
+                    String columnNameCell = Bytes.toString(CellUtil.cloneQualifier(cell));
+                    String variableName = columnMapping.get(columnNameCell);
+                    String value = Bytes.toString(CellUtil.cloneValue(cell));
 
-                    if (familyObject == null) {
-                        if (familyField.getType() == List.class) {
-                            familyObject = new ArrayList<>();
-                            familyField.set(object, familyObject);
+                    // Mengisi objek dengan data yang diambil
+                    if (columnMapping.containsKey(familyNameCell)) {
+                        String subFieldName = columnNameCell.substring(columnNameCell.indexOf(".") + 1);
+                        Field familyField = object.getClass().getDeclaredField(familyNameCell);
+                        familyField.setAccessible(true);
+                        Object familyObject = familyField.get(object);
+
+                        if (familyObject == null) {
+                            if (familyField.getType() == List.class) {
+                                familyObject = new ArrayList<>();
+                                familyField.set(object, familyObject);
+                            } else {
+                                familyObject = familyField.getType().newInstance();
+                                familyField.set(object, familyObject);
+                            }
+                        }
+
+                        // Menangani pengisian field sub
+                        if (familyObject instanceof List) {
+                            ((List) familyObject).add(value);
                         } else {
-                            familyObject = familyField.getType().newInstance();
-                            familyField.set(object, familyObject);
+                            Field subField = familyObject.getClass().getDeclaredField(subFieldName);
+                            subField.setAccessible(true);
+                            setField(subField, familyObject, value);
+                        }
+                    } else {
+                        if (variableName != null) {
+                            Field field = object.getClass().getDeclaredField(variableName);
+                            field.setAccessible(true);
+                            setField(field, object, value);
                         }
                     }
-
-                    // Menangani pengisian field sub
-                    if (familyObject instanceof List) {
-                        ((List) familyObject).add(value);
-                    } else {
-                        Field subField = familyObject.getClass().getDeclaredField(subFieldName);
-                        subField.setAccessible(true);
-                        setField(subField, familyObject, value);
-                    }
-                } else {
-                    if (variableName != null) {
-                        Field field = object.getClass().getDeclaredField(variableName);
-                        field.setAccessible(true);
-                        setField(field, object, value);
-                    }
                 }
+                objects.add(object);
             }
-            objects.add(object);
+
+            return objects;
+        } catch (IOException e) {
+            if (rsObj != null)
+                rsObj.close();
+            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | NoSuchFieldException | InvocationTargetException
+                | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (rsObj != null) {
+                rsObj.close(); // Pastikan scanner ditutup di dalam finally
+            }
         }
 
-        return objects;
-    } catch (IOException e) {
-        if (rsObj != null) rsObj.close();
-        e.printStackTrace();
-    } catch (InstantiationException | IllegalAccessException | NoSuchFieldException | InvocationTargetException | NoSuchMethodException e) {
-        throw new RuntimeException(e);
-    } finally {
-        if (rsObj != null) {
-            rsObj.close(); // Pastikan scanner ditutup di dalam finally
-        }
+        return null;
     }
 
-    return null;
-}
+    public Map<String, Map<String, String>> getAllRows(TableName tableName) throws IOException {
+        try (Table table = connection.getTable(tableName)) {
+            Scan scan = new Scan();
+            ResultScanner scanner = table.getScanner(scan);
+            Map<String, Map<String, String>> rows = new HashMap<>();
 
-public Map<String, Map<String, String>> getAllRows(TableName tableName) throws IOException {
-    try (Table table = connection.getTable(tableName)) {
-        Scan scan = new Scan();
-        ResultScanner scanner = table.getScanner(scan);
-        Map<String, Map<String, String>> rows = new HashMap<>();
-
-        for (Result result : scanner) {
-            Map<String, String> rowData = new HashMap<>();
-            result.getNoVersionMap().forEach((family, columns) -> {
-                columns.forEach((qualifier, value) -> 
-                    rowData.put(new String(family) + ":" + new String(qualifier), new String(value))
-                );
-            });
-            rows.put(new String(result.getRow()), rowData);
+            for (Result result : scanner) {
+                Map<String, String> rowData = new HashMap<>();
+                result.getNoVersionMap().forEach((family, columns) -> {
+                    columns.forEach((qualifier, value) -> rowData.put(new String(family) + ":" + new String(qualifier),
+                            new String(value)));
+                });
+                rows.put(new String(result.getRow()), rowData);
+            }
+            return rows;
         }
-        return rows;
     }
-}
 
     public <T> T showDataTable(String tablename, Map<String, String> columnMapping, String uuid, Class<T> modelClass) {
         Result result = null;
@@ -402,9 +411,12 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
                             // Tidak berformat JSON, lakukan konversi biasa
                         }
 
-                        if (jsonNode != null && jsonNode.getNodeType() == JsonNodeFactory.instance.objectNode().getNodeType()) {
+                        if (jsonNode != null
+                                && jsonNode.getNodeType() == JsonNodeFactory.instance.objectNode().getNodeType()) {
                             // Value berformat JSON, lakukan konversi ke Map
-                            Map<String, Object> dataList = mapper.readValue((String) value, new TypeReference<Map<String, Object>>(){});
+                            Map<String, Object> dataList = mapper.readValue((String) value,
+                                    new TypeReference<Map<String, Object>>() {
+                                    });
                             ((List) currentObject).add(dataList);
                         } else {
                             // Value tidak berformat JSON, lakukan konversi biasa
@@ -438,7 +450,8 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
         return null;
     }
 
-    public <T> T getDataByColumn(String tableName, Map<String, String> columnMapping, String familyName, String columnName, String columnValue, Class<T> modelClass) {
+    public <T> T getDataByColumn(String tableName, Map<String, String> columnMapping, String familyName,
+            String columnName, String columnValue, Class<T> modelClass) {
         try {
             // Create HBase table object
             Table table = connection.getTable(TableName.valueOf(tableName));
@@ -449,7 +462,8 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
             scan.setLimit(1000);
 
             // Add filter to scan by column value
-            Filter filter = new SingleColumnValueFilter(Bytes.toBytes(familyName), Bytes.toBytes(columnName), CompareOperator.EQUAL, Bytes.toBytes(columnValue));
+            Filter filter = new SingleColumnValueFilter(Bytes.toBytes(familyName), Bytes.toBytes(columnName),
+                    CompareOperator.EQUAL, Bytes.toBytes(columnValue));
             scan.setFilter(filter);
 
             // Create a list to store the objects
@@ -504,7 +518,8 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
         return null;
     }
 
-    public <T> List<T> getDataListByColumn(String tableName, Map<String, String> columnMapping, String familyName, String columnName, String columnValue, Class<T> modelClass, int sizeLimit) {
+    public <T> List<T> getDataListByColumn(String tableName, Map<String, String> columnMapping, String familyName,
+            String columnName, String columnValue, Class<T> modelClass, int sizeLimit) {
         ResultScanner rsObj = null;
 
         try {
@@ -520,7 +535,8 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
                 s.addFamily(family);
             }
 
-            Filter filter = new SingleColumnValueFilter(Bytes.toBytes(familyName), Bytes.toBytes(columnName), CompareOperator.EQUAL, Bytes.toBytes(columnValue));
+            Filter filter = new SingleColumnValueFilter(Bytes.toBytes(familyName), Bytes.toBytes(columnName),
+                    CompareOperator.EQUAL, Bytes.toBytes(columnValue));
             s.setFilter(filter);
 
             rsObj = table.getScanner(s);
@@ -570,9 +586,12 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
                                 // Tidak berformat JSON, lakukan konversi biasa
                             }
 
-                            if (jsonNode != null && jsonNode.getNodeType() == JsonNodeFactory.instance.objectNode().getNodeType()) {
+                            if (jsonNode != null
+                                    && jsonNode.getNodeType() == JsonNodeFactory.instance.objectNode().getNodeType()) {
                                 // Value berformat JSON, lakukan konversi ke Map
-                                Map<String, Object> dataList = mapper.readValue((String) value, new TypeReference<Map<String, Object>>(){});
+                                Map<String, Object> dataList = mapper.readValue((String) value,
+                                        new TypeReference<Map<String, Object>>() {
+                                        });
                                 ((List) currentObject).add(dataList);
                             } else {
                                 // Value tidak berformat JSON, lakukan konversi biasa
@@ -640,9 +659,9 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
             field.setBoolean(object, booleanValue);
         } else if (fieldType == Boolean.class) {
             Boolean booleanValue;
-            if(value.equalsIgnoreCase("true")){
+            if (value.equalsIgnoreCase("true")) {
                 booleanValue = Boolean.TRUE;
-            }else{
+            } else {
                 booleanValue = Boolean.FALSE;
             }
             field.set(object, booleanValue);
@@ -657,7 +676,7 @@ public Map<String, Map<String, String>> getAllRows(TableName tableName) throws I
         } else if (fieldType == Question.AnswerType.class) {
             Question.AnswerType instantValue = Question.AnswerType.valueOf(value);
             field.set(object, instantValue);
-        }else if (fieldType == Answer.AnswerType.class) {
+        } else if (fieldType == Answer.AnswerType.class) {
             Answer.AnswerType instantValue = Answer.AnswerType.valueOf(value);
             field.set(object, instantValue);
         } else if (fieldType == Question.ExamType.class) {
