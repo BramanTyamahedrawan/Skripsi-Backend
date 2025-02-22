@@ -1,0 +1,242 @@
+package com.doyatama.university.repository;
+
+import com.doyatama.university.helper.HBaseCustomClient;
+import com.doyatama.university.model.Atp;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.TableName;
+import org.springframework.stereotype.Repository;
+
+public class AtpRepository {
+    Configuration conf = HBaseConfiguration.create();
+    String tableName = "atp";
+
+    public List<Atp> findAll(int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+
+        return client.showListTable(tableAtp.toString(), columnMapping, Atp.class, size);
+    }
+
+    public Atp save(Atp atp) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        String rowKey = atp.getIdAtp();
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        client.insertRecord(tableAtp, rowKey, "main", "idAtp", atp.getIdAtp());
+        client.insertRecord(tableAtp, rowKey, "main", "namaAtp", atp.getNamaAtp());
+
+        // Tahun Ajaran
+        client.insertRecord(tableAtp, rowKey, "tahunAjaran", "idTahun", atp.getTahunAjaran().getIdTahun());
+        client.insertRecord(tableAtp, rowKey, "tahunAjaran", "tahunAjaran",
+                atp.getTahunAjaran().getTahunAjaran());
+        // Semester
+        client.insertRecord(tableAtp, rowKey, "semester", "idSemester", atp.getSemester().getIdSemester());
+        client.insertRecord(tableAtp, rowKey, "semester", "namaSemester",
+                atp.getSemester().getNamaSemester());
+        // Kelas
+        client.insertRecord(tableAtp, rowKey, "kelas", "idKelas", atp.getKelas().getIdKelas());
+        client.insertRecord(tableAtp, rowKey, "kelas", "namaKelas", atp.getKelas().getNamaKelas());
+        // Mapel
+        client.insertRecord(tableAtp, rowKey, "mapel", "idMapel", atp.getMapel().getIdMapel());
+        client.insertRecord(tableAtp, rowKey, "mapel", "name", atp.getMapel().getName());
+        // Konsentrasi Keahlian
+        client.insertRecord(tableAtp, rowKey, "konsentrasiKeahlian", "id",
+                atp.getKonsentrasiKeahlian().getId());
+        client.insertRecord(tableAtp, rowKey, "konsentrasiKeahlian", "konsentrasi",
+                atp.getKonsentrasiKeahlian().getKonsentrasi());
+        // Elemen
+        client.insertRecord(tableAtp, rowKey, "elemen", "idElemen", atp.getElemen().getIdElemen());
+        client.insertRecord(tableAtp, rowKey, "elemen", "namaElemen", atp.getElemen().getNamaElemen());
+        // Acp
+        client.insertRecord(tableAtp, rowKey, "acp", "idAcp", atp.getAcp().getIdAcp());
+        client.insertRecord(tableAtp, rowKey, "acp", "namaAcp", atp.getAcp().getNamaAcp());
+
+        return atp;
+    }
+
+    public Atp findAtpById(String atpId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+
+        return client.showDataTable(tableAtp.toString(), columnMapping, atpId, Atp.class);
+    }
+
+    public Atp findById(String atpId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+
+        return client.showDataTable(tableAtp.toString(), columnMapping, atpId, Atp.class);
+    }
+
+    public List<Atp> findAtpByMapel(String mapelId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+
+        List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "mapel", "idMapel",
+                mapelId, Atp.class, size);
+
+        return atpList;
+    }
+
+    public List<Atp> findAtpByUser(String userId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+
+        List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "user", "id",
+                userId, Atp.class, size);
+
+        return atpList;
+    }
+
+    public Atp update(String atpId, Atp atp) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        String rowKey = atpId;
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        if (atp.getNamaAtp() != null) {
+            client.insertRecord(tableAtp, rowKey, "main", "namaAtp", atp.getNamaAtp());
+        }
+
+        // Tahun Ajaran
+        if (atp.getTahunAjaran() != null) {
+            client.insertRecord(tableAtp, atpId, "tahunAjaran", "idTahun", atp.getTahunAjaran().getIdTahun());
+            client.insertRecord(tableAtp, atpId, "tahunAjaran", "tahunAjaran",
+                    atp.getTahunAjaran().getTahunAjaran());
+        }
+
+        // Semester
+        if (atp.getSemester() != null) {
+            client.insertRecord(tableAtp, atpId, "semester", "idSemester", atp.getSemester().getIdSemester());
+            client.insertRecord(tableAtp, atpId, "semester", "namaSemester",
+                    atp.getSemester().getNamaSemester());
+        }
+
+        // Kelas
+        if (atp.getKelas() != null) {
+            client.insertRecord(tableAtp, atpId, "kelas", "idKelas", atp.getKelas().getIdKelas());
+            client.insertRecord(tableAtp, atpId, "kelas", "namaKelas", atp.getKelas().getNamaKelas());
+        }
+
+        // Mapel
+        if (atp.getMapel() != null) {
+            client.insertRecord(tableAtp, atpId, "mapel", "idMapel", atp.getMapel().getIdMapel());
+            client.insertRecord(tableAtp, atpId, "mapel", "name", atp.getMapel().getName());
+        }
+
+        // Konsentrasi Keahlian
+        if (atp.getKonsentrasiKeahlian() != null) {
+            client.insertRecord(tableAtp, atpId, "konsentrasiKeahlian", "id",
+                    atp.getKonsentrasiKeahlian().getId());
+            client.insertRecord(tableAtp, atpId, "konsentrasiKeahlian", "konsentrasi",
+                    atp.getKonsentrasiKeahlian().getKonsentrasi());
+        }
+
+        // Elemen
+        if (atp.getElemen() != null) {
+            client.insertRecord(tableAtp, atpId, "elemen", "idElemen", atp.getElemen().getIdElemen());
+            client.insertRecord(tableAtp, atpId, "elemen", "namaElemen", atp.getElemen().getNamaElemen());
+        }
+        // Acp
+        if (atp.getAcp() != null) {
+            client.insertRecord(tableAtp, atpId, "acp", "idAcp", atp.getAcp().getIdAcp());
+            client.insertRecord(tableAtp, atpId, "acp", "namaAcp", atp.getAcp().getNamaAcp());
+        }
+
+        client.insertRecord(tableAtp, atpId, "detail", "updated_by", "Polinema");
+
+        return atp;
+    }
+
+    public boolean deleteById(String atpId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        client.deleteRecord(tableName, atpId);
+        return true;
+    }
+
+    public boolean existsById(String atpId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+        columnMapping.put("idAtp", "idAtp");
+
+        Atp atp = client.getDataByColumn(tableAtp.toString(), columnMapping,
+                "main", "idAtp",
+                atpId, Atp.class);
+
+        return atp.getIdAtp() != null;
+    }
+
+}

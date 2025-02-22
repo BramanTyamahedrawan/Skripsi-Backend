@@ -102,6 +102,14 @@ public class HBaseClientStructure {
                 client.deleteTable(tableAcp);
                 client.createTable(tableAcp, acp);
 
+                // Create Tabel Tujuan Pembelajaran
+                TableName tableAtp = TableName.valueOf("atp");
+                String[] atp = { "main", "tahunAjaran", "mapel", "kelas", "semester",
+                                "konsentrasiKeahlian", "elemen", "acp",
+                                "detail" };
+                client.deleteTable(tableAtp);
+                client.createTable(tableAtp, atp);
+
                 // Batas Kode Baru
                 // Kode Lama
 
