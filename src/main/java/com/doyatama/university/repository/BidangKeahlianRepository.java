@@ -22,10 +22,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class BidangKeahlianRepository {
-     Configuration conf = HBaseConfiguration.create();
+    Configuration conf = HBaseConfiguration.create();
     String tableName = "bidangKeahlians";
-    
-     public List<BidangKeahlian> findAll(int size) throws IOException {
+
+    public List<BidangKeahlian> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableBidangKeahlian = TableName.valueOf(tableName);
@@ -34,26 +34,22 @@ public class BidangKeahlianRepository {
         // Add the mappings to the HashMap
         columnMapping.put("id", "id");
         columnMapping.put("bidang", "bidang");
-        columnMapping.put("school", "school");
         return client.showListTable(tableBidangKeahlian.toString(), columnMapping, BidangKeahlian.class, size);
     }
-     
-     public BidangKeahlian save(BidangKeahlian bidangKeahlian) throws IOException {
+
+    public BidangKeahlian save(BidangKeahlian bidangKeahlian) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         String rowKey = bidangKeahlian.getId();
         TableName tableBidangKeahlian = TableName.valueOf(tableName);
         client.insertRecord(tableBidangKeahlian, rowKey, "main", "id", rowKey);
         client.insertRecord(tableBidangKeahlian, rowKey, "main", "bidang", bidangKeahlian.getBidang());
-        
-        client.insertRecord(tableBidangKeahlian, rowKey, "school", "id", bidangKeahlian.getSchool().getId());
-        client.insertRecord(tableBidangKeahlian, rowKey, "school", "name", bidangKeahlian.getSchool().getName());
 
         client.insertRecord(tableBidangKeahlian, rowKey, "detail", "created_by", "Doyatama");
         return bidangKeahlian;
-    } 
-     
-         public BidangKeahlian findById(String BDGid) throws IOException {
+    }
+
+    public BidangKeahlian findById(String BDGid) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableBidangKeahlian = TableName.valueOf(tableName);
@@ -62,12 +58,11 @@ public class BidangKeahlianRepository {
         // Add the mappings to the HashMap
         columnMapping.put("id", "id");
         columnMapping.put("bidang", "bidang");
-        columnMapping.put("school", "school");
 
         return client.showDataTable(tableBidangKeahlian.toString(), columnMapping, BDGid, BidangKeahlian.class);
     }
-         
-             public List<BidangKeahlian> findAllById(List<String> BDGids) throws IOException {
+
+    public List<BidangKeahlian> findAllById(List<String> BDGids) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableBidangKeahlian = TableName.valueOf(tableName);
@@ -76,10 +71,10 @@ public class BidangKeahlianRepository {
         columnMapping.put("id", "id");
         columnMapping.put("bidang", "bidang");
 
-
         List<BidangKeahlian> bidangKeahlians = new ArrayList<>();
         for (String BDGid : BDGids) {
-            BidangKeahlian bidangKeahlian = client.showDataTable(tableBidangKeahlian.toString(), columnMapping, BDGid, BidangKeahlian.class);
+            BidangKeahlian bidangKeahlian = client.showDataTable(tableBidangKeahlian.toString(), columnMapping, BDGid,
+                    BidangKeahlian.class);
             if (bidangKeahlian != null) {
                 bidangKeahlians.add(bidangKeahlian);
             }
@@ -87,24 +82,20 @@ public class BidangKeahlianRepository {
 
         return bidangKeahlians;
     }
-             
-        public BidangKeahlian update(String BDGid, BidangKeahlian bidangKeahlian) throws IOException {
+
+    public BidangKeahlian update(String BDGid, BidangKeahlian bidangKeahlian) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableBidangKeahlian = TableName.valueOf(tableName);
         client.insertRecord(tableBidangKeahlian, BDGid, "main", "bidang", bidangKeahlian.getBidang());
         client.insertRecord(tableBidangKeahlian, BDGid, "detail", "created_by", "Doyatama");
-        
-        client.insertRecord(tableBidangKeahlian, BDGid, "school", "id", bidangKeahlian.getSchool().getId());
-        client.insertRecord(tableBidangKeahlian, BDGid, "school", "name", bidangKeahlian.getSchool().getName());
-        
+
         return bidangKeahlian;
     }
-        
-        
-       public boolean deleteById(String BDGid) throws IOException {
+
+    public boolean deleteById(String BDGid) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
         client.deleteRecord(tableName, BDGid);
         return true;
-    }  
+    }
 }

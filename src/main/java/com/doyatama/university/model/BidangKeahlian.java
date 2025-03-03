@@ -3,15 +3,13 @@ package com.doyatama.university.model;
 public class BidangKeahlian {
     private String id;
     private String bidang;
-    private School school;
 
     public BidangKeahlian() {
     }
 
-    public BidangKeahlian(String id, String bidang, School school) {
+    public BidangKeahlian(String id, String bidang) {
         this.id = id;
         this.bidang = bidang;
-        this.school = school;
     }
 
     public String getId() {
@@ -30,18 +28,9 @@ public class BidangKeahlian {
         this.bidang = bidang;
     }
 
-    public School getSchool() {
-        return school;
-    }
-
-    public void setSchool(School school) {
-        this.school = school;
-    }
-
     public boolean isValid() {
         return this.id != null &&
-                this.bidang != null &&
-                this.school != null;
+                this.bidang != null;
     }
 
     public void set(String fieldName, String value) {

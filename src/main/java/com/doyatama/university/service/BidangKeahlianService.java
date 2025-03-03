@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
-
-
 /**
  *
  * @author senja
@@ -33,54 +31,54 @@ import java.util.Optional;
 public class BidangKeahlianService {
     private BidangKeahlianRepository bidangKeahlianRepository = new BidangKeahlianRepository();
     private SchoolRepository schoolRepository = new SchoolRepository();
-    
+
     private static final Logger logger = LoggerFactory.getLogger(BidangKeahlianService.class);
 
-public PagedResponse<BidangKeahlian> getAllBidangKeahlian(int page, int size) throws IOException {
+    public PagedResponse<BidangKeahlian> getAllBidangKeahlian(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
         // Retrieve Polls
         List<BidangKeahlian> bidangKeahlianResponse = new ArrayList<>();
-            bidangKeahlianResponse = bidangKeahlianRepository.findAll(size);
+        bidangKeahlianResponse = bidangKeahlianRepository.findAll(size);
         return new PagedResponse<>(bidangKeahlianResponse, bidangKeahlianResponse.size(), "Successfully get data", 200);
     }
 
     public BidangKeahlian createBidangKeahlian(BidangKeahlianRequest bidangKeahlianRequest) throws IOException {
-        School school = schoolRepository.findById(bidangKeahlianRequest.getSchool_id());
 
         BidangKeahlian bidangKeahlian = new BidangKeahlian();
-            bidangKeahlian.setId(bidangKeahlianRequest.getId());
-            bidangKeahlian.setBidang(bidangKeahlianRequest.getBidang());
-            bidangKeahlian.setSchool(school);
-            return bidangKeahlianRepository.save(bidangKeahlian);
-    }        
+        bidangKeahlian.setId(bidangKeahlianRequest.getId());
+        bidangKeahlian.setBidang(bidangKeahlianRequest.getBidang());
+        return bidangKeahlianRepository.save(bidangKeahlian);
+    }
 
     public DefaultResponse<BidangKeahlian> getBidangKeahlianById(String BDGid) throws IOException {
         // Retrieve BidangKeahlian
         BidangKeahlian bidangKeahlian = bidangKeahlianRepository.findById(BDGid);
-        return new DefaultResponse<>(bidangKeahlian.isValid() ? bidangKeahlian : null, bidangKeahlian.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(bidangKeahlian.isValid() ? bidangKeahlian : null, bidangKeahlian.isValid() ? 1 : 0,
+                "Successfully get data");
     }
-    
-        public BidangKeahlian updateBidangKeahlian(String BDGid, BidangKeahlianRequest bidangKeahlianRequest) throws IOException {
+
+    public BidangKeahlian updateBidangKeahlian(String BDGid, BidangKeahlianRequest bidangKeahlianRequest)
+            throws IOException {
         BidangKeahlian bidangKeahlian = new BidangKeahlian();
-            bidangKeahlian.setBidang(bidangKeahlianRequest.getBidang());
-            return bidangKeahlianRepository.update(BDGid, bidangKeahlian);
+        bidangKeahlian.setBidang(bidangKeahlianRequest.getBidang());
+        return bidangKeahlianRepository.update(BDGid, bidangKeahlian);
     }
-    
+
     public void deleteBidangKeahlianById(String BDGid) throws IOException {
         BidangKeahlian bidangKeahlianResponse = bidangKeahlianRepository.findById(BDGid);
-        if(bidangKeahlianResponse.isValid()){
+        if (bidangKeahlianResponse.isValid()) {
             bidangKeahlianRepository.deleteById(BDGid);
-        }else{
+        } else {
             throw new ResourceNotFoundException("BidangKeahlian", "id", BDGid);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

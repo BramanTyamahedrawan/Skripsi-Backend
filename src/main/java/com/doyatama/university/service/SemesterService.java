@@ -38,13 +38,16 @@ public class SemesterService {
 
     public Semester createSemester(SemesterRequest semesterRequest) throws IOException {
 
+        if (semesterRequest.getIdSemester() == null) {
+            semesterRequest.setIdSemester(UUID.randomUUID().toString());
+        }
+
         if (semesterRepository.existById(semesterRequest.getIdSemester())) {
             throw new IllegalArgumentException("Semester already exist");
         }
 
         Semester semester = new Semester();
-        semester.setIdSemester(semesterRequest.getIdSemester() == null ? UUID.randomUUID().toString()
-                : semesterRequest.getIdSemester());
+        semester.setIdSemester(semesterRequest.getIdSemester());
         semester.setNamaSemester(semesterRequest.getNamaSemester());
         return semesterRepository.save(semester);
     }

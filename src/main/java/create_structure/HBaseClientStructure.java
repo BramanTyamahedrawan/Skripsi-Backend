@@ -37,7 +37,7 @@ public class HBaseClientStructure {
 
                 // Create Table Bidang Keahlian
                 TableName tableBidangKeahlian = TableName.valueOf("bidangKeahlians");
-                String[] bidangKeahlian = { "main", "school", "detail" };
+                String[] bidangKeahlian = { "main", "detail" };
                 client.deleteTable(tableBidangKeahlian);
                 client.createTable(tableBidangKeahlian, bidangKeahlian);
 
