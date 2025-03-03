@@ -10,8 +10,6 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,7 +27,8 @@ public class RPSDetailService {
     private AssessmentCriteriaRepository assessmentCriteriaRepository = new AssessmentCriteriaRepository();
     private AppraisalFormRepository appraisalFormRepository = new AppraisalFormRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(RPSDetailService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(RPSDetailService.class);
 
     public PagedResponse<RPSDetail> getAllRPSDetail(int page, int size, String rpsID) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -37,16 +36,15 @@ public class RPSDetailService {
         // Retrieve rpsDetail
         List<RPSDetail> rpsDetailResponse;
 
-        if(rpsID.equalsIgnoreCase("*")){
+        if (rpsID.equalsIgnoreCase("*")) {
             rpsDetailResponse = rpsDetailRepository.findAll(size);
-        }else{
+        } else {
             rpsDetailResponse = rpsDetailRepository.findByRpsID(rpsID, size);
         }
 
         return new PagedResponse<>(rpsDetailResponse, rpsDetailResponse.size(), "Successfully get data", 200);
     }
 
-    
     public List<RPSDetail> importRPSDetailFromExcel(MultipartFile file) throws IOException {
         if (!ExcelUploadService.isValidExcelFile(file)) {
             throw new BadRequestException("Invalid Excel file");
@@ -64,10 +62,13 @@ public class RPSDetailService {
 
         RPS rpsResponse = rpsRepository.findById(rpsDetailRequest.getRps_id());
         FormLearning formLearningResponse = formLearningRepository.findById(rpsDetailRequest.getForm_learning_id());
-        List<LearningMethod> learningMethodList = learningMethodRepository.findAllById(rpsDetailRequest.getLearning_methods());
-        List<AssessmentCriteria> assessmentCriteriaList = assessmentCriteriaRepository.findAllById(rpsDetailRequest.getAssessment_criterias());
-        List<AppraisalForm> appraisalFormList = appraisalFormRepository.findAllById(rpsDetailRequest.getAppraisal_forms());
-        
+        List<LearningMethod> learningMethodList = learningMethodRepository
+                .findAllById(rpsDetailRequest.getLearning_methods());
+        List<AssessmentCriteria> assessmentCriteriaList = assessmentCriteriaRepository
+                .findAllById(rpsDetailRequest.getAssessment_criterias());
+        List<AppraisalForm> appraisalFormList = appraisalFormRepository
+                .findAllById(rpsDetailRequest.getAppraisal_forms());
+
         ZoneId zoneId = ZoneId.of("Asia/Jakarta");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         Instant instant = zonedDateTime.toInstant();
@@ -102,16 +103,20 @@ public class RPSDetailService {
     public DefaultResponse<RPSDetail> getRPSDetailById(String rpsDetailId) throws IOException {
         // Retrieve RPSDetail
         RPSDetail rpsDetailResponse = rpsDetailRepository.findById(rpsDetailId);
-        return new DefaultResponse<>(rpsDetailResponse.isValid() ? rpsDetailResponse : null, rpsDetailResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(rpsDetailResponse.isValid() ? rpsDetailResponse : null,
+                rpsDetailResponse.isValid() ? 1 : 0, "Successfully get data");
     }
 
     public RPSDetail updateRPSDetail(String rpsDetailId, RPSDetailRequest rpsDetailRequest) throws IOException {
         RPSDetail rpsDetail = new RPSDetail();
         RPS rpsResponse = rpsRepository.findById(rpsDetailRequest.getRps_id());
         FormLearning formLearningResponse = formLearningRepository.findById(rpsDetailRequest.getForm_learning_id());
-        List<LearningMethod> learningMethodList = learningMethodRepository.findAllById(rpsDetailRequest.getLearning_methods());
-        List<AssessmentCriteria> assessmentCriteriaList = assessmentCriteriaRepository.findAllById(rpsDetailRequest.getAssessment_criterias());
-        List<AppraisalForm> appraisalFormList = appraisalFormRepository.findAllById(rpsDetailRequest.getAppraisal_forms());
+        List<LearningMethod> learningMethodList = learningMethodRepository
+                .findAllById(rpsDetailRequest.getLearning_methods());
+        List<AssessmentCriteria> assessmentCriteriaList = assessmentCriteriaRepository
+                .findAllById(rpsDetailRequest.getAssessment_criterias());
+        List<AppraisalForm> appraisalFormList = appraisalFormRepository
+                .findAllById(rpsDetailRequest.getAppraisal_forms());
 
         ZoneId zoneId = ZoneId.of("Asia/Jakarta");
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
@@ -145,19 +150,19 @@ public class RPSDetailService {
 
     public void deleteRPSDetailById(String rpsDetailId) throws IOException {
         RPSDetail rpsDetailResponse = rpsDetailRepository.findById(rpsDetailId);
-        if(rpsDetailResponse.isValid()){
+        if (rpsDetailResponse.isValid()) {
             rpsDetailRepository.deleteById(rpsDetailId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("RPSDetail", "id", rpsDetailId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

@@ -1,7 +1,5 @@
 package com.doyatama.university.repository;
 
-
-
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.*;
 import com.google.gson.Gson;
@@ -14,10 +12,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Repository;
 
 /**
  * @author alfa
@@ -25,7 +20,6 @@ import org.springframework.stereotype.Repository;
 public class QuizAnnouncementRepository {
     Configuration conf = HBaseConfiguration.create();
     String tableName = "quizzes_announcement";
-
 
     public List<QuizAnnouncement> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -44,11 +38,10 @@ public class QuizAnnouncementRepository {
         columnMapping.put("date_start", "date_start");
         columnMapping.put("date_end", "date_end");
         columnMapping.put("created_at", "created_at");
-        columnMapping.put("message","message");
-        columnMapping.put("type_quiz","type_quiz");
+        columnMapping.put("message", "message");
+        columnMapping.put("type_quiz", "type_quiz");
         return client.showListTable(tableUsers.toString(), columnMapping, QuizAnnouncement.class, size);
     }
-
 
     public QuizAnnouncement save(QuizAnnouncement quizAnnouncement) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -58,11 +51,16 @@ public class QuizAnnouncementRepository {
         TableName tableQuizAnnouncement = TableName.valueOf(tableName);
         client.insertRecord(tableQuizAnnouncement, rowKey, "main", "id", rowKey);
         client.insertRecord(tableQuizAnnouncement, rowKey, "main", "name", quizAnnouncement.getName());
-        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "description", quizAnnouncement.getDescription().toString());
-        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "min_grade", quizAnnouncement.getMin_grade().toString());
-        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "duration", quizAnnouncement.getDuration().toString());
-        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "date_start", quizAnnouncement.getDate_start().toString());
-        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "date_end", quizAnnouncement.getDate_end().toString());
+        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "description",
+                quizAnnouncement.getDescription().toString());
+        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "min_grade",
+                quizAnnouncement.getMin_grade().toString());
+        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "duration",
+                quizAnnouncement.getDuration().toString());
+        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "date_start",
+                quizAnnouncement.getDate_start().toString());
+        client.insertRecord(tableQuizAnnouncement, rowKey, "main", "date_end",
+                quizAnnouncement.getDate_end().toString());
         client.insertRecord(tableQuizAnnouncement, rowKey, "main", "type_quiz", quizAnnouncement.getType_quiz());
 
         if (quizAnnouncement.getQuestions() != null) {
@@ -87,8 +85,6 @@ public class QuizAnnouncementRepository {
 
         return quizAnnouncement;
     }
-
-
 
     public QuizAnnouncement findById(String quizId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);

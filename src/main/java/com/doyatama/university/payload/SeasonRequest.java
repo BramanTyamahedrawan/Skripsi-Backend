@@ -10,20 +10,20 @@ public class SeasonRequest {
     private String kelas_id;
     private String lecture_id;
     private String tahunAjaran_id;
-    //private String jadwalPelajaran_id;
+    // private String jadwalPelajaran_id;
     private List<String> student_id;
     private List<String> jadwalPelajaran_id;
 
-    public SeasonRequest() {}
+    public SeasonRequest() {
+    }
 
-    public SeasonRequest(String idSeason, String bidangKeahlian_id, String programKeahlian_id, 
-                         String konsentrasiKeahlian_id, String kelas_id, String lecture_id, 
-                         String tahunAjaran_id,
-                        // String jadwalPelajaran_id
-                         
-    List<String> student_id,
-    List<String> jadwalPelajaran_id
-    ) {
+    public SeasonRequest(String idSeason, String bidangKeahlian_id, String programKeahlian_id,
+            String konsentrasiKeahlian_id, String kelas_id, String lecture_id,
+            String tahunAjaran_id,
+            // String jadwalPelajaran_id
+
+            List<String> student_id,
+            List<String> jadwalPelajaran_id) {
         this.idSeason = idSeason;
         this.bidangKeahlian_id = bidangKeahlian_id;
         this.programKeahlian_id = programKeahlian_id;
@@ -107,15 +107,13 @@ public class SeasonRequest {
         this.student_id = student_id;
     }
 
-    
-
-//    public String getJadwalPelajaran_id() {
-//        return jadwalPelajaran_id;
-//    }
-//
-//    public void setJadwalPelajaran_id(String jadwalPelajaran_id) {
-//        this.jadwalPelajaran_id = jadwalPelajaran_id;
-//    }
+    // public String getJadwalPelajaran_id() {
+    // return jadwalPelajaran_id;
+    // }
+    //
+    // public void setJadwalPelajaran_id(String jadwalPelajaran_id) {
+    // this.jadwalPelajaran_id = jadwalPelajaran_id;
+    // }
 
     // Metode set dengan penambahan lecture_id, student_id, dan jadwalPelajaran_id
     public void set(String fieldName, Object value) {
@@ -141,12 +139,12 @@ public class SeasonRequest {
             case "tahunAjaran_id":
                 this.tahunAjaran_id = (String) value;
                 break;
-            case "student_id":
-                this.student_id = (List<String>) value;
-                break;
-            case "jadwalPelajaran_id":
-                this.jadwalPelajaran_id = (List<String>) value;
-                break;
+            // case "student_id":
+            // this.student_id = (List<String>) value;
+            // break;
+            // case "jadwalPelajaran_id":
+            // this.jadwalPelajaran_id = (List<String>) value;
+            // break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);
         }

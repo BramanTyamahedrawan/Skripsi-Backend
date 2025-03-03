@@ -2,7 +2,6 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.FormLearning;
-import com.doyatama.university.model.User;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;

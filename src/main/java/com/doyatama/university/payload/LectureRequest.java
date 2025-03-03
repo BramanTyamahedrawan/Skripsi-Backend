@@ -1,7 +1,5 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.Religion;
-
 public class LectureRequest {
     private String nip;
     private String name;
@@ -19,8 +17,8 @@ public class LectureRequest {
     public LectureRequest() {
     }
 
-    public LectureRequest(String nip, String name, String place_born, String date_born, 
-            String gender, String status, String religion_id, String bidangKeahlian_id, 
+    public LectureRequest(String nip, String name, String place_born, String date_born,
+            String gender, String status, String religion_id, String bidangKeahlian_id,
             String programKeahlian_id, String konsentrasiKeahlian_id, String address, String phone) {
         this.nip = nip;
         this.name = name;

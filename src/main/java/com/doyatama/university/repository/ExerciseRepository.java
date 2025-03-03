@@ -2,7 +2,6 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.*;
-import com.google.gson.Gson;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -12,10 +11,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 public class ExerciseRepository {
     Configuration conf = HBaseConfiguration.create();
@@ -41,8 +37,6 @@ public class ExerciseRepository {
         columnMapping.put("type_exercise", "type_exercise");
         return client.showListTable(tableUsers.toString(), columnMapping, Exercise.class, size);
     }
-
-    
 
     public Exercise save(Exercise exercise) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -98,10 +92,9 @@ public class ExerciseRepository {
         columnMapping.put("date_end", "date_end");
         columnMapping.put("created_at", "created_at");
         columnMapping.put("type_exercise", "type_exercise");
-        
+
         return client.showDataTable(tableUsers.toString(), columnMapping, exerciseId, Exercise.class);
     }
-
 
     public Exercise findAnswer(String exerciseId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);

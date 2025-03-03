@@ -11,15 +11,13 @@ import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
 import java.util.UUID;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 public class SemesterService {
     private SemesterRepository semesterRepository = new SemesterRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(SemesterService.class);
 
     public PagedResponse<Semester> getAllSemester(int page, int size, String userID) throws IOException {
         validatePageNumberAndSize(page, size);

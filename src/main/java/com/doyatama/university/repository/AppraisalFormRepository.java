@@ -2,8 +2,6 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.AppraisalForm;
-import com.doyatama.university.model.AppraisalForm;
-import com.doyatama.university.model.User;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -53,7 +51,8 @@ public class AppraisalFormRepository {
         columnMapping.put("name", "name");
         columnMapping.put("description", "description");
 
-        return client.showDataTable(tableAppraisalForms.toString(), columnMapping, appraisalFormId, AppraisalForm.class);
+        return client.showDataTable(tableAppraisalForms.toString(), columnMapping, appraisalFormId,
+                AppraisalForm.class);
     }
 
     public List<AppraisalForm> findAllById(List<String> appraisalFormIds) throws IOException {
@@ -68,7 +67,8 @@ public class AppraisalFormRepository {
 
         List<AppraisalForm> appraisalForms = new ArrayList<>();
         for (String appraisalFormId : appraisalFormIds) {
-            AppraisalForm appraisalForm = client.showDataTable(table.toString(), columnMapping, appraisalFormId, AppraisalForm.class);
+            AppraisalForm appraisalForm = client.showDataTable(table.toString(), columnMapping, appraisalFormId,
+                    AppraisalForm.class);
             if (appraisalForm != null) {
                 appraisalForms.add(appraisalForm);
             }
@@ -76,7 +76,6 @@ public class AppraisalFormRepository {
 
         return appraisalForms;
     }
-
 
     public AppraisalForm update(String appraisalFormId, AppraisalForm appraisalForm) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);

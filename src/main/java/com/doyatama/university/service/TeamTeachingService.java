@@ -8,10 +8,6 @@ import com.doyatama.university.payload.TeamTeachingRequest;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
 import com.doyatama.university.util.AppConstants;
-import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -23,7 +19,8 @@ public class TeamTeachingService {
     private TeamTeachingRepository teamTeachingRepository = new TeamTeachingRepository();
     private LectureRepository lectureRepository = new LectureRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(TeamTeachingService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(TeamTeachingService.class);
 
     public PagedResponse<TeamTeaching> getAllTeamTeaching(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -34,31 +31,30 @@ public class TeamTeachingService {
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
-    }   
+    }
 
+    public TeamTeaching createTeamTeaching(TeamTeachingRequest teamTeachingRequest) throws IOException {
 
-    public TeamTeaching createTeamTeaching(TeamTeachingRequest teamTeachingRequest) throws IOException{
-        
         TeamTeaching teamTeaching = new TeamTeaching();
 
         Lecture lecture = lectureRepository.findById(teamTeachingRequest.getLecture());
         Lecture lecture2 = lectureRepository.findById(teamTeachingRequest.getLecture2());
         Lecture lecture3 = lectureRepository.findById(teamTeachingRequest.getLecture3());
 
-        if ( lecture.getName() != null && lecture2.getName() != null && lecture3.getName() != null){
+        if (lecture.getName() != null && lecture2.getName() != null && lecture3.getName() != null) {
             teamTeaching.setName(teamTeachingRequest.getName());
             teamTeaching.setDescription(teamTeachingRequest.getDescription());
             teamTeaching.setLecture(lecture);
             teamTeaching.setLecture2(lecture2);
             teamTeaching.setLecture3(lecture3);
-            
+
             return teamTeachingRepository.save(teamTeaching);
         } else {
             return null;
@@ -69,20 +65,22 @@ public class TeamTeachingService {
     public DefaultResponse<TeamTeaching> getTeamTeachingById(String teamTeachingId) throws IOException {
         // Retrieve TeamTeaching
         TeamTeaching teamTeachingResponse = teamTeachingRepository.findById(teamTeachingId);
-        return new DefaultResponse<>(teamTeachingResponse.isValid() ? teamTeachingResponse : null, teamTeachingResponse.isValid() ? 1 : 0, "Successfully get data");
-    
+        return new DefaultResponse<>(teamTeachingResponse.isValid() ? teamTeachingResponse : null,
+                teamTeachingResponse.isValid() ? 1 : 0, "Successfully get data");
+
     }
 
-    public TeamTeaching updateTeamTeaching(String teamTeachingId, TeamTeachingRequest teamTeachingRequest) throws IOException {
+    public TeamTeaching updateTeamTeaching(String teamTeachingId, TeamTeachingRequest teamTeachingRequest)
+            throws IOException {
         // Create a new TeamTeaching object
         TeamTeaching teamTeaching = new TeamTeaching();
-        
+
         Lecture lecture = lectureRepository.findById(teamTeachingRequest.getLecture());
         Lecture lecture2 = lectureRepository.findById(teamTeachingRequest.getLecture2());
         Lecture lecture3 = lectureRepository.findById(teamTeachingRequest.getLecture3());
 
-        if ( lecture.getName() != null && lecture2.getName() != null && lecture3.getName() != null){
-                // Set the properties on the TeamTeaching object
+        if (lecture.getName() != null && lecture2.getName() != null && lecture3.getName() != null) {
+            // Set the properties on the TeamTeaching object
             teamTeaching.setName(teamTeachingRequest.getName());
             teamTeaching.setDescription(teamTeachingRequest.getDescription());
             teamTeaching.setLecture(lecture);
@@ -97,9 +95,9 @@ public class TeamTeachingService {
 
     public void deleteTeamTeachingById(String teamTeachingId) throws IOException {
         TeamTeaching teamTeachingResponse = teamTeachingRepository.findById(teamTeachingId);
-        if(teamTeachingResponse.isValid()){
+        if (teamTeachingResponse.isValid()) {
             teamTeachingRepository.deleteById(teamTeachingId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("TeamTeaching", "id", teamTeachingId);
         }
     }

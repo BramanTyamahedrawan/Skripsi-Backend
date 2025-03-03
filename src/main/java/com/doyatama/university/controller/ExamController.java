@@ -1,6 +1,5 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.StudyProgram;
 import com.doyatama.university.model.Exam;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.DefaultResponse;
@@ -23,21 +22,21 @@ public class ExamController {
     private ExamService examService = new ExamService();
     ExamRequest examRequest = new ExamRequest();
 
-
     @GetMapping
-    public PagedResponse<Exam> getExams(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                      @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return examService.getAllExam(page, size,examRequest);
+    public PagedResponse<Exam> getExams(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+        return examService.getAllExam(page, size, examRequest);
     }
 
     @PostMapping
     public ResponseEntity<?> createExam(@Valid @RequestBody ExamRequest examRequest) throws IOException {
         Exam exam = examService.createExam(examRequest);
 
-        if(exam == null){
+        if (exam == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Please check relational ID"));
-        }else{
+        } else {
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{examId}")
                     .buildAndExpand(exam.getId()).toUri();
@@ -52,10 +51,9 @@ public class ExamController {
         return examService.getExamById(examId);
     }
 
-
     @PutMapping("/{examId}")
     public ResponseEntity<?> updateExam(@PathVariable String examId,
-                                       @Valid @RequestBody ExamRequest examRequest) throws IOException {
+            @Valid @RequestBody ExamRequest examRequest) throws IOException {
         Exam exam = examService.updateExam(examId, examRequest);
 
         URI location = ServletUriComponentsBuilder
@@ -67,7 +65,7 @@ public class ExamController {
     }
 
     @DeleteMapping("/{examId}")
-    public HttpStatus deleteExam(@PathVariable (value = "examId") String examId) throws IOException {
+    public HttpStatus deleteExam(@PathVariable(value = "examId") String examId) throws IOException {
         examService.deleteExamById(examId);
         return HttpStatus.FORBIDDEN;
     }

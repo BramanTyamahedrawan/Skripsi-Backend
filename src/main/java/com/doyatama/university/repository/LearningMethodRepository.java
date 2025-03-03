@@ -1,9 +1,7 @@
 package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
-import com.doyatama.university.model.LearningMedia;
 import com.doyatama.university.model.LearningMethod;
-import com.doyatama.university.model.User;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -53,7 +51,8 @@ public class LearningMethodRepository {
         columnMapping.put("name", "name");
         columnMapping.put("description", "description");
 
-        return client.showDataTable(tableLearningMethods.toString(), columnMapping, learningMethodId, LearningMethod.class);
+        return client.showDataTable(tableLearningMethods.toString(), columnMapping, learningMethodId,
+                LearningMethod.class);
     }
 
     public List<LearningMethod> findAllById(List<String> learningMethodIds) throws IOException {
@@ -68,7 +67,8 @@ public class LearningMethodRepository {
 
         List<LearningMethod> learningMethods = new ArrayList<>();
         for (String learningMethodId : learningMethodIds) {
-            LearningMethod learningMethod = client.showDataTable(table.toString(), columnMapping, learningMethodId, LearningMethod.class);
+            LearningMethod learningMethod = client.showDataTable(table.toString(), columnMapping, learningMethodId,
+                    LearningMethod.class);
             if (learningMethod != null) {
                 learningMethods.add(learningMethod);
             }
@@ -82,7 +82,8 @@ public class LearningMethodRepository {
 
         TableName tableLearningMethod = TableName.valueOf(tableName);
         client.insertRecord(tableLearningMethod, learningMethodId, "main", "name", learningMethod.getName());
-        client.insertRecord(tableLearningMethod, learningMethodId, "main", "description", learningMethod.getDescription());
+        client.insertRecord(tableLearningMethod, learningMethodId, "main", "description",
+                learningMethod.getDescription());
         return learningMethod;
     }
 

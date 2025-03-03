@@ -1,7 +1,5 @@
 package com.doyatama.university.payload;
 
-import java.util.List;
-
 public class DefaultResponse<T> {
 
     private T content;
@@ -12,7 +10,7 @@ public class DefaultResponse<T> {
 
     }
 
-    public DefaultResponse(T content,  long totalElements, String message) {
+    public DefaultResponse(T content, long totalElements, String message) {
         this.content = content;
         this.totalElements = totalElements;
         this.message = message;

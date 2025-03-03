@@ -3,7 +3,6 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.controller.DepartmentController;
 import com.doyatama.university.helper.HBaseCustomClient;
-import com.doyatama.university.model.Department;
 import com.doyatama.university.model.Answer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -84,7 +83,8 @@ public class AnswerRepository {
         columnMapping.put("file_path", "file_path");
         columnMapping.put("question", "question");
 
-        List<Answer> answer = client.getDataListByColumn(tableUsers.toString(), columnMapping, "question", "id", questionId, Answer.class, size);
+        List<Answer> answer = client.getDataListByColumn(tableUsers.toString(), columnMapping, "question", "id",
+                questionId, Answer.class, size);
 
         return answer;
     }

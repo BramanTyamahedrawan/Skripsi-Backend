@@ -1,10 +1,5 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.Exam;
-import com.doyatama.university.model.StudentAnswer;
-import com.doyatama.university.model.User;
-
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,10 +9,12 @@ public class ExamAttemptRequest {
     private String user_id;
     private String student_id;
     private Integer duration;
+
     public ExamAttemptRequest() {
     }
 
-    public ExamAttemptRequest(List<String> studentAnswers, String exam_id, String user_id, String student_id, Integer duration) {
+    public ExamAttemptRequest(List<String> studentAnswers, String exam_id, String user_id, String student_id,
+            Integer duration) {
         this.studentAnswers = studentAnswers;
         this.exam_id = exam_id;
         this.user_id = user_id;

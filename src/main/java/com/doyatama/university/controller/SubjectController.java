@@ -1,6 +1,5 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.StudyProgram;
 import com.doyatama.university.model.Subject;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.DefaultResponse;
@@ -23,8 +22,9 @@ public class SubjectController {
     private SubjectService subjectService = new SubjectService();
 
     @GetMapping
-    public PagedResponse<Subject> getSubjects(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                              @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+    public PagedResponse<Subject> getSubjects(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         return subjectService.getAllSubject(page, size);
     }
 
@@ -32,10 +32,10 @@ public class SubjectController {
     public ResponseEntity<?> createSubject(@Valid @RequestBody SubjectRequest subjectRequest) throws IOException {
         Subject subject = subjectService.createSubject(subjectRequest);
 
-        if(subject == null){
+        if (subject == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Please check relational ID"));
-        }else{
+        } else {
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{subjectId}")
                     .buildAndExpand(subject.getId()).toUri();
@@ -50,10 +50,9 @@ public class SubjectController {
         return subjectService.getSubjectById(subjectId);
     }
 
-
     @PutMapping("/{subjectId}")
     public ResponseEntity<?> updateSubject(@PathVariable String subjectId,
-                                              @Valid @RequestBody SubjectRequest subjectRequest) throws IOException {
+            @Valid @RequestBody SubjectRequest subjectRequest) throws IOException {
         Subject subject = subjectService.updateSubject(subjectId, subjectRequest);
 
         URI location = ServletUriComponentsBuilder
@@ -65,7 +64,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{subjectId}")
-    public HttpStatus deleteSubject(@PathVariable (value = "subjectId") String subjectId) throws IOException {
+    public HttpStatus deleteSubject(@PathVariable(value = "subjectId") String subjectId) throws IOException {
         subjectService.deleteSubjectById(subjectId);
         return HttpStatus.FORBIDDEN;
     }

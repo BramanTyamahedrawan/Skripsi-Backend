@@ -1,9 +1,7 @@
 package com.doyatama.university.controller;
 
 import com.doyatama.university.config.PathConfig;
-import com.doyatama.university.model.Exam;
 import com.doyatama.university.model.Question;
-import com.doyatama.university.model.ExamType;
 import com.doyatama.university.payload.*;
 import com.doyatama.university.service.QuestionService;
 import com.doyatama.university.util.AppConstants;
@@ -20,19 +18,11 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
-import org.springframework.core.io.ByteArrayResource;
 import java.util.Base64;
 
 @CrossOrigin(origins = "http://localhost:3000//rps#/rps/8ed53076-d779-4f03-8c2b-9558d0d33e18/f7fa2143-6806-4556-b9a4-afec20fce867")
@@ -41,19 +31,23 @@ import java.util.Base64;
 public class QuestionController {
 
     private QuestionService questionService = new QuestionService();
+
     @CrossOrigin
     @GetMapping
 
-    public PagedResponse<Question> getQuestions(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-                                                @RequestParam(value = "rpsDetailID", defaultValue = "*") String rpsDetailID,
-                                                @RequestParam(value = "rpsID", defaultValue = "*") String rpsID) throws IOException {
+    public PagedResponse<Question> getQuestions(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "rpsDetailID", defaultValue = "*") String rpsDetailID,
+            @RequestParam(value = "rpsID", defaultValue = "*") String rpsID) throws IOException {
         return questionService.getAllQuestion(page, size, rpsDetailID, rpsID);
     }
+
     @CrossOrigin
     @PostMapping
 
-    public ResponseEntity<?> createQuestion(@RequestParam(value = "file", required = false) MultipartFile file, @ModelAttribute QuestionRequest questionRequest) throws IOException {
+    public ResponseEntity<?> createQuestion(@RequestParam(value = "file", required = false) MultipartFile file,
+            @ModelAttribute QuestionRequest questionRequest) throws IOException {
 
         if (file == null || file.isEmpty()) {
             // Tidak ada input file
@@ -61,7 +55,7 @@ public class QuestionController {
             try {
                 Question question = questionService.createQuestion(questionRequest, "");
 
-                if(question == null){
+                if (question == null) {
                     return ResponseEntity.badRequest()
                             .body(new ApiResponse(false, "Please check relational ID"));
                 } else {
@@ -78,7 +72,7 @@ public class QuestionController {
                 return ResponseEntity.badRequest()
                         .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
             }
-        }else{
+        } else {
             // upload file
             try {
                 // Mendapatkan nama file asli
@@ -108,15 +102,15 @@ public class QuestionController {
                 Configuration configuration = new Configuration();
                 FileSystem fs = FileSystem.get(URI.create(uri), configuration);
                 fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
-                String savePath = "webhdfs/v1/questions/"+ newFileName + fileExtension +"?op=OPEN";
+                String savePath = "webhdfs/v1/questions/" + newFileName + fileExtension + "?op=OPEN";
 
                 newFile.delete();
                 Question question = questionService.createQuestion(questionRequest, savePath);
 
-                if(question == null){
+                if (question == null) {
                     return ResponseEntity.badRequest()
                             .body(new ApiResponse(false, "Please check relational ID"));
-                }else{
+                } else {
                     URI location = ServletUriComponentsBuilder
                             .fromCurrentRequest().path("/{questionId}")
                             .buildAndExpand(question.getId()).toUri();
@@ -131,7 +125,6 @@ public class QuestionController {
                         .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
             }
         }
-
 
     }
 
@@ -158,10 +151,9 @@ public class QuestionController {
         return questionService.getQuestionByIdPaged(questionId);
     }
 
-
     @PutMapping("/{questionId}")
-    public ResponseEntity<?> updateQuestion(@PathVariable (value = "questionId") String questionId,
-                                            @Valid @RequestBody QuestionRequest questionRequest) {
+    public ResponseEntity<?> updateQuestion(@PathVariable(value = "questionId") String questionId,
+            @Valid @RequestBody QuestionRequest questionRequest) {
         try {
             Question question = questionService.updateQuestion(questionId, questionRequest);
 
@@ -181,58 +173,63 @@ public class QuestionController {
 
     // @PutMapping("/{questionId}")
     // public ResponseEntity<?> updateQuestion(@PathVariable String questionId,
-    //                                         @RequestParam("file") MultipartFile file, @ModelAttribute QuestionRequest questionRequest) throws IOException {
-    //     // upload file
-    //     try {
-    //         // Mendapatkan nama file asli
-    //         String originalFileName = file.getOriginalFilename();
+    // @RequestParam("file") MultipartFile file, @ModelAttribute QuestionRequest
+    // questionRequest) throws IOException {
+    // // upload file
+    // try {
+    // // Mendapatkan nama file asli
+    // String originalFileName = file.getOriginalFilename();
 
-    //         // Mendapatkan ekstensi file
-    //         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+    // // Mendapatkan ekstensi file
+    // String fileExtension =
+    // originalFileName.substring(originalFileName.lastIndexOf("."));
 
-    //         // Mendapatkan timestamp saat ini
-    //         String timestamp = String.valueOf(System.currentTimeMillis());
+    // // Mendapatkan timestamp saat ini
+    // String timestamp = String.valueOf(System.currentTimeMillis());
 
-    //         // Membuat UUID baru
-    //         String uuid = UUID.randomUUID().toString();
+    // // Membuat UUID baru
+    // String uuid = UUID.randomUUID().toString();
 
-    //         // Menggabungkan timestamp dan UUID
-    //         String newFileName = "file_" + timestamp + "_" + uuid;
-    //         String filePath = PathConfig.storagePath + "/" + newFileName + fileExtension;
-    //         File newFile = new File(filePath);
+    // // Menggabungkan timestamp dan UUID
+    // String newFileName = "file_" + timestamp + "_" + uuid;
+    // String filePath = PathConfig.storagePath + "/" + newFileName + fileExtension;
+    // File newFile = new File(filePath);
 
-    //         // Menyimpan file ke lokasi yang ditentukan di server
-    //         file.transferTo(newFile);
+    // // Menyimpan file ke lokasi yang ditentukan di server
+    // file.transferTo(newFile);
 
-    //         // Mendapatkan local path dari file yang disimpan
-    //         String localPath = newFile.getAbsolutePath();
-    //         String uri = "hdfs://h-primary:9000";
-    //         String hdfsDir = "hdfs://h-primary:9000/questions/" + newFileName + fileExtension;
-    //         Configuration configuration = new Configuration();
-    //         FileSystem fs = FileSystem.get(URI.create(uri), configuration);
-    //         fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
-    //         String savePath = "webhdfs/v1/questions/"+ newFileName + fileExtension +"?op=OPEN";
+    // // Mendapatkan local path dari file yang disimpan
+    // String localPath = newFile.getAbsolutePath();
+    // String uri = "hdfs://h-primary:9000";
+    // String hdfsDir = "hdfs://h-primary:9000/questions/" + newFileName +
+    // fileExtension;
+    // Configuration configuration = new Configuration();
+    // FileSystem fs = FileSystem.get(URI.create(uri), configuration);
+    // fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
+    // String savePath = "webhdfs/v1/questions/"+ newFileName + fileExtension
+    // +"?op=OPEN";
 
-    //         newFile.delete();
-    //         Question question = questionService.updateQuestion(questionId, questionRequest, savePath);
+    // newFile.delete();
+    // Question question = questionService.updateQuestion(questionId,
+    // questionRequest, savePath);
 
-    //         URI location = ServletUriComponentsBuilder
-    //                 .fromCurrentRequest().path("/{questionId}")
-    //                 .buildAndExpand(question.getId()).toUri();
+    // URI location = ServletUriComponentsBuilder
+    // .fromCurrentRequest().path("/{questionId}")
+    // .buildAndExpand(question.getId()).toUri();
 
-    //         return ResponseEntity.created(location)
-    //                 .body(new ApiResponse(true, "Question Updated Successfully"));
-    //     } catch (IOException e) {
-    //         // Penanganan kesalahan saat menyimpan file
-    //         e.printStackTrace();
-    //         return ResponseEntity.badRequest()
-    //                 .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
-    //     }
+    // return ResponseEntity.created(location)
+    // .body(new ApiResponse(true, "Question Updated Successfully"));
+    // } catch (IOException e) {
+    // // Penanganan kesalahan saat menyimpan file
+    // e.printStackTrace();
+    // return ResponseEntity.badRequest()
+    // .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
+    // }
 
     // }
 
     @DeleteMapping("/{questionId}")
-    public HttpStatus deleteQuestion(@PathVariable (value = "questionId") String questionId) throws IOException {
+    public HttpStatus deleteQuestion(@PathVariable(value = "questionId") String questionId) throws IOException {
         questionService.deleteQuestionById(questionId);
         return HttpStatus.FORBIDDEN;
     }

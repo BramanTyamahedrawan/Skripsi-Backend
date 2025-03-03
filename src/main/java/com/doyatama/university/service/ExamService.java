@@ -1,6 +1,6 @@
 package com.doyatama.university.service;
 
-import com.doyatama.university.exception.BadRequestException;
+// import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.*;
 import com.doyatama.university.model.Exam;
@@ -8,16 +8,15 @@ import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.ExamRequest;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
-import com.doyatama.university.util.AppConstants;
+// import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,20 +25,17 @@ public class ExamService {
     private QuestionRepository questionRepository = new QuestionRepository();
     private RPSRepository rpsRepository = new RPSRepository();
 
-
-    private static final Logger logger = LoggerFactory.getLogger(ExamService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(ExamService.class);
 
     public PagedResponse<Exam> getAllExam(int page, int size, ExamRequest examRequest) throws IOException {
         // Get all exams from the repository
         List<Exam> allExams = examRepository.findAll(size);
 
-        
-
         // Return the filtered exams in a PagedResponse object
         return new PagedResponse<>(allExams, allExams.size(), "Successfully get data", 200);
     }
 
-   
     public Exam createExam(ExamRequest examRequest) throws IOException {
         Exam exam = new Exam();
 
@@ -53,7 +49,7 @@ public class ExamService {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         Instant instant = zonedDateTime.toInstant();
 
-        if ( rpsResponse.getName() != null) {
+        if (rpsResponse.getName() != null) {
 
             exam.setName(examRequest.getName());
             exam.setDescription(examRequest.getDescription());
@@ -75,10 +71,9 @@ public class ExamService {
     public DefaultResponse<Exam> getExamById(String examId) throws IOException {
         // Retrieve Exam
         Exam examResponse = examRepository.findById(examId);
-        return new DefaultResponse<>(examResponse.isValid() ? examResponse : null, examResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(examResponse.isValid() ? examResponse : null, examResponse.isValid() ? 1 : 0,
+                "Successfully get data");
     }
-
-
 
     public Exam updateExam(String examId, ExamRequest examRequest) throws IOException {
         Exam exam = new Exam();
@@ -103,21 +98,22 @@ public class ExamService {
 
     public void deleteExamById(String examId) throws IOException {
         Exam examResponse = examRepository.findById(examId);
-        if(examResponse.isValid()){
+        if (examResponse.isValid()) {
             examRepository.deleteById(examId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("Exam", "id", examId);
         }
     }
 
-    private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
-            throw new BadRequestException("Page number cannot be less than zero.");
-        }
+    // private void validatePageNumberAndSize(int page, int size) {
+    // if (page < 0) {
+    // throw new BadRequestException("Page number cannot be less than zero.");
+    // }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
-            throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
-        }
-    }
+    // if (size > AppConstants.MAX_PAGE_SIZE) {
+    // throw new BadRequestException("Page size must not be greater than " +
+    // AppConstants.MAX_PAGE_SIZE);
+    // }
+    // }
 
 }

@@ -8,8 +8,6 @@ import com.doyatama.university.payload.ReligionRequest;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.ReligionRepository;
 import com.doyatama.university.util.AppConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,15 +17,14 @@ import java.util.List;
 public class ReligionService {
     private ReligionRepository religionRepository = new ReligionRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(ReligionService.class);
-
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(ReligionService.class);
 
     public PagedResponse<Religion> getAllReligion(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
         List<Religion> religionResponse = religionRepository.findAll(size);
-
 
         return new PagedResponse<>(religionResponse, religionResponse.size(), "Successfully get data", 200);
     }
@@ -44,7 +41,8 @@ public class ReligionService {
     public DefaultResponse<Religion> getReligionById(String religionId) throws IOException {
         // Retrieve Religion
         Religion religionResponse = religionRepository.findById(religionId);
-        return new DefaultResponse<>(religionResponse.isValid() ? religionResponse : null, religionResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(religionResponse.isValid() ? religionResponse : null,
+                religionResponse.isValid() ? 1 : 0, "Successfully get data");
     }
 
     public Religion updateReligion(String religionId, ReligionRequest religionRequest) throws IOException {
@@ -57,19 +55,19 @@ public class ReligionService {
 
     public void deleteReligionById(String religionId) throws IOException {
         Religion religionResponse = religionRepository.findById(religionId);
-        if(religionResponse.isValid()){
+        if (religionResponse.isValid()) {
             religionRepository.deleteById(religionId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("Religion", "id", religionId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

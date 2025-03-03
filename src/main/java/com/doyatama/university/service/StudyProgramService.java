@@ -11,9 +11,6 @@ import com.doyatama.university.repository.DepartmentRepository;
 import com.doyatama.university.repository.StudyProgramRepository;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -22,8 +19,8 @@ public class StudyProgramService {
     private StudyProgramRepository studyProgramRepository = new StudyProgramRepository();
     private DepartmentRepository departmentRepository = new DepartmentRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(StudyProgramService.class);
-
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(StudyProgramService.class);
 
     public PagedResponse<StudyProgram> getAllStudyProgram(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -31,13 +28,13 @@ public class StudyProgramService {
         // Retrieve Polls
         List<StudyProgram> studyProgramResponse = studyProgramRepository.findAll(size);
 
-
         return new PagedResponse<>(studyProgramResponse, studyProgramResponse.size(), "Successfully get data", 200);
     }
 
     public StudyProgram createStudyProgram(StudyProgramRequest studyProgramRequest) throws IOException {
         StudyProgram studyProgram = new StudyProgram();
-        Department departmentResponse = departmentRepository.findById(studyProgramRequest.getDepartment_id().toString());
+        Department departmentResponse = departmentRepository
+                .findById(studyProgramRequest.getDepartment_id().toString());
         if (departmentResponse.getName() != null) {
             studyProgram.setName(studyProgramRequest.getName());
             studyProgram.setDescription(studyProgramRequest.getDescription());
@@ -51,12 +48,15 @@ public class StudyProgramService {
     public DefaultResponse<StudyProgram> getStudyProgramById(String studyProgramId) throws IOException {
         // Retrieve StudyProgram
         StudyProgram studyProgramResponse = studyProgramRepository.findById(studyProgramId);
-        return new DefaultResponse<>(studyProgramResponse.isValid() ? studyProgramResponse : null, studyProgramResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(studyProgramResponse.isValid() ? studyProgramResponse : null,
+                studyProgramResponse.isValid() ? 1 : 0, "Successfully get data");
     }
 
-    public StudyProgram updateStudyProgram(String studyProgramId, StudyProgramRequest studyProgramRequest) throws IOException {
+    public StudyProgram updateStudyProgram(String studyProgramId, StudyProgramRequest studyProgramRequest)
+            throws IOException {
         StudyProgram studyProgram = new StudyProgram();
-        Department departmentResponse = departmentRepository.findById(studyProgramRequest.getDepartment_id().toString());
+        Department departmentResponse = departmentRepository
+                .findById(studyProgramRequest.getDepartment_id().toString());
         if (departmentResponse.getName() != null) {
             studyProgram.setName(studyProgramRequest.getName());
             studyProgram.setDescription(studyProgramRequest.getDescription());
@@ -69,19 +69,19 @@ public class StudyProgramService {
 
     public void deleteStudyProgramById(String departmentId) throws IOException {
         StudyProgram studyProgramResponse = studyProgramRepository.findById(departmentId);
-        if(studyProgramResponse.isValid()){
+        if (studyProgramResponse.isValid()) {
             studyProgramRepository.deleteById(departmentId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("Department", "id", departmentId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

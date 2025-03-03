@@ -1,27 +1,22 @@
 package com.doyatama.university.model;
 
-import java.time.Instant;
-import java.util.List;
-/**
- * @author alfa
- */
-
 public class TeamTeaching {
 
     private String id;
     private String name;
     private String description;
-    
+
     private Lecture lecture;
 
-    private  Lecture lecture2;
+    private Lecture lecture2;
 
-    private  Lecture lecture3;
+    private Lecture lecture3;
 
     public TeamTeaching() {
     }
 
-    public TeamTeaching(String id, String name, String description, Lecture lecture, Lecture lecture2, Lecture lecture3) {
+    public TeamTeaching(String id, String name, String description, Lecture lecture, Lecture lecture2,
+            Lecture lecture3) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -78,11 +73,10 @@ public class TeamTeaching {
         this.lecture3 = lecture3;
     }
 
-    
-
     public boolean isValid() {
-        return this.id != null && this.name != null && this.description != null ;
+        return this.id != null && this.name != null && this.description != null;
     }
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
             case "id":

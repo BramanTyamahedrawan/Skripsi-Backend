@@ -3,14 +3,12 @@ package com.doyatama.university.repository;
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.Atp;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
-import org.springframework.stereotype.Repository;
 
 public class AtpRepository {
     Configuration conf = HBaseConfiguration.create();
@@ -41,7 +39,7 @@ public class AtpRepository {
 
         String rowKey = atp.getIdAtp();
         TableName tableAtp = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+        // Map<String, String> columnMapping = new HashMap<>();
 
         client.insertRecord(tableAtp, rowKey, "main", "idAtp", atp.getIdAtp());
         client.insertRecord(tableAtp, rowKey, "main", "namaAtp", atp.getNamaAtp());
@@ -164,7 +162,7 @@ public class AtpRepository {
 
         String rowKey = atpId;
         TableName tableAtp = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+        // Map<String, String> columnMapping = new HashMap<>();
 
         if (atp.getNamaAtp() != null) {
             client.insertRecord(tableAtp, rowKey, "main", "namaAtp", atp.getNamaAtp());

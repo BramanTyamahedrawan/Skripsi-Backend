@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -29,14 +28,16 @@ public class SchoolProfileController {
     private SchoolProfileService schoolProfileService = new SchoolProfileService();
 
     @GetMapping
-    public PagedResponse<SchoolProfile> getSchoolProfiles(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-                                            @RequestParam(value = "schoolId", defaultValue = "*") String schoolId) throws IOException {
+    public PagedResponse<SchoolProfile> getSchoolProfiles(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "schoolId", defaultValue = "*") String schoolId) throws IOException {
         return schoolProfileService.getAllProfile(page, size, schoolId);
     }
-    
+
     @PostMapping
-    public ResponseEntity<?> createSchoolProfile(@RequestPart(value = "file", required = false) MultipartFile file, @ModelAttribute SchoolProfileRequest profileRequest) throws IOException {
+    public ResponseEntity<?> createSchoolProfile(@RequestPart(value = "file", required = false) MultipartFile file,
+            @ModelAttribute SchoolProfileRequest profileRequest) throws IOException {
 
         if (file != null && !file.isEmpty()) {
             // upload file
@@ -68,15 +69,15 @@ public class SchoolProfileController {
                 Configuration configuration = new Configuration();
                 FileSystem fs = FileSystem.get(URI.create(uri), configuration);
                 fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
-                String savePath = "webhdfs/v1/profiles/"+ newFileName + fileExtension +"?op=OPEN";
+                String savePath = "webhdfs/v1/profiles/" + newFileName + fileExtension + "?op=OPEN";
 
                 newFile.delete();
                 SchoolProfile profile = schoolProfileService.createSchoolProfile(profileRequest, savePath);
 
-                if(profile == null){
+                if (profile == null) {
                     return ResponseEntity.badRequest()
                             .body(new ApiResponse(false, "Please check relational ID"));
-                }else{
+                } else {
                     URI location = ServletUriComponentsBuilder
                             .fromCurrentRequest().path("/{profileId}")
                             .buildAndExpand(profile.getId()).toUri();
@@ -90,15 +91,15 @@ public class SchoolProfileController {
                 return ResponseEntity.badRequest()
                         .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
             }
-        }else{
+        } else {
             // Tidak ada input file
             try {
                 SchoolProfile profile = schoolProfileService.createSchoolProfile(profileRequest, "");
 
-                if(profile == null){
+                if (profile == null) {
                     return ResponseEntity.badRequest()
                             .body(new ApiResponse(false, "Please check relational ID"));
-                }else{
+                } else {
                     URI location = ServletUriComponentsBuilder
                             .fromCurrentRequest().path("/{profileId}")
                             .buildAndExpand(profile.getId()).toUri();
@@ -114,15 +115,16 @@ public class SchoolProfileController {
             }
         }
     }
-    
+
     @GetMapping("/{profileId}")
     public DefaultResponse<SchoolProfile> getSchoolProfileById(@PathVariable String profileId) throws IOException {
         return schoolProfileService.getSchoolProfileById(profileId);
     }
-    
+
     @PutMapping("/{profileId}")
     public ResponseEntity<?> updateSchoolProfile(@PathVariable String profileId,
-                                          @RequestParam("file") MultipartFile file, @ModelAttribute SchoolProfileRequest profileRequest) throws IOException {
+            @RequestParam("file") MultipartFile file, @ModelAttribute SchoolProfileRequest profileRequest)
+            throws IOException {
         // upload file
         try {
             // Mendapatkan nama file asli
@@ -152,7 +154,7 @@ public class SchoolProfileController {
             Configuration configuration = new Configuration();
             FileSystem fs = FileSystem.get(URI.create(uri), configuration);
             fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
-            String savePath = "webhdfs/v1/profiles/"+ newFileName + fileExtension +"?op=OPEN";
+            String savePath = "webhdfs/v1/profiles/" + newFileName + fileExtension + "?op=OPEN";
 
             newFile.delete();
             SchoolProfile profile = schoolProfileService.updateSchoolProfile(profileId, profileRequest, savePath);
@@ -170,9 +172,9 @@ public class SchoolProfileController {
                     .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
         }
     }
-    
+
     @DeleteMapping("/{profileId}")
-    public HttpStatus deleteSchoolProfile(@PathVariable (value = "profileId") String profileId) throws IOException {
+    public HttpStatus deleteSchoolProfile(@PathVariable(value = "profileId") String profileId) throws IOException {
         schoolProfileService.deleteSchoolProfileById(profileId);
         return HttpStatus.FORBIDDEN;
     }

@@ -1,6 +1,5 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.Kelas;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.SemesterRequest;

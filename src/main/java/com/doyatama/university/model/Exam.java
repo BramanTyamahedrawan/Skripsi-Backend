@@ -1,7 +1,6 @@
 package com.doyatama.university.model;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Exam {
@@ -18,11 +17,12 @@ public class Exam {
     private String type_exercise;
     private RPSDetail rps_detail;
 
-
     public Exam() {
     }
 
-    public Exam(String id, String name, String description, RPSDetail rps_detail,List<Question> questions, RPS rps, Integer min_grade, Integer duration, Instant date_start, Instant date_end, Instant created_at, String type_exercise) {
+    public Exam(String id, String name, String description, RPSDetail rps_detail, List<Question> questions, RPS rps,
+            Integer min_grade, Integer duration, Instant date_start, Instant date_end, Instant created_at,
+            String type_exercise) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -61,15 +61,13 @@ public class Exam {
         this.description = description;
     }
 
-
-     public RPSDetail getRps_detail() {
+    public RPSDetail getRps_detail() {
         return rps_detail;
     }
 
     public void setRps_detail(RPSDetail rps_detail) {
         this.rps_detail = rps_detail;
     }
-
 
     public List<Question> getQuestions() {
         return questions;
@@ -78,7 +76,6 @@ public class Exam {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
-
 
     public RPS getRps() {
         return rps;
@@ -127,6 +124,7 @@ public class Exam {
     public void setCreated_at(Instant created_at) {
         this.created_at = created_at;
     }
+
     public String getType_exercise() {
         return type_exercise;
     }

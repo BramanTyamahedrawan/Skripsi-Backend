@@ -10,8 +10,6 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -28,15 +26,14 @@ public class RPSService {
     private SubjectRepository subjectRepository = new SubjectRepository();
     private LectureRepository lectureRepository = new LectureRepository();
 
-
-    private static final Logger logger = LoggerFactory.getLogger(RPSService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(RPSService.class);
 
     public PagedResponse<RPS> getAllRPS(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
         List<RPS> rpsResponse = rpsRepository.findAll(size);
-
 
         return new PagedResponse<>(rpsResponse, rpsResponse.size(), "Successfully get data", 200);
     }
@@ -56,8 +53,10 @@ public class RPSService {
     public RPS createRPS(RPSRequest rpsRequest) throws IOException {
         RPS rps = new RPS();
 
-        List<LearningMedia> learningMediaSoftwareList = learningMediaRepository.findAllById(rpsRequest.getLearning_media_softwares());
-        List<LearningMedia> learningMediaHardwareList = learningMediaRepository.findAllById(rpsRequest.getLearning_media_hardwares());
+        List<LearningMedia> learningMediaSoftwareList = learningMediaRepository
+                .findAllById(rpsRequest.getLearning_media_softwares());
+        List<LearningMedia> learningMediaHardwareList = learningMediaRepository
+                .findAllById(rpsRequest.getLearning_media_hardwares());
         StudyProgram studyProgramResponse = studyProgramRepository.findById(rpsRequest.getStudy_program_id());
         Subject subjectResponse = subjectRepository.findById(rpsRequest.getSubject_id());
         List<Subject> requirementSubjectList = subjectRepository.findRelationById(rpsRequest.getRequirement_subjects());
@@ -105,13 +104,16 @@ public class RPSService {
     public DefaultResponse<RPS> getRPSById(String rpsId) throws IOException {
         // Retrieve RPS
         RPS rpsResponse = rpsRepository.findById(rpsId);
-        return new DefaultResponse<>(rpsResponse.isValid() ? rpsResponse : null, rpsResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(rpsResponse.isValid() ? rpsResponse : null, rpsResponse.isValid() ? 1 : 0,
+                "Successfully get data");
     }
 
     public RPS updateRPS(String rpsId, RPSRequest rpsRequest) throws IOException {
         RPS rps = new RPS();
-        List<LearningMedia> learningMediaSoftwareList = learningMediaRepository.findAllById(rpsRequest.getLearning_media_softwares());
-        List<LearningMedia> learningMediaHardwareList = learningMediaRepository.findAllById(rpsRequest.getLearning_media_hardwares());
+        List<LearningMedia> learningMediaSoftwareList = learningMediaRepository
+                .findAllById(rpsRequest.getLearning_media_softwares());
+        List<LearningMedia> learningMediaHardwareList = learningMediaRepository
+                .findAllById(rpsRequest.getLearning_media_hardwares());
         StudyProgram studyProgramResponse = studyProgramRepository.findById(rpsRequest.getStudy_program_id());
         Subject subjectResponse = subjectRepository.findById(rpsRequest.getSubject_id());
         List<Subject> requirementSubjectList = subjectRepository.findRelationById(rpsRequest.getRequirement_subjects());
@@ -151,19 +153,19 @@ public class RPSService {
 
     public void deleteRPSById(String rpsId) throws IOException {
         RPS rpsResponse = rpsRepository.findById(rpsId);
-        if(rpsResponse.isValid()){
+        if (rpsResponse.isValid()) {
             rpsRepository.deleteById(rpsId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("RPS", "id", rpsId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

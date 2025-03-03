@@ -1,11 +1,5 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.Religion;
-import com.doyatama.university.model.StudyProgram;
-import com.doyatama.university.model.User;
-
-import java.time.LocalDate;
-
 public class StudentRequest {
     private String id;
     private String nisn;
@@ -20,13 +14,11 @@ public class StudentRequest {
     private String place_born;
     private String address;
 
-    
-    
     public StudentRequest() {
     }
 
-    public StudentRequest(String id, String nisn, String name, String gender, String phone, 
-            String religion_id, String bidangKeahlian_id, String programKeahlian_id, 
+    public StudentRequest(String id, String nisn, String name, String gender, String phone,
+            String religion_id, String bidangKeahlian_id, String programKeahlian_id,
             String konsentrasiKeahlian_id, String birth_date, String place_born, String address) {
         this.id = id;
         this.nisn = nisn;

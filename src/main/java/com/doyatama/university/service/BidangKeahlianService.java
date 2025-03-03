@@ -7,20 +7,15 @@ package com.doyatama.university.service;
 import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.BidangKeahlian;
-import com.doyatama.university.model.School;
 import com.doyatama.university.payload.BidangKeahlianRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.BidangKeahlianRepository;
-import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 /**
  *
@@ -30,9 +25,10 @@ import java.util.Optional;
 @Service
 public class BidangKeahlianService {
     private BidangKeahlianRepository bidangKeahlianRepository = new BidangKeahlianRepository();
-    private SchoolRepository schoolRepository = new SchoolRepository();
+    // private SchoolRepository schoolRepository = new SchoolRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(BidangKeahlianService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(BidangKeahlianService.class);
 
     public PagedResponse<BidangKeahlian> getAllBidangKeahlian(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);

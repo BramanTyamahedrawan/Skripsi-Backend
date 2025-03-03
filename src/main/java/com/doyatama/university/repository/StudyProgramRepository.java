@@ -3,7 +3,6 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.controller.DepartmentController;
 import com.doyatama.university.helper.HBaseCustomClient;
-import com.doyatama.university.model.Department;
 import com.doyatama.university.model.StudyProgram;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -74,7 +73,8 @@ public class StudyProgramRepository {
 
         List<StudyProgram> studyPrograms = new ArrayList<>();
         for (String studyProgramId : studyProgramIds) {
-            StudyProgram studyProgram = client.showDataTable(table.toString(), columnMapping, studyProgramId, StudyProgram.class);
+            StudyProgram studyProgram = client.showDataTable(table.toString(), columnMapping, studyProgramId,
+                    StudyProgram.class);
             if (studyProgram != null) {
                 studyPrograms.add(studyProgram);
             }
@@ -89,8 +89,10 @@ public class StudyProgramRepository {
         TableName tableStudyProgram = TableName.valueOf(tableName);
         client.insertRecord(tableStudyProgram, studyProgramId, "main", "name", studyProgram.getName());
         client.insertRecord(tableStudyProgram, studyProgramId, "main", "description", studyProgram.getDescription());
-        client.insertRecord(tableStudyProgram, studyProgramId, "department", "id", studyProgram.getDepartment().getId());
-        client.insertRecord(tableStudyProgram, studyProgramId, "department", "name", studyProgram.getDepartment().getName());
+        client.insertRecord(tableStudyProgram, studyProgramId, "department", "id",
+                studyProgram.getDepartment().getId());
+        client.insertRecord(tableStudyProgram, studyProgramId, "department", "name",
+                studyProgram.getDepartment().getName());
         return studyProgram;
     }
 

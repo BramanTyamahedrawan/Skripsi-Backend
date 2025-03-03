@@ -1,6 +1,5 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.StudyProgram;
 import com.doyatama.university.model.ExamAttempt;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.DefaultResponse;
@@ -23,21 +22,23 @@ public class ExamAttemptController {
     private ExamAttemptService examAttemptService = new ExamAttemptService();
 
     @GetMapping
-    public PagedResponse<ExamAttempt> getExamAttempts(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                      @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-                                                      @RequestParam(value = "userID", defaultValue = "*") String userID,
-                                                      @RequestParam(value = "examID", defaultValue = "*") String examID) throws IOException {
+    public PagedResponse<ExamAttempt> getExamAttempts(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "userID", defaultValue = "*") String userID,
+            @RequestParam(value = "examID", defaultValue = "*") String examID) throws IOException {
         return examAttemptService.getAllExamAttempt(page, size, userID, examID);
     }
 
     @PostMapping
-    public ResponseEntity<?> createExamAttempt(@Valid @RequestBody ExamAttemptRequest examAttemptRequest) throws IOException {
+    public ResponseEntity<?> createExamAttempt(@Valid @RequestBody ExamAttemptRequest examAttemptRequest)
+            throws IOException {
         ExamAttempt examAttempt = examAttemptService.createExamAttempt(examAttemptRequest);
 
-        if(examAttempt == null){
+        if (examAttempt == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Please check relational ID"));
-        }else{
+        } else {
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{examAttemptId}")
                     .buildAndExpand(examAttempt.getId()).toUri();
@@ -52,10 +53,9 @@ public class ExamAttemptController {
         return examAttemptService.getExamAttemptById(examAttemptId);
     }
 
-
     @PutMapping("/{examAttemptId}")
     public ResponseEntity<?> updateExamAttempt(@PathVariable String examAttemptId,
-                                        @Valid @RequestBody ExamAttemptRequest examAttemptRequest) throws IOException {
+            @Valid @RequestBody ExamAttemptRequest examAttemptRequest) throws IOException {
         ExamAttempt examAttempt = examAttemptService.updateExamAttempt(examAttemptId, examAttemptRequest);
 
         URI location = ServletUriComponentsBuilder
@@ -67,7 +67,8 @@ public class ExamAttemptController {
     }
 
     @DeleteMapping("/{examAttemptId}")
-    public HttpStatus deleteExamAttempt(@PathVariable (value = "examAttemptId") String examAttemptId) throws IOException {
+    public HttpStatus deleteExamAttempt(@PathVariable(value = "examAttemptId") String examAttemptId)
+            throws IOException {
         examAttemptService.deleteExamAttemptById(examAttemptId);
         return HttpStatus.FORBIDDEN;
     }

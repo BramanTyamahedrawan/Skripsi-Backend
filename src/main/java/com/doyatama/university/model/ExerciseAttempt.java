@@ -1,12 +1,7 @@
 package com.doyatama.university.model;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 public class ExerciseAttempt {
     private String id;
@@ -21,11 +16,12 @@ public class ExerciseAttempt {
     private Instant created_at;
     private List<String> explanations;
 
-
     public ExerciseAttempt() {
     }
 
-    public ExerciseAttempt(String id, double grade, Integer total_right, String state, List<StudentAnswer> student_answers, Exercise exercise, User user, Student student, Integer duration, Instant created_at) {
+    public ExerciseAttempt(String id, double grade, Integer total_right, String state,
+            List<StudentAnswer> student_answers, Exercise exercise, User user, Student student, Integer duration,
+            Instant created_at) {
         this.id = id;
         this.grade = grade;
         this.total_right = total_right;
@@ -109,12 +105,11 @@ public class ExerciseAttempt {
     public void setDuration(Integer duration) {
         this.duration = duration;
     }
+
     public List<StudentAnswer> getStudentAnswers() {
         return this.student_answers;
     }
 
-
-    
     public List<String> getExplanations() {
         return explanations;
     }
@@ -122,6 +117,7 @@ public class ExerciseAttempt {
     public void setExplanations(List<String> explanations) {
         this.explanations = explanations;
     }
+
     public Instant getCreated_at() {
         return created_at;
     }
@@ -142,12 +138,12 @@ public class ExerciseAttempt {
             case "id":
                 this.id = value;
                 break;
-            case "grade":
-                this.grade = grade;
-                break;
-            case "total_right":
-                this.total_right = total_right;
-                break;
+            // case "grade":
+            // this.grade = grade;
+            // break;
+            // case "total_right":
+            // this.total_right = total_right;
+            // break;
             case "state":
                 this.state = value;
                 break;

@@ -15,14 +15,15 @@ public class LinguisticValue {
     private String average;
     private String file_path;
 
-
     private static final int MAX_ID_LENGTH = 6; // replace 16 with your desired maximum length
 
     // Default constructor
     public LinguisticValue() {
     }
+
     // Constructor
-    public LinguisticValue(String name, float value1, float value2, float value3, float value4,String file_path) {
+    public LinguisticValue(String id, String name, float value1, float value2, float value3, float value4,
+            String file_path) {
         this.id = id;
         this.name = name;
         this.value1 = value1;
@@ -37,9 +38,11 @@ public class LinguisticValue {
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
@@ -84,7 +87,7 @@ public class LinguisticValue {
         updateAvg();
     }
 
-      public float getAvg() {
+    public float getAvg() {
         return avg;
     }
 
@@ -97,9 +100,8 @@ public class LinguisticValue {
         this.avg = Float.parseFloat(average);
     }
 
-
     public String getAverage() {
-         this.avg = (this.value1 + this.value2 + this.value3 + this.value4) / 4.0f;
+        this.avg = (this.value1 + this.value2 + this.value3 + this.value4) / 4.0f;
         this.average = Float.toString(this.avg);
         return this.average;
     }
@@ -110,7 +112,6 @@ public class LinguisticValue {
 
     }
 
-
     public String getFile_path() {
         return file_path;
     }
@@ -119,16 +120,18 @@ public class LinguisticValue {
         this.file_path = file_path;
     }
 
-    public boolean isValid(){
-        return this.id != null && this.name != null && this.value1 != 0 && this.value2 != 0 && this.value3 != 0 && this.value4 != 0;
+    public boolean isValid() {
+        return this.id != null && this.name != null && this.value1 != 0 && this.value2 != 0 && this.value3 != 0
+                && this.value4 != 0;
     }
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
             case "id":
-            String idValue = String.valueOf(value);
-            if (idValue.length() > MAX_ID_LENGTH) {
-                throw new IllegalArgumentException("ID must be no more than " + MAX_ID_LENGTH + " characters long");
-            }
+                String idValue = String.valueOf(value);
+                if (idValue.length() > MAX_ID_LENGTH) {
+                    throw new IllegalArgumentException("ID must be no more than " + MAX_ID_LENGTH + " characters long");
+                }
             case "name":
                 this.name = value;
                 break;
@@ -145,7 +148,7 @@ public class LinguisticValue {
                 this.value4 = Float.parseFloat(value);
                 break;
             case "file_path":
-                this.file_path =  value;
+                this.file_path = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

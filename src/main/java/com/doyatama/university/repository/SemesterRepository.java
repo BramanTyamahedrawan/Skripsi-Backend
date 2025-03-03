@@ -1,7 +1,6 @@
 package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
-import com.doyatama.university.model.Acp;
 import com.doyatama.university.model.Semester;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
-import org.springframework.stereotype.Repository;
 
 public class SemesterRepository {
     Configuration conf = HBaseConfiguration.create();

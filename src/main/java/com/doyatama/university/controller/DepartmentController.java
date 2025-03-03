@@ -17,31 +17,25 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/department")
 public class DepartmentController {
     private DepartmentService departmentService = new DepartmentService();
-    
- 
-    
-@GetMapping
-public PagedResponse<Department> getDepartments(@CurrentUser UserPrincipal currentUser, 
-                                                @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-    String schoolId = currentUser.getSchoolId();  
-   
 
-    return departmentService.getDepartments(schoolId, page, size);
-}
+    @GetMapping
+    public PagedResponse<Department> getDepartments(@CurrentUser UserPrincipal currentUser,
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+        String schoolId = currentUser.getSchoolId();
 
-
+        return departmentService.getDepartments(schoolId, page, size);
+    }
 
     @PostMapping
-    public ResponseEntity<?> createDepartment(@CurrentUser UserPrincipal currentUser ,@Valid @RequestBody DepartmentRequest departmentRequest) throws IOException {
-        
+    public ResponseEntity<?> createDepartment(@CurrentUser UserPrincipal currentUser,
+            @Valid @RequestBody DepartmentRequest departmentRequest) throws IOException {
+
         String schoolID = currentUser.getSchoolId();
         Department department = departmentService.createDepartment(departmentRequest, schoolID);
 
@@ -58,10 +52,9 @@ public PagedResponse<Department> getDepartments(@CurrentUser UserPrincipal curre
         return departmentService.getDepartmentById(departmentId);
     }
 
-
     @PutMapping("/{departmentId}")
     public ResponseEntity<?> updateDepartment(@PathVariable String departmentId,
-                                              @Valid @RequestBody DepartmentRequest departmentRequest) throws IOException {
+            @Valid @RequestBody DepartmentRequest departmentRequest) throws IOException {
         Department department = departmentService.updateDepartment(departmentId, departmentRequest);
 
         URI location = ServletUriComponentsBuilder
@@ -73,7 +66,7 @@ public PagedResponse<Department> getDepartments(@CurrentUser UserPrincipal curre
     }
 
     @DeleteMapping("/{departmentId}")
-    public HttpStatus deleteDepartment(@PathVariable (value = "departmentId") String departmentId) throws IOException {
+    public HttpStatus deleteDepartment(@PathVariable(value = "departmentId") String departmentId) throws IOException {
         departmentService.deleteDepartmentById(departmentId);
         return HttpStatus.FORBIDDEN;
     }

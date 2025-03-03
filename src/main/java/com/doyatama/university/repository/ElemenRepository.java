@@ -3,14 +3,12 @@ package com.doyatama.university.repository;
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.Elemen;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
-import org.springframework.stereotype.Repository;
 
 public class ElemenRepository {
 
@@ -40,7 +38,7 @@ public class ElemenRepository {
 
         String rowKey = elemen.getIdElemen();
         TableName tableElemen = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+        // Map<String, String> columnMapping = new HashMap<>();
 
         client.insertRecord(tableElemen, rowKey, "main", "idElemen", elemen.getIdElemen());
         client.insertRecord(tableElemen, rowKey, "main", "namaElemen", elemen.getNamaElemen());
@@ -129,7 +127,7 @@ public class ElemenRepository {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableElemen = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+        // Map<String, String> columnMapping = new HashMap<>();
 
         if (elemen.getNamaElemen() != null) {
             client.insertRecord(tableElemen, elemenId, "main", "namaElemen", elemen.getNamaElemen());

@@ -2,19 +2,12 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.*;
-import com.google.gson.Gson;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 
 /**
  * @author alfa
@@ -23,8 +16,6 @@ public class CriteriaValueRepository {
 
     Configuration conf = HBaseConfiguration.create();
     String tableName = "criteria_values";
-
-
 
     public List<CriteriaValue> findAllByQuestion(String questionId, int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -54,13 +45,14 @@ public class CriteriaValueRepository {
         columnMapping.put("linguistic_value", "linguistic_value");
 
         // Use the questionId as the filter and afsort by id
-        List<CriteriaValue> criteriaValue=  client.getDataListByColumn(tableUsers.toString(), columnMapping, "question", "id", questionId, CriteriaValue.class, size);
+        List<CriteriaValue> criteriaValue = client.getDataListByColumn(tableUsers.toString(), columnMapping, "question",
+                "id", questionId, CriteriaValue.class, size);
 
         return criteriaValue;
     }
 
-    public List<CriteriaValue> findByUser(String userID,int size)throws IOException{
-         HBaseCustomClient client = new HBaseCustomClient(conf);
+    public List<CriteriaValue> findByUser(String userID, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableUsers = TableName.valueOf(this.tableName);
         Map<String, String> columnMapping = new HashMap<>();
@@ -84,15 +76,17 @@ public class CriteriaValueRepository {
         columnMapping.put("team_teaching", "team_teaching");
         columnMapping.put("lecture", "lecture");
         columnMapping.put("linguistic_value", "linguistic_value");
-        return client.getDataListByColumn(tableUsers.toString(), columnMapping, "user", "id", userID, CriteriaValue.class, size);
+        return client.getDataListByColumn(tableUsers.toString(), columnMapping, "user", "id", userID,
+                CriteriaValue.class, size);
 
     }
 
     public CriteriaValue save(CriteriaValue criteriaValue, String questionId) throws IOException {
         if (!criteriaValue.getQuestion().getId().equals(questionId)) {
-            throw new IllegalArgumentException("The provided questionId does not match the questionId of the CriteriaValue");
+            throw new IllegalArgumentException(
+                    "The provided questionId does not match the questionId of the CriteriaValue");
         }
-        
+
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         String rowKey = UUID.randomUUID().toString().substring(0, 5);
@@ -103,22 +97,40 @@ public class CriteriaValueRepository {
 
         client.insertRecord(tableCriteriaValue, rowKey, "main", "user_id", criteriaValue.getUser());
 
-        client.insertRecord(tableCriteriaValue, rowKey,  "question", "id", criteriaValue.getQuestion().getId());
+        client.insertRecord(tableCriteriaValue, rowKey, "question", "id", criteriaValue.getQuestion().getId());
         client.insertRecord(tableCriteriaValue, rowKey, "question", "title", criteriaValue.getQuestion().getTitle());
 
         // Save each LinguisticValue with its average
         for (int i = 1; i <= 9; i++) {
             LinguisticValue value = null;
             switch (i) {
-                case 1: value = criteriaValue.getValue1(); break;
-                case 2: value = criteriaValue.getValue2(); break;
-                case 3: value = criteriaValue.getValue3(); break;
-                case 4: value = criteriaValue.getValue4(); break;
-                case 5: value = criteriaValue.getValue5(); break;
-                case 6: value = criteriaValue.getValue6(); break;
-                case 7: value = criteriaValue.getValue7(); break;
-                case 8: value = criteriaValue.getValue8(); break;
-                case 9: value = criteriaValue.getValue9(); break;
+                case 1:
+                    value = criteriaValue.getValue1();
+                    break;
+                case 2:
+                    value = criteriaValue.getValue2();
+                    break;
+                case 3:
+                    value = criteriaValue.getValue3();
+                    break;
+                case 4:
+                    value = criteriaValue.getValue4();
+                    break;
+                case 5:
+                    value = criteriaValue.getValue5();
+                    break;
+                case 6:
+                    value = criteriaValue.getValue6();
+                    break;
+                case 7:
+                    value = criteriaValue.getValue7();
+                    break;
+                case 8:
+                    value = criteriaValue.getValue8();
+                    break;
+                case 9:
+                    value = criteriaValue.getValue9();
+                    break;
             }
             if (value != null) {
                 String valueKey = "value" + i;
@@ -133,7 +145,6 @@ public class CriteriaValueRepository {
         return criteriaValue;
     }
 
-    
     public CriteriaValue findById(String criteriaValueId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -156,16 +167,14 @@ public class CriteriaValueRepository {
         columnMapping.put("rps_detail", "rps_detail");
         columnMapping.put("team_teaching", "team_teaching");
 
-        return client.showDataTable(tableCriteriaValue.toString(), columnMapping,criteriaValueId, CriteriaValue.class);
+        return client.showDataTable(tableCriteriaValue.toString(), columnMapping, criteriaValueId, CriteriaValue.class);
     }
 
-    public CriteriaValue update (String criteriaValueId, CriteriaValue criteriaValue) throws IOException{
-        HBaseCustomClient client = new HBaseCustomClient(conf);
+    public CriteriaValue update(String criteriaValueId, CriteriaValue criteriaValue) throws IOException {
+        // HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        TableName tableCriteriaValue = TableName.valueOf(this.tableName);
+        // TableName tableCriteriaValue = TableName.valueOf(this.tableName);
 
-
-        
         return criteriaValue;
     }
 
@@ -177,7 +186,7 @@ public class CriteriaValueRepository {
         return true;
     }
 
-    public List<CriteriaValue> findAllById (List<String> CriteriaValueIds) throws IOException {
+    public List<CriteriaValue> findAllById(List<String> CriteriaValueIds) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName table = TableName.valueOf(this.tableName);
@@ -199,11 +208,12 @@ public class CriteriaValueRepository {
 
         List<CriteriaValue> criteriaValues = new ArrayList<>();
         for (String criteriaValueId : CriteriaValueIds) {
-            CriteriaValue criteriaValue = client.showDataTable(table.toString(), columnMapping, criteriaValueId, CriteriaValue.class);
+            CriteriaValue criteriaValue = client.showDataTable(table.toString(), columnMapping, criteriaValueId,
+                    CriteriaValue.class);
             criteriaValues.add(criteriaValue);
         }
         return criteriaValues;
 
     }
-        
+
 }

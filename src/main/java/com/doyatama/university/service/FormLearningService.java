@@ -9,26 +9,21 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.FormLearningRepository;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FormLearningService {
     private FormLearningRepository formLearningRepository = new FormLearningRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(FormLearningService.class);
-
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(FormLearningService.class);
 
     public PagedResponse<FormLearning> getAllFormLearning(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
         List<FormLearning> formLearningResponse = formLearningRepository.findAll(size);
-
 
         return new PagedResponse<>(formLearningResponse, formLearningResponse.size(), "Successfully get data", 200);
     }
@@ -45,10 +40,12 @@ public class FormLearningService {
     public DefaultResponse<FormLearning> getFormLearningById(String formLearningId) throws IOException {
         // Retrieve FormLearning
         FormLearning formLearningResponse = formLearningRepository.findById(formLearningId);
-        return new DefaultResponse<>(formLearningResponse.isValid() ? formLearningResponse : null, formLearningResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(formLearningResponse.isValid() ? formLearningResponse : null,
+                formLearningResponse.isValid() ? 1 : 0, "Successfully get data");
     }
 
-    public FormLearning updateFormLearning(String formLearningId, FormLearningRequest formLearningRequest) throws IOException {
+    public FormLearning updateFormLearning(String formLearningId, FormLearningRequest formLearningRequest)
+            throws IOException {
         FormLearning formLearning = new FormLearning();
         formLearning.setName(formLearningRequest.getName());
         formLearning.setDescription(formLearningRequest.getDescription());
@@ -58,19 +55,19 @@ public class FormLearningService {
 
     public void deleteFormLearningById(String formLearningId) throws IOException {
         FormLearning formLearningResponse = formLearningRepository.findById(formLearningId);
-        if(formLearningResponse.isValid()){
+        if (formLearningResponse.isValid()) {
             formLearningRepository.deleteById(formLearningId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("FormLearning", "id", formLearningId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

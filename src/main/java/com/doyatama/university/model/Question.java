@@ -1,9 +1,7 @@
 package com.doyatama.university.model;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -22,9 +20,9 @@ public class Question {
     private ExamType2 examType2;
     private ExamType3 examType3;
     private String explanation;
-    private ExerciseAttempt exerciseAttempt;
+    // private ExerciseAttempt exerciseAttempt;
 
-    //untuk hitung ivihf vikor tahap matrix
+    // untuk hitung ivihf vikor tahap matrix
     private List<CriteriaValue> criteria_values;
     private Double averageValue1;
     private Double averageValue2;
@@ -51,18 +49,17 @@ public class Question {
         MATCHING,
     }
 
-
-    public enum ExamType{
+    public enum ExamType {
         EXERCISE,
         NOTHING,
     }
 
-    public enum ExamType2{
+    public enum ExamType2 {
         QUIZ,
         NOTHING,
     }
-    
-    public enum ExamType3{
+
+    public enum ExamType3 {
         EXAM,
         NOTHING,
     }
@@ -70,7 +67,11 @@ public class Question {
     public Question() {
     }
 
-    public Question(String id, String title, String description, QuestionType questionType, AnswerType answerType, String file_path, RPSDetail rps_detail, ExamType examType, ExamType2 examType2, ExamType3 examType3, String explanation, List<CriteriaValue> criteria_values, Double averageValue1, Double averageValue2, Double averageValue3, Double averageValue4, Double averageValue5, Double averageValue6, Double averageValue7, Double averageValue8, Double averageValue9) {
+    public Question(String id, String title, String description, QuestionType questionType, AnswerType answerType,
+            String file_path, RPSDetail rps_detail, ExamType examType, ExamType2 examType2, ExamType3 examType3,
+            String explanation, List<CriteriaValue> criteria_values, Double averageValue1, Double averageValue2,
+            Double averageValue3, Double averageValue4, Double averageValue5, Double averageValue6,
+            Double averageValue7, Double averageValue8, Double averageValue9) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -135,7 +136,6 @@ public class Question {
         this.answer_type = answerType;
     }
 
-
     public ExamType getExamType() {
         return this.examType != null ? this.examType : ExamType.NOTHING;
     }
@@ -152,7 +152,6 @@ public class Question {
         this.examType2 = examType2;
     }
 
-    
     public ExamType3 getExamType3() {
         return this.examType3 != null ? this.examType3 : ExamType3.NOTHING;
     }
@@ -267,9 +266,9 @@ public class Question {
     }
 
     public boolean isValid() {
-        return this.id != null && this.title != null && this.description != null && this.question_type != null && this.answer_type != null ;
+        return this.id != null && this.title != null && this.description != null && this.question_type != null
+                && this.answer_type != null;
     }
-
 
     public void set(String fieldName, String value) {
         switch (fieldName) {

@@ -1,6 +1,5 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.StudyProgram;
 import com.doyatama.university.model.Question;
 import com.doyatama.university.model.Quiz;
 import com.doyatama.university.payload.ApiResponse;
@@ -11,7 +10,7 @@ import com.doyatama.university.repository.QuizRepository;
 import com.doyatama.university.repository.RPSRepository;
 import com.doyatama.university.service.QuizService;
 import com.doyatama.university.util.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,14 +25,15 @@ import java.net.URI;
 public class QuizController {
     private final QuizService quizService;
 
-    @Autowired
+    // @Autowired
     public QuizController(QuizRepository quizRepository, RPSRepository rpsRepository) {
         this.quizService = new QuizService(quizRepository, rpsRepository);
     }
 
     @GetMapping
-    public PagedResponse<Quiz> getQuiz(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+    public PagedResponse<Quiz> getQuiz(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         return quizService.getAllQuiz(page, size);
     }
 
@@ -52,14 +52,15 @@ public class QuizController {
             @RequestParam("rpsID") String rpsID) throws IOException {
         return quizService.getAllQuestionsByRPSQuiz2(page, size, rpsID);
     }
+
     @PostMapping
     public ResponseEntity<?> createQuiz(@Valid @RequestBody QuizRequest quizRequest) throws IOException {
         Quiz quiz = quizService.createQuiz(quizRequest);
 
-        if(quiz == null){
+        if (quiz == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Please check relational ID"));
-        }else{
+        } else {
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{quizId}")
                     .buildAndExpand(quiz.getId()).toUri();
@@ -74,10 +75,9 @@ public class QuizController {
         return quizService.getQuizById(quizId);
     }
 
-
     @PutMapping("/{quizId}")
     public ResponseEntity<?> updateQuiz(@PathVariable String quizId,
-                                            @Valid @RequestBody QuizRequest quizRequest) throws IOException {
+            @Valid @RequestBody QuizRequest quizRequest) throws IOException {
         Quiz quiz = quizService.updateQuiz(quizId, quizRequest);
 
         URI location = ServletUriComponentsBuilder
@@ -89,7 +89,7 @@ public class QuizController {
     }
 
     @DeleteMapping("/{quizId}")
-    public HttpStatus deleteQuiz(@PathVariable (value = "quizId") String quizId) throws IOException {
+    public HttpStatus deleteQuiz(@PathVariable(value = "quizId") String quizId) throws IOException {
         quizService.deleteQuizById(quizId);
         return HttpStatus.FORBIDDEN;
     }

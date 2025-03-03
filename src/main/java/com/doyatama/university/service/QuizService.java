@@ -10,11 +10,7 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
 import com.doyatama.university.util.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -28,15 +24,14 @@ public class QuizService {
     private QuizRepository quizRepository = new QuizRepository();
     private QuestionRepository questionRepository = new QuestionRepository();
     private RPSRepository rpsRepository = new RPSRepository();
-    private String lastSavedRowKey;
+    // private String lastSavedRowKey;
 
-
-    @Autowired
     public QuizService(QuizRepository quizRepository, RPSRepository rpsRepository) {
         this.quizRepository = quizRepository;
         this.rpsRepository = rpsRepository;
     }
-    private static final Logger logger = LoggerFactory.getLogger(QuizService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(QuizService.class);
 
     public PagedResponse<Quiz> getAllQuiz(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -44,11 +39,8 @@ public class QuizService {
         // Retrieve Polls
         List<Quiz> quizResponse = quizRepository.findAll(size);
 
-
         return new PagedResponse<>(quizResponse, quizResponse.size(), "Successfully get data", 200);
     }
-
-
 
     public Quiz createQuiz(QuizRequest quizRequest) throws IOException {
         Quiz quiz = new Quiz();
@@ -60,6 +52,7 @@ public class QuizService {
         if (rpsResponse.getDev_lecturers() != null) {
             for (Object object : rpsResponse.getDev_lecturers()) {
                 if (object instanceof LinkedHashMap) {
+                    @SuppressWarnings("rawtypes")
                     LinkedHashMap map = (LinkedHashMap) object;
                     Lecture lecture = mapper.convertValue(map, Lecture.class);
                     String lectureId = lecture.getId();
@@ -74,7 +67,7 @@ public class QuizService {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
         Instant instant = zonedDateTime.toInstant();
 
-        if ( rpsResponse.getName() != null) {
+        if (rpsResponse.getName() != null) {
             quiz.setName(quizRequest.getName());
             quiz.setDescription(quizRequest.getDescription());
             quiz.setMin_grade(quizRequest.getMin_grade());
@@ -86,10 +79,10 @@ public class QuizService {
             quiz.setMessage(quizRequest.getMessage());
             quiz.setType_quiz(quizRequest.getType_quiz());
             quiz.setCreated_at(instant);
-            
+
             return quizRepository.save(quiz);
-//            lastSavedRowKey = quizRepository.save(quiz);
-    
+            // lastSavedRowKey = quizRepository.save(quiz);
+
         } else {
             return null;
         }
@@ -105,14 +98,12 @@ public class QuizService {
         return quiz;
     }
 
-
     public DefaultResponse<Quiz> getQuizById(String quizId) throws IOException {
         // Retrieve Quiz
         Quiz quizResponse = quizRepository.findById(quizId);
-        return new DefaultResponse<>(quizResponse.isValid() ? quizResponse : null, quizResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(quizResponse.isValid() ? quizResponse : null, quizResponse.isValid() ? 1 : 0,
+                "Successfully get data");
     }
-
-
 
     public Quiz updateQuiz(String quizId, QuizRequest quizRequest) throws IOException {
         Quiz quiz = new Quiz();
@@ -134,14 +125,14 @@ public class QuizService {
         }
     }
 
-    public PagedResponse<Question> getAllQuestionsByRPSQuiz1(int page, int size, String rpsID ) throws IOException {
+    public PagedResponse<Question> getAllQuestionsByRPSQuiz1(int page, int size, String rpsID) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Define the filteredQuestions list
         List<Question> filteredQuestions = new ArrayList<>();
 
         // Retrieve the questions associated with the given RPS ID
-        List<Question> questions = questionRepository.findAllByRPS(rpsID,size);
+        List<Question> questions = questionRepository.findAllByRPS(rpsID, size);
 
         // Inside your for loop where you're iterating over the questions
         for (Question question : questions) {
@@ -158,12 +149,14 @@ public class QuizService {
 
                     // Get the last two characters of the ID
                     String lastTwoChars = questionRpsDetailId.substring(questionRpsDetailId.length() - 2);
-        
-                        // Check if the last two characters are "-1", "-2", "-3", or "-4" and if ExamType is EXERCISE
-                        if ((lastTwoChars.equals("-1") || lastTwoChars.equals("-2") || lastTwoChars.equals("-3") || lastTwoChars.equals("-4")) && question.getExamType2() == Question.ExamType2.QUIZ) {
-                            // Add the current Question to filteredQuestions
-                            filteredQuestions.add(question);
-                        }
+
+                    // Check if the last two characters are "-1", "-2", "-3", or "-4" and if
+                    // ExamType is EXERCISE
+                    if ((lastTwoChars.equals("-1") || lastTwoChars.equals("-2") || lastTwoChars.equals("-3")
+                            || lastTwoChars.equals("-4")) && question.getExamType2() == Question.ExamType2.QUIZ) {
+                        // Add the current Question to filteredQuestions
+                        filteredQuestions.add(question);
+                    }
                 }
             }
         }
@@ -171,14 +164,14 @@ public class QuizService {
         return new PagedResponse<>(filteredQuestions, filteredQuestions.size(), "Successfully get data", 200);
     }
 
-    public PagedResponse<Question> getAllQuestionsByRPSQuiz2(int page, int size, String rpsID ) throws IOException {
+    public PagedResponse<Question> getAllQuestionsByRPSQuiz2(int page, int size, String rpsID) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Define the filteredQuestions list
         List<Question> filteredQuestions = new ArrayList<>();
 
         // Retrieve the questions associated with the given RPS ID
-        List<Question> questions = questionRepository.findAllByRPS(rpsID,size);
+        List<Question> questions = questionRepository.findAllByRPS(rpsID, size);
 
         // Inside your for loop where you're iterating over the questions
         for (Question question : questions) {
@@ -195,33 +188,36 @@ public class QuizService {
 
                     // Get the last two characters of the ID
                     String lastTwoChars = questionRpsDetailId.substring(questionRpsDetailId.length() - 2);
-        
-                        // Check if the last two characters are "-1", "-2", "-3", or "-4" and if ExamType is EXERCISE
-                        if ((lastTwoChars.equals("-9") || lastTwoChars.equals("10") || lastTwoChars.equals("11") || lastTwoChars.equals("12")) && question.getExamType2() == Question.ExamType2.QUIZ) {
-                            // Add the current Question to filteredQuestions
-                            filteredQuestions.add(question);
-                        }
+
+                    // Check if the last two characters are "-1", "-2", "-3", or "-4" and if
+                    // ExamType is EXERCISE
+                    if ((lastTwoChars.equals("-9") || lastTwoChars.equals("10") || lastTwoChars.equals("11")
+                            || lastTwoChars.equals("12")) && question.getExamType2() == Question.ExamType2.QUIZ) {
+                        // Add the current Question to filteredQuestions
+                        filteredQuestions.add(question);
+                    }
                 }
             }
         }
 
         return new PagedResponse<>(filteredQuestions, filteredQuestions.size(), "Successfully get data", 200);
     }
+
     public void deleteQuizById(String quizId) throws IOException {
         Quiz quizResponse = quizRepository.findById(quizId);
-        if(quizResponse.isValid()){
+        if (quizResponse.isValid()) {
             quizRepository.deleteById(quizId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("Quiz", "id", quizId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

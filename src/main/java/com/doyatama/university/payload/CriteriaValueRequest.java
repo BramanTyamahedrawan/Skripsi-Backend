@@ -1,9 +1,5 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.*;
-
-import java.util.ArrayList;
-import java.util.List;
 /**
  * @author alfa
  */
@@ -20,8 +16,6 @@ public class CriteriaValueRequest {
     private String value8;
     private String value9;
 
-    private String avgOfAvgValue9;
-
     private String question_id;
     private String team_teaching_id;
     private String linguistic_value_id;
@@ -29,11 +23,12 @@ public class CriteriaValueRequest {
 
     private String lecture;
 
-
     public CriteriaValueRequest() {
     }
 
-    public CriteriaValueRequest(String id,String value1, String value2, String value3, String value4, String value5, String value6, String value7, String value8, String value9,String avgOfAvgValue9, String question_id, String team_teaching_id, String linguistic_value_id,String user_id) {
+    public CriteriaValueRequest(String id, String value1, String value2, String value3, String value4, String value5,
+            String value6, String value7, String value8, String value9, String avgOfAvgValue9, String question_id,
+            String team_teaching_id, String linguistic_value_id, String user_id) {
         this.id = id;
         this.value1 = value1;
         this.value2 = value2;
@@ -44,7 +39,6 @@ public class CriteriaValueRequest {
         this.value7 = value7;
         this.value8 = value8;
         this.value9 = value9;
-        this.avgOfAvgValue9 = avgOfAvgValue9;
         this.question_id = question_id;
         this.team_teaching_id = team_teaching_id;
         this.linguistic_value_id = linguistic_value_id;
@@ -52,14 +46,13 @@ public class CriteriaValueRequest {
 
     }
 
-    public String getId(){
+    public String getId() {
         return id;
     }
 
-    public void setId(String id){
+    public void setId(String id) {
         this.id = id;
     }
-
 
     public String getValue1() {
         return this.value1;
@@ -93,7 +86,7 @@ public class CriteriaValueRequest {
         this.value4 = value4;
     }
 
-     public String getValue5() {
+    public String getValue5() {
         return this.value5;
     }
 
@@ -137,24 +130,22 @@ public class CriteriaValueRequest {
         return this.linguistic_value_id;
     }
 
-    public String getQuestionId(){
+    public String getQuestionId() {
         return question_id;
     }
 
-    public void setQuestionId(String question_id){
+    public void setQuestionId(String question_id) {
         this.question_id = question_id;
     }
 
-    public String getTeamTeachingId(){
+    public String getTeamTeachingId() {
         return team_teaching_id;
     }
 
-    public void setTeamTeachingId(String team_teaching_id){
+    public void setTeamTeachingId(String team_teaching_id) {
         this.team_teaching_id = team_teaching_id;
     }
 
-
-    
     public String getLecture() {
         return lecture;
     }
@@ -176,7 +167,7 @@ public class CriteriaValueRequest {
             case "id":
                 this.id = value;
                 break;
-            case"question_id":
+            case "question_id":
                 this.question_id = value;
             case "value1":
                 this.value1 = value;
@@ -206,7 +197,6 @@ public class CriteriaValueRequest {
                 this.value9 = value;
                 break;
             case "avgOfAvgValue9":
-                this.avgOfAvgValue9 = value;
                 break;
             case "user_id":
                 this.user_id = value;

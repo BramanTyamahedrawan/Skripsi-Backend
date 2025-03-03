@@ -23,13 +23,15 @@ public class RPSDetail {
     private List<String> assessment_indicators;
     private Float weight;
     private Instant created_at;
-    private String weekLabel;
-
 
     public RPSDetail() {
     }
 
-    public RPSDetail(String id, Integer week, RPS rps, String sub_cp_mk, List<String> learning_materials, FormLearning form_learning, List<LearningMethod> learning_methods, List<String> assignments, List<String> estimated_times, List<String> student_learning_experiences, List<AssessmentCriteria> assessment_criterias, List<AppraisalForm> appraisal_forms, List<String> assessment_indicators, Float weight,String weekLabel, Instant created_at) {
+    public RPSDetail(String id, Integer week, RPS rps, String sub_cp_mk, List<String> learning_materials,
+            FormLearning form_learning, List<LearningMethod> learning_methods, List<String> assignments,
+            List<String> estimated_times, List<String> student_learning_experiences,
+            List<AssessmentCriteria> assessment_criterias, List<AppraisalForm> appraisal_forms,
+            List<String> assessment_indicators, Float weight, String weekLabel, Instant created_at) {
         this.id = id;
         this.week = week;
         this.rps = rps;
@@ -44,12 +46,9 @@ public class RPSDetail {
         this.appraisal_forms = appraisal_forms;
         this.assessment_indicators = assessment_indicators;
         this.weight = weight;
-        this.weekLabel = weekLabel;
         this.created_at = created_at;
-        
-    }
 
-    
+    }
 
     public String getId() {
         return id;
@@ -72,7 +71,6 @@ public class RPSDetail {
     }
 
     public void setWeekLabel(String weekLabel) {
-        this.weekLabel = weekLabel;
     }
 
     public Integer getWeek() {
@@ -82,7 +80,6 @@ public class RPSDetail {
     public void setWeek(Integer week) {
         this.week = week;
     }
-
 
     public RPS getRps() {
         return rps;
@@ -100,9 +97,7 @@ public class RPSDetail {
         this.sub_cp_mk = sub_cp_mk;
     }
 
-
-
-   public List<String> getLearning_materials() {
+    public List<String> getLearning_materials() {
         return learning_materials != null ? learning_materials : new ArrayList<>();
     }
 
@@ -147,7 +142,8 @@ public class RPSDetail {
     }
 
     public void setStudent_learning_experiences(List<String> student_learning_experiences) {
-        this.student_learning_experiences = student_learning_experiences != null ? student_learning_experiences : new ArrayList<>();
+        this.student_learning_experiences = student_learning_experiences != null ? student_learning_experiences
+                : new ArrayList<>();
     }
 
     public List<AssessmentCriteria> getAssessment_criterias() {
@@ -181,9 +177,6 @@ public class RPSDetail {
     public void setWeight(Float weight) {
         this.weight = weight;
     }
-    
-     
-
 
     public Instant getCreatedAt() {
         return created_at;

@@ -11,20 +11,16 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-/**
- * @author alfa
- */
-
 
 public class ExcelUploadService {
     public static boolean isValidExcelFile(MultipartFile file) {
-        return Objects.equals(file.getContentType(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        return Objects.equals(file.getContentType(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     }
 
     public static List<RPS> getRPSDataFromExcel(InputStream inputStream) {
@@ -32,7 +28,7 @@ public class ExcelUploadService {
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
             XSSFSheet sheet = workbook.getSheet("RPS");
-            
+
             if (sheet == null) {
                 workbook.close();
                 throw new IllegalArgumentException("Sheet 'RPS' does not exist in the Excel file.");
@@ -101,6 +97,7 @@ public class ExcelUploadService {
         }
         return rpsList;
     }
+
     public static List<RPSDetail> getRPSDetailDataFromExcel(InputStream inputStream) {
         List<RPSDetail> rpsDetailList = new ArrayList<>();
         try {
@@ -136,7 +133,8 @@ public class ExcelUploadService {
                                 rpsDetail.setWeek((int) cell.getNumericCellValue()); // Set week as Integer
                             } else if (cell.getCellType() == CellType.STRING) {
                                 try {
-                                    rpsDetail.setWeek(Integer.parseInt(cell.getStringCellValue())); // Parse string to Integer
+                                    rpsDetail.setWeek(Integer.parseInt(cell.getStringCellValue())); // Parse string to
+                                                                                                    // Integer
                                 } catch (NumberFormatException e) {
                                     // Handle the case where the string cannot be parsed to an integer
                                 }
@@ -166,7 +164,8 @@ public class ExcelUploadService {
                             if (learningMaterials == null) {
                                 learningMaterials = new ArrayList<>();
                             }
-                            String[] materials = cell.getStringCellValue().split(";"); // Assuming materials are semicolon-separated
+                            String[] materials = cell.getStringCellValue().split(";"); // Assuming materials are
+                                                                                       // semicolon-separated
                             for (String material : materials) {
                                 learningMaterials.add(material.trim());
                             }

@@ -1,11 +1,8 @@
 package com.doyatama.university.model;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 public class SchoolProfile {
     private String id;
-    
+
     private String npsn;
     private String status;
     private String bentukKependidikan;
@@ -16,11 +13,12 @@ public class SchoolProfile {
     private String tglSKOperasional;
     private School school;
     private String file_path;
-    
-    public SchoolProfile(){}
 
-    public SchoolProfile(String id, String npsn, String status, String bentukKependidikan, String kepemilikan, 
-            String SKPendirianSekolah, String tglSKPendirian, String SKIzinOperasional, String tglSKOperasional, 
+    public SchoolProfile() {
+    }
+
+    public SchoolProfile(String id, String npsn, String status, String bentukKependidikan, String kepemilikan,
+            String SKPendirianSekolah, String tglSKPendirian, String SKIzinOperasional, String tglSKOperasional,
             School school, String file_path) {
         this.id = id;
         this.npsn = npsn;
@@ -122,20 +120,20 @@ public class SchoolProfile {
     public void setFile_path(String file_path) {
         this.file_path = file_path;
     }
-    
-    public boolean isValid(){
+
+    public boolean isValid() {
         return this.id != null &&
-         this.npsn != null &&
-         this.status != null &&
-         this.bentukKependidikan != null &&
-         this.kepemilikan != null &&
-         this.SKPendirianSekolah != null &&
-         this.tglSKPendirian != null &&
-         this.SKIzinOperasional != null &&
-         this.tglSKOperasional != null;
-               
+                this.npsn != null &&
+                this.status != null &&
+                this.bentukKependidikan != null &&
+                this.kepemilikan != null &&
+                this.SKPendirianSekolah != null &&
+                this.tglSKPendirian != null &&
+                this.SKIzinOperasional != null &&
+                this.tglSKOperasional != null;
+
     }
-    
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
             case "id":

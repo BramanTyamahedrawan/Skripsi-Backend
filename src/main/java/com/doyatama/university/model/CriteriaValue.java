@@ -1,14 +1,5 @@
 package com.doyatama.university.model;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import com.doyatama.university.model.User;
-
-/**
- * @author alfa
- */
-
 public class CriteriaValue {
 
     private String id;
@@ -23,19 +14,21 @@ public class CriteriaValue {
     private LinguisticValue value8;
     private LinguisticValue value9;
 
-    private Question question;  
+    private Question question;
     private TeamTeaching team_teaching;
     private LinguisticValue linguistic_value;
     private Lecture lecture;
     private String user_id;
 
-   
     private String avgOfAvgValue9;
 
     public CriteriaValue() {
     }
 
-    public CriteriaValue(String id, LinguisticValue value1, LinguisticValue value2, LinguisticValue value3, LinguisticValue value4, LinguisticValue value5, LinguisticValue value6, LinguisticValue value7, LinguisticValue value8, LinguisticValue value9, Question question,TeamTeaching team_teaching,LinguisticValue linguisticValue, Lecture lecture, String user_id) {
+    public CriteriaValue(String id, LinguisticValue value1, LinguisticValue value2, LinguisticValue value3,
+            LinguisticValue value4, LinguisticValue value5, LinguisticValue value6, LinguisticValue value7,
+            LinguisticValue value8, LinguisticValue value9, Question question, TeamTeaching team_teaching,
+            LinguisticValue linguisticValue, Lecture lecture, String user_id) {
         this.id = id;
         this.value1 = value1;
         this.value2 = value2;
@@ -48,21 +41,20 @@ public class CriteriaValue {
         this.value9 = value9;
         this.question = question;
         this.team_teaching = team_teaching;
-        this.linguistic_value = linguistic_value;
+        // this.linguistic_value = linguistic_value;
         this.user_id = user_id;
         this.lecture = lecture;
 
     }
 
-    public String getId(){
+    public String getId() {
         return id;
     }
 
-    public void setId(String id){
+    public void setId(String id) {
         this.id = id;
     }
 
-    
     public LinguisticValue getValue1() {
         return this.value1;
     }
@@ -98,9 +90,6 @@ public class CriteriaValue {
     public LinguisticValue getValue9() {
         return this.value9;
     }
-
-    
-
 
     public void setAvgOfAvgValue9(String avgOfAvgValue9) {
         this.avgOfAvgValue9 = avgOfAvgValue9;
@@ -143,14 +132,14 @@ public class CriteriaValue {
     }
 
     public String getAvgOfAvgValue9() {
-         if (value9 != null) {
-            this.avgOfAvgValue9 = String.valueOf((value9.getValue1() + value9.getValue2() + value9.getValue3() + value9.getValue4()) / 4.0f);
+        if (value9 != null) {
+            this.avgOfAvgValue9 = String.valueOf(
+                    (value9.getValue1() + value9.getValue2() + value9.getValue3() + value9.getValue4()) / 4.0f);
         }
         return avgOfAvgValue9;
     }
 
-
-   public Question getQuestion() {
+    public Question getQuestion() {
         return question;
     }
 
@@ -158,23 +147,21 @@ public class CriteriaValue {
         this.question = question;
     }
 
-
-    public TeamTeaching getTeamTeaching(){
+    public TeamTeaching getTeamTeaching() {
         return team_teaching;
     }
 
-    public void setTeamTeaching(TeamTeaching team_teaching){
+    public void setTeamTeaching(TeamTeaching team_teaching) {
         this.team_teaching = team_teaching;
     }
 
-    public LinguisticValue getLinguisticValue(){
+    public LinguisticValue getLinguisticValue() {
         return linguistic_value;
     }
 
-    public void setLinguisticValue(LinguisticValue linguistic_value){
+    public void setLinguisticValue(LinguisticValue linguistic_value) {
         this.linguistic_value = linguistic_value;
     }
-
 
     public Lecture getLecture() {
         return lecture;
@@ -192,13 +179,13 @@ public class CriteriaValue {
         this.user_id = user_id;
     }
 
-
-    public boolean isValid(){
-        return this.id != null  && this.value1 != null && this.value2 != null && this.value3 != null && this.value4 != null && this.value5 != null && this.value6 != null && this.value7 != null && this.value8 != null && this.value9 != null;
+    public boolean isValid() {
+        return this.id != null && this.value1 != null && this.value2 != null && this.value3 != null
+                && this.value4 != null && this.value5 != null && this.value6 != null && this.value7 != null
+                && this.value8 != null && this.value9 != null;
     }
 
-    
-    public void set(String fieldName,  String value){
+    public void set(String fieldName, String value) {
         switch (fieldName) {
             case "id":
                 this.id = value;

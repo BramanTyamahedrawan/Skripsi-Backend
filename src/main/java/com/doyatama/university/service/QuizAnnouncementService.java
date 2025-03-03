@@ -1,28 +1,17 @@
 package com.doyatama.university.service;
 
-
-import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.*;
-import com.doyatama.university.model.Quiz;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.QuizAnnouncementRequest;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
-import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
 
 /**
  * @author alfa
@@ -33,12 +22,12 @@ public class QuizAnnouncementService {
 
     private QuestionRepository questionRepository = new QuestionRepository();
     private RPSRepository rpsRepository = new RPSRepository();
-    
-    private static final Logger logger = LoggerFactory.getLogger(QuizAnnouncementService.class);
+
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(QuizAnnouncementService.class);
 
     public PagedResponse<QuizAnnouncement> getAllQuizAnnouncements(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
-
 
         // Retrieve QuizAnnouncements
         List<QuizAnnouncement> quizAnnouncements = quizAnnouncementRepository.findAll(size);
@@ -55,7 +44,8 @@ public class QuizAnnouncementService {
             List<Question> filteredQuestions = new ArrayList<>();
 
             // Retrieve the questions associated with the given RPS ID
-            List<Question> questions = questionRepository.findAllByRPS(quizAnnouncementRequest.getRps_id(), quizAnnouncementRequest.getSizeQuestion());
+            List<Question> questions = questionRepository.findAllByRPS(quizAnnouncementRequest.getRps_id(),
+                    quizAnnouncementRequest.getSizeQuestion());
 
             // Inside your for loop where you're iterating over the questions
             for (Question question : questions) {
@@ -73,8 +63,10 @@ public class QuizAnnouncementService {
                         // Get the last two characters of the ID
                         String lastTwoChars = questionRpsDetailId.substring(questionRpsDetailId.length() - 2);
 
-                        // Check if the last two characters are "-1", "-2", "-3", or "-4" and if ExamType is QUIZ
-                        if ((lastTwoChars.equals("-1") || lastTwoChars.equals("-2") || lastTwoChars.equals("-3") || lastTwoChars.equals("-4")) && question.getExamType2() == Question.ExamType2.QUIZ) {
+                        // Check if the last two characters are "-1", "-2", "-3", or "-4" and if
+                        // ExamType is QUIZ
+                        if ((lastTwoChars.equals("-1") || lastTwoChars.equals("-2") || lastTwoChars.equals("-3")
+                                || lastTwoChars.equals("-4")) && question.getExamType2() == Question.ExamType2.QUIZ) {
                             // Add the current Question to filteredQuestions
                             filteredQuestions.add(question);
                         }
@@ -84,11 +76,12 @@ public class QuizAnnouncementService {
 
             questionList = filteredQuestions;
         } else {
-        // Define the filteredQuestions list
+            // Define the filteredQuestions list
             List<Question> filteredQuestions = new ArrayList<>();
 
             // Retrieve the questions associated with the given RPS ID
-            List<Question> questions = questionRepository.findAllByRPS(quizAnnouncementRequest.getRps_id(), quizAnnouncementRequest.getSizeQuestion());
+            List<Question> questions = questionRepository.findAllByRPS(quizAnnouncementRequest.getRps_id(),
+                    quizAnnouncementRequest.getSizeQuestion());
 
             // Inside your for loop where you're iterating over the questions
             for (Question question : questions) {
@@ -106,8 +99,10 @@ public class QuizAnnouncementService {
                         // Get the last two characters of the ID
                         String lastTwoChars = questionRpsDetailId.substring(questionRpsDetailId.length() - 2);
 
-                       // Check if the last two characters are "-1", "-2", "-3", or "-4" and if ExamType is EXERCISE
-                        if ((lastTwoChars.equals("-9") || lastTwoChars.equals("10") || lastTwoChars.equals("11") || lastTwoChars.equals("12")) && question.getExamType2() == Question.ExamType2.QUIZ) {
+                        // Check if the last two characters are "-1", "-2", "-3", or "-4" and if
+                        // ExamType is EXERCISE
+                        if ((lastTwoChars.equals("-9") || lastTwoChars.equals("10") || lastTwoChars.equals("11")
+                                || lastTwoChars.equals("12")) && question.getExamType2() == Question.ExamType2.QUIZ) {
                             // Add the current Question to filteredQuestions
                             filteredQuestions.add(question);
                         }
@@ -142,15 +137,16 @@ public class QuizAnnouncementService {
         }
     }
 
-
     public DefaultResponse<QuizAnnouncement> getQuizAnnouncementById(String quizAnnouncementId) throws IOException {
         // Retrieve QuizAnnouncement
         QuizAnnouncement quizAnnouncementResponse = quizAnnouncementRepository.findById(quizAnnouncementId);
         boolean isValid = quizAnnouncementResponse != null && quizAnnouncementResponse.isValid();
-        return new DefaultResponse<>(isValid ? quizAnnouncementResponse : null, isValid ? 1 : 0, "Successfully retrieved data");
+        return new DefaultResponse<>(isValid ? quizAnnouncementResponse : null, isValid ? 1 : 0,
+                "Successfully retrieved data");
     }
 
-    public QuizAnnouncement updateQuizAnnouncement(String quizAnnouncementId, QuizAnnouncementRequest quizAnnouncementRequest) throws IOException {
+    public QuizAnnouncement updateQuizAnnouncement(String quizAnnouncementId,
+            QuizAnnouncementRequest quizAnnouncementRequest) throws IOException {
         QuizAnnouncement quizAnnouncement = quizAnnouncementRepository.findById(quizAnnouncementId);
         if (quizAnnouncement == null) {
             throw new IOException("QuizAnnouncement not found");
@@ -183,7 +179,6 @@ public class QuizAnnouncementService {
             throw new ResourceNotFoundException("QuizAnnouncement", "id", quizAnnouncementId);
         }
     }
-
 
     private void validatePageNumberAndSize(int page, int size) {
         if (page < 0) {

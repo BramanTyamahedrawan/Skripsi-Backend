@@ -1,13 +1,5 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.*;
-
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
-
 public class QuestionRequest {
     private String id;
     private String title;
@@ -23,7 +15,8 @@ public class QuestionRequest {
     public QuestionRequest() {
     }
 
-    public QuestionRequest(String id, String title, String description, String question_type, String answer_type, String rps_detail_id, String examType, String examType2, String examType3, String explanation) {
+    public QuestionRequest(String id, String title, String description, String question_type, String answer_type,
+            String rps_detail_id, String examType, String examType2, String examType3, String explanation) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -35,7 +28,6 @@ public class QuestionRequest {
         this.examType3 = examType3;
         this.explanation = explanation;
     }
-
 
     public String getId() {
         return id;
@@ -77,7 +69,6 @@ public class QuestionRequest {
         this.answer_type = answer_type;
     }
 
-    
     public String getExamType() {
         return examType;
     }

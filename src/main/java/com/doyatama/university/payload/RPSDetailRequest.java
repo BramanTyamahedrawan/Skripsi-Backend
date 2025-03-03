@@ -1,8 +1,5 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.*;
-
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,10 +18,15 @@ public class RPSDetailRequest {
     private List<String> appraisal_forms;
     private List<String> assessment_indicators;
     private Float weight;
+
     public RPSDetailRequest() {
     }
 
-    public RPSDetailRequest(String rps_id, Integer week, String sub_cp_mk,String weekLabel, List<String> learning_materials, String form_learning_id, List<String> learning_methods, List<String> assignments, List<String> estimated_times, List<String> student_learning_experiences, List<String> assessment_criterias, List<String> appraisal_forms, List<String> assessment_indicators, Float weight) {
+    public RPSDetailRequest(String rps_id, Integer week, String sub_cp_mk, String weekLabel,
+            List<String> learning_materials, String form_learning_id, List<String> learning_methods,
+            List<String> assignments, List<String> estimated_times, List<String> student_learning_experiences,
+            List<String> assessment_criterias, List<String> appraisal_forms, List<String> assessment_indicators,
+            Float weight) {
         this.rps_id = rps_id;
         this.week = week;
         this.sub_cp_mk = sub_cp_mk;
@@ -191,7 +193,7 @@ public class RPSDetailRequest {
             case "weight":
                 this.weight = Float.parseFloat(value);
                 break;
-            case"weekLabel":
+            case "weekLabel":
                 this.weekLabel = value;
                 break;
             default:

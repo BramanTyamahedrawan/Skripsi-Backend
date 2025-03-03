@@ -1,27 +1,21 @@
 package com.doyatama.university.payload;
 
-import com.doyatama.university.model.Lecture;
-
-import java.util.Collections;
-import java.util.List;
-/**
- * @author alfa
- */
-
 public class TeamTeachingRequest {
     private String id;
     private String name;
     private String description;
-    
+
     private String lecture;
     private String lecture2;
     private String lecture3;
+
     // Default constructor
     public TeamTeachingRequest() {
     }
 
     // Constructor with parameters
-    public TeamTeachingRequest(String id, String name, String description,String lecture, String lecture2, String lecture3) {
+    public TeamTeachingRequest(String id, String name, String description, String lecture, String lecture2,
+            String lecture3) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -79,7 +73,7 @@ public class TeamTeachingRequest {
         this.lecture3 = lecture3;
     }
 
-    public void set (String fieldName, String value) {
+    public void set(String fieldName, String value) {
         switch (fieldName) {
             case "id":
                 this.id = value;

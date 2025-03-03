@@ -11,8 +11,8 @@ import com.doyatama.university.repository.QuestionRepository;
 import com.doyatama.university.repository.AnswerRepository;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ public class AnswerService {
     private AnswerRepository answerRepository = new AnswerRepository();
     private QuestionRepository questionRepository = new QuestionRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(AnswerService.class);
-
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(AnswerService.class);
 
     public PagedResponse<Answer> getAllAnswer(int page, int size, String questionId) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -32,9 +32,9 @@ public class AnswerService {
         // Retrieve Polls
         List<Answer> answerResponse = new ArrayList<>();
 
-        if(questionId.equalsIgnoreCase("*")){
+        if (questionId.equalsIgnoreCase("*")) {
             answerResponse = answerRepository.findAll(size);
-        }else{
+        } else {
             answerResponse = answerRepository.findAnswerByQuestion(questionId, size);
         }
 
@@ -57,11 +57,11 @@ public class AnswerService {
         }
     }
 
-
     public DefaultResponse<Answer> getAnswerById(String answerId) throws IOException {
         // Retrieve Answer
         Answer answerResponse = answerRepository.findById(answerId);
-        return new DefaultResponse<>(answerResponse.isValid() ? answerResponse : null, answerResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(answerResponse.isValid() ? answerResponse : null, answerResponse.isValid() ? 1 : 0,
+                "Successfully get data");
     }
 
     public Answer updateAnswer(String answerId, AnswerRequest answerRequest, String savePath) throws IOException {
@@ -82,19 +82,19 @@ public class AnswerService {
 
     public void deleteAnswerById(String answerId) throws IOException {
         Answer answerResponse = answerRepository.findById(answerId);
-        if(answerResponse.isValid()){
+        if (answerResponse.isValid()) {
             answerRepository.deleteById(answerId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("Answer", "id", answerId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

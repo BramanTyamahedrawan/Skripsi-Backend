@@ -2,8 +2,6 @@ package com.doyatama.university.controller;
 
 import com.doyatama.university.config.PathConfig;
 import com.doyatama.university.model.Answer;
-import com.doyatama.university.model.Exam;
-import com.doyatama.university.model.Question;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.AnswerRequest;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -31,14 +28,16 @@ public class AnswerController {
     private AnswerService answerService = new AnswerService();
 
     @GetMapping
-    public PagedResponse<Answer> getAnswers(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-                                            @RequestParam(value = "questionID", defaultValue = "*") String questionID) throws IOException {
+    public PagedResponse<Answer> getAnswers(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "questionID", defaultValue = "*") String questionID) throws IOException {
         return answerService.getAllAnswer(page, size, questionID);
     }
 
     @PostMapping
-    public ResponseEntity<?> createAnswer(@RequestPart(value = "file", required = false) MultipartFile file, @ModelAttribute AnswerRequest answerRequest) throws IOException {
+    public ResponseEntity<?> createAnswer(@RequestPart(value = "file", required = false) MultipartFile file,
+            @ModelAttribute AnswerRequest answerRequest) throws IOException {
 
         if (file != null && !file.isEmpty()) {
             // upload file
@@ -70,15 +69,15 @@ public class AnswerController {
                 Configuration configuration = new Configuration();
                 FileSystem fs = FileSystem.get(URI.create(uri), configuration);
                 fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
-                String savePath = "webhdfs/v1/answers/"+ newFileName + fileExtension +"?op=OPEN";
+                String savePath = "webhdfs/v1/answers/" + newFileName + fileExtension + "?op=OPEN";
 
                 newFile.delete();
                 Answer answer = answerService.createAnswer(answerRequest, savePath);
 
-                if(answer == null){
+                if (answer == null) {
                     return ResponseEntity.badRequest()
                             .body(new ApiResponse(false, "Please check relational ID"));
-                }else{
+                } else {
                     URI location = ServletUriComponentsBuilder
                             .fromCurrentRequest().path("/{answerId}")
                             .buildAndExpand(answer.getId()).toUri();
@@ -92,15 +91,15 @@ public class AnswerController {
                 return ResponseEntity.badRequest()
                         .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
             }
-        }else{
+        } else {
             // Tidak ada input file
             try {
                 Answer answer = answerService.createAnswer(answerRequest, "");
 
-                if(answer == null){
+                if (answer == null) {
                     return ResponseEntity.badRequest()
                             .body(new ApiResponse(false, "Please check relational ID"));
-                }else{
+                } else {
                     URI location = ServletUriComponentsBuilder
                             .fromCurrentRequest().path("/{answerId}")
                             .buildAndExpand(answer.getId()).toUri();
@@ -116,8 +115,6 @@ public class AnswerController {
             }
         }
 
-
-
     }
 
     @GetMapping("/{answerId}")
@@ -127,7 +124,7 @@ public class AnswerController {
 
     @PutMapping("/{answerId}")
     public ResponseEntity<?> updateAnswer(@PathVariable String answerId,
-                                          @RequestParam("file") MultipartFile file, @ModelAttribute AnswerRequest answerRequest) throws IOException {
+            @RequestParam("file") MultipartFile file, @ModelAttribute AnswerRequest answerRequest) throws IOException {
         // upload file
         try {
             // Mendapatkan nama file asli
@@ -157,7 +154,7 @@ public class AnswerController {
             Configuration configuration = new Configuration();
             FileSystem fs = FileSystem.get(URI.create(uri), configuration);
             fs.copyFromLocalFile(new Path(localPath), new Path(hdfsDir));
-            String savePath = "webhdfs/v1/answers/"+ newFileName + fileExtension +"?op=OPEN";
+            String savePath = "webhdfs/v1/answers/" + newFileName + fileExtension + "?op=OPEN";
 
             newFile.delete();
             Answer answer = answerService.updateAnswer(answerId, answerRequest, savePath);
@@ -175,11 +172,10 @@ public class AnswerController {
                     .body(new ApiResponse(false, "Cannot Upload File into Hadoop"));
         }
 
-
     }
 
     @DeleteMapping("/{answerId}")
-    public HttpStatus deleteAnswer(@PathVariable (value = "answerId") String answerId) throws IOException {
+    public HttpStatus deleteAnswer(@PathVariable(value = "answerId") String answerId) throws IOException {
         answerService.deleteAnswerById(answerId);
         return HttpStatus.FORBIDDEN;
     }

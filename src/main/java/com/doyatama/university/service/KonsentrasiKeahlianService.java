@@ -17,8 +17,8 @@ import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,7 +31,8 @@ public class KonsentrasiKeahlianService {
     private KonsentrasiKeahlianRepository konsentrasiKeahlianRepository = new KonsentrasiKeahlianRepository();
     private ProgramKeahlianRepository programKeahlianRepository = new ProgramKeahlianRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(KonsentrasiKeahlianService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(KonsentrasiKeahlianService.class);
 
     public PagedResponse<KonsentrasiKeahlian> getAllKonsentrasiKeahlian(int page, int size, String programId)
             throws IOException {

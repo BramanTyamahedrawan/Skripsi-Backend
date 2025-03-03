@@ -9,9 +9,6 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.*;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -23,8 +20,8 @@ public class LectureService {
     private ProgramKeahlianRepository programKeahlianRepository = new ProgramKeahlianRepository();
     private KonsentrasiKeahlianRepository konsentrasiKeahlianRepository = new KonsentrasiKeahlianRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(LectureService.class);
-
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(LectureService.class);
 
     public PagedResponse<Lecture> getAllLecture(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -37,8 +34,10 @@ public class LectureService {
     public Lecture createLecture(LectureRequest lectureRequest) throws IOException {
         BidangKeahlian bidang = bidangKeahlianRepository.findById(lectureRequest.getBidangKeahlian_id());
         ProgramKeahlian program = programKeahlianRepository.findById(lectureRequest.getProgramKeahlian_id());
-        KonsentrasiKeahlian konsentrasi = konsentrasiKeahlianRepository.findById(lectureRequest.getKonsentrasiKeahlian_id());
-        Religion religionResponse = religionRepository.findById(lectureRequest.getReligion_id() != "" ? lectureRequest.getReligion_id() : "0");
+        KonsentrasiKeahlian konsentrasi = konsentrasiKeahlianRepository
+                .findById(lectureRequest.getKonsentrasiKeahlian_id());
+        Religion religionResponse = religionRepository
+                .findById(lectureRequest.getReligion_id() != "" ? lectureRequest.getReligion_id() : "0");
         Lecture lecture = new Lecture();
         if (religionResponse.getName() != null) {
             lecture.setNip(lectureRequest.getNip());
@@ -62,14 +61,17 @@ public class LectureService {
     public DefaultResponse<Lecture> getLectureById(String lectureId) throws IOException {
         // Retrieve Lecture
         Lecture lectureResponse = lectureRepository.findById(lectureId);
-        return new DefaultResponse<>(lectureResponse.isValid() ? lectureResponse : null, lectureResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(lectureResponse.isValid() ? lectureResponse : null,
+                lectureResponse.isValid() ? 1 : 0, "Successfully get data");
     }
 
     public Lecture updateLecture(String lectureId, LectureRequest lectureRequest) throws IOException {
         BidangKeahlian bidang = bidangKeahlianRepository.findById(lectureRequest.getBidangKeahlian_id());
         ProgramKeahlian program = programKeahlianRepository.findById(lectureRequest.getProgramKeahlian_id());
-        KonsentrasiKeahlian konsentrasi = konsentrasiKeahlianRepository.findById(lectureRequest.getKonsentrasiKeahlian_id());
-        Religion religionResponse = religionRepository.findById(lectureRequest.getReligion_id() != "" ? lectureRequest.getReligion_id() : "0");
+        KonsentrasiKeahlian konsentrasi = konsentrasiKeahlianRepository
+                .findById(lectureRequest.getKonsentrasiKeahlian_id());
+        Religion religionResponse = religionRepository
+                .findById(lectureRequest.getReligion_id() != "" ? lectureRequest.getReligion_id() : "0");
         Lecture lecture = new Lecture();
         if (religionResponse.getName() != null) {
             lecture.setNip(lectureRequest.getNip());
@@ -92,19 +94,19 @@ public class LectureService {
 
     public void deleteLectureById(String lectureId) throws IOException {
         Lecture lectureResponse = lectureRepository.findById(lectureId);
-        if(lectureResponse.isValid()){
+        if (lectureResponse.isValid()) {
             lectureRepository.deleteById(lectureId);
-        }else{
+        } else {
             throw new ResourceNotFoundException("Lecture", "id", lectureId);
         }
     }
 
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }

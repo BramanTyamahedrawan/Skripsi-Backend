@@ -1,10 +1,7 @@
 package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
-import com.doyatama.university.model.Lecture;
-import com.doyatama.university.model.Question;
 import com.doyatama.university.model.Student;
-import com.doyatama.university.model.User;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -14,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class StudentRepository {
     Configuration conf = HBaseConfiguration.create();
@@ -42,7 +38,7 @@ public class StudentRepository {
 
         return client.showListTable(tableUsers.toString(), columnMapping, Student.class, size);
     }
-    
+
     public List<Student> findAllById(List<String> studentIds) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -61,7 +57,6 @@ public class StudentRepository {
         columnMapping.put("programKeahlian", "programKeahlian");
         columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
 
-
         List<Student> students = new ArrayList<>();
         for (String studentId : studentIds) {
             Student student = client.showDataTable(tableStudent.toString(), columnMapping, studentId, Student.class);
@@ -72,7 +67,7 @@ public class StudentRepository {
 
         return students;
     }
-    
+
     public List<List<Student>> findAllById2D(List<List<String>> studentIdGroups) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
         TableName tableStudent = TableName.valueOf(tableName);
@@ -96,7 +91,8 @@ public class StudentRepository {
         for (List<String> studentIds : studentIdGroups) {
             List<Student> studentRow = new ArrayList<>();
             for (String studentId : studentIds) {
-                Student student = client.showDataTable(tableStudent.toString(), columnMapping, studentId, Student.class);
+                Student student = client.showDataTable(tableStudent.toString(), columnMapping, studentId,
+                        Student.class);
                 if (student != null) {
                     studentRow.add(student);
                 }
@@ -106,7 +102,6 @@ public class StudentRepository {
 
         return students2D;
     }
-
 
     public Student save(Student student) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -127,9 +122,12 @@ public class StudentRepository {
         client.insertRecord(tableStudent, rowKey, "bidangKeahlian", "id", student.getBidangKeahlian().getId());
         client.insertRecord(tableStudent, rowKey, "bidangKeahlian", "bidang", student.getBidangKeahlian().getBidang());
         client.insertRecord(tableStudent, rowKey, "programKeahlian", "id", student.getProgramKeahlian().getId());
-        client.insertRecord(tableStudent, rowKey, "programKeahlian", "program", student.getProgramKeahlian().getProgram());
-        client.insertRecord(tableStudent, rowKey, "konsentrasiKeahlian", "id", student.getKonsentrasiKeahlian().getId());
-        client.insertRecord(tableStudent, rowKey, "konsentrasiKeahlian", "konsentrasi", student.getKonsentrasiKeahlian().getKonsentrasi());
+        client.insertRecord(tableStudent, rowKey, "programKeahlian", "program",
+                student.getProgramKeahlian().getProgram());
+        client.insertRecord(tableStudent, rowKey, "konsentrasiKeahlian", "id",
+                student.getKonsentrasiKeahlian().getId());
+        client.insertRecord(tableStudent, rowKey, "konsentrasiKeahlian", "konsentrasi",
+                student.getKonsentrasiKeahlian().getKonsentrasi());
         client.insertRecord(tableStudent, rowKey, "detail", "created_by", "Doyatama");
         return student;
     }
@@ -170,11 +168,15 @@ public class StudentRepository {
         client.insertRecord(tableStudent, studentId, "religion", "id", student.getReligion().getId());
         client.insertRecord(tableStudent, studentId, "religion", "name", student.getReligion().getName());
         client.insertRecord(tableStudent, studentId, "bidangKeahlian", "id", student.getBidangKeahlian().getId());
-        client.insertRecord(tableStudent, studentId, "bidangKeahlian", "bidang", student.getBidangKeahlian().getBidang());
+        client.insertRecord(tableStudent, studentId, "bidangKeahlian", "bidang",
+                student.getBidangKeahlian().getBidang());
         client.insertRecord(tableStudent, studentId, "programKeahlian", "id", student.getProgramKeahlian().getId());
-        client.insertRecord(tableStudent, studentId, "programKeahlian", "program", student.getProgramKeahlian().getProgram());
-        client.insertRecord(tableStudent, studentId, "konsentrasiKeahlian", "id", student.getKonsentrasiKeahlian().getId());
-        client.insertRecord(tableStudent, studentId, "konsentrasiKeahlian", "konsentrasi", student.getKonsentrasiKeahlian().getKonsentrasi());
+        client.insertRecord(tableStudent, studentId, "programKeahlian", "program",
+                student.getProgramKeahlian().getProgram());
+        client.insertRecord(tableStudent, studentId, "konsentrasiKeahlian", "id",
+                student.getKonsentrasiKeahlian().getId());
+        client.insertRecord(tableStudent, studentId, "konsentrasiKeahlian", "konsentrasi",
+                student.getKonsentrasiKeahlian().getKonsentrasi());
         client.insertRecord(tableStudent, studentId, "detail", "created_by", "Doyatama");
         return student;
     }
@@ -188,14 +190,14 @@ public class StudentRepository {
         // Add the mappings to the HashMap
         columnMapping.put("id", "id");
 
-        Student student = client.getDataByColumn(tableUsers.toString(), columnMapping, "user", "id", UID, Student.class);
-        if(student.getId() != null){
+        Student student = client.getDataByColumn(tableUsers.toString(), columnMapping, "user", "id", UID,
+                Student.class);
+        if (student.getId() != null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-
 
     public boolean deleteById(String studentId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);

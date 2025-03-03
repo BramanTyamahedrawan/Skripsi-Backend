@@ -5,17 +5,13 @@ package com.doyatama.university.repository;
  */
 
 import com.doyatama.university.helper.HBaseCustomClient;
-import com.doyatama.university.model.Lecture;
 import com.doyatama.university.model.TeamTeaching;
 import org.apache.hadoop.conf.Configuration;
-import com.google.gson.Gson;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TeamTeachingRepository {
 
@@ -51,14 +47,14 @@ public class TeamTeachingRepository {
         client.insertRecord(tableTeamTeaching, rowKey, "main", "name", teamTeaching.getName());
         client.insertRecord(tableTeamTeaching, rowKey, "main", "description", teamTeaching.getDescription());
 
-        client.insertRecord(tableTeamTeaching, rowKey, "lecture","id", teamTeaching.getLecture().getId());
-        client.insertRecord(tableTeamTeaching, rowKey, "lecture","name", teamTeaching.getLecture().getName());
+        client.insertRecord(tableTeamTeaching, rowKey, "lecture", "id", teamTeaching.getLecture().getId());
+        client.insertRecord(tableTeamTeaching, rowKey, "lecture", "name", teamTeaching.getLecture().getName());
 
-        client.insertRecord(tableTeamTeaching, rowKey, "lecture2" ,"id", teamTeaching.getLecture2().getId());
-        client.insertRecord(tableTeamTeaching, rowKey, "lecture2","name", teamTeaching.getLecture2().getName());
+        client.insertRecord(tableTeamTeaching, rowKey, "lecture2", "id", teamTeaching.getLecture2().getId());
+        client.insertRecord(tableTeamTeaching, rowKey, "lecture2", "name", teamTeaching.getLecture2().getName());
 
-        client.insertRecord(tableTeamTeaching, rowKey, "lecture3" ,"id", teamTeaching.getLecture3().getId());
-        client.insertRecord(tableTeamTeaching, rowKey, "lecture3" ,"name", teamTeaching.getLecture3().getName());
+        client.insertRecord(tableTeamTeaching, rowKey, "lecture3", "id", teamTeaching.getLecture3().getId());
+        client.insertRecord(tableTeamTeaching, rowKey, "lecture3", "name", teamTeaching.getLecture3().getName());
 
         return teamTeaching;
     }
@@ -87,17 +83,19 @@ public class TeamTeachingRepository {
         client.insertRecord(tableTeamTeaching, teamTeachingId, "main", "name", teamTeaching.getName());
         client.insertRecord(tableTeamTeaching, teamTeachingId, "main", "description", teamTeaching.getDescription());
 
-        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture","id", teamTeaching.getLecture().getId());
-        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture","name", teamTeaching.getLecture().getName());
+        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture", "id", teamTeaching.getLecture().getId());
+        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture", "name", teamTeaching.getLecture().getName());
 
-        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture2","id", teamTeaching.getLecture2().getId());
-        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture2","name", teamTeaching.getLecture2().getName());
+        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture2", "id", teamTeaching.getLecture2().getId());
+        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture2", "name",
+                teamTeaching.getLecture2().getName());
 
-        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture3","id", teamTeaching.getLecture3().getId());
-        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture3","name", teamTeaching.getLecture3().getName());
-        
+        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture3", "id", teamTeaching.getLecture3().getId());
+        client.insertRecord(tableTeamTeaching, teamTeachingId, "lecture3", "name",
+                teamTeaching.getLecture3().getName());
+
         return teamTeaching;
-    }   
+    }
 
     public boolean deleteById(String teamTeachingId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -105,7 +103,7 @@ public class TeamTeachingRepository {
         return true;
     }
 
-    public List<TeamTeaching> findAllById (List<String> TeamTeachingIds) throws IOException {
+    public List<TeamTeaching> findAllById(List<String> TeamTeachingIds) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName table = TableName.valueOf(tableName);
@@ -121,7 +119,8 @@ public class TeamTeachingRepository {
 
         List<TeamTeaching> teamTeachings = new ArrayList<>();
         for (String teamTeachingId : TeamTeachingIds) {
-            TeamTeaching teamTeaching = client.showDataTable(table.toString(), columnMapping, teamTeachingId, TeamTeaching.class);
+            TeamTeaching teamTeaching = client.showDataTable(table.toString(), columnMapping, teamTeachingId,
+                    TeamTeaching.class);
             if (teamTeaching != null) {
                 teamTeachings.add(teamTeaching);
             }
@@ -129,7 +128,7 @@ public class TeamTeachingRepository {
         return teamTeachings;
     }
 
-    public List<TeamTeaching> findRelationById (List <String> TeamTeachingIds) throws IOException {
+    public List<TeamTeaching> findRelationById(List<String> TeamTeachingIds) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName table = TableName.valueOf(tableName);
@@ -145,14 +144,13 @@ public class TeamTeachingRepository {
 
         List<TeamTeaching> teamTeachings = new ArrayList<>();
         for (String teamTeachingId : TeamTeachingIds) {
-            TeamTeaching teamTeaching = client.showDataTable(table.toString(), columnMapping, teamTeachingId, TeamTeaching.class);
+            TeamTeaching teamTeaching = client.showDataTable(table.toString(), columnMapping, teamTeachingId,
+                    TeamTeaching.class);
             if (teamTeaching != null) {
                 teamTeachings.add(teamTeaching);
             }
         }
         return teamTeachings;
     }
-
-
 
 }

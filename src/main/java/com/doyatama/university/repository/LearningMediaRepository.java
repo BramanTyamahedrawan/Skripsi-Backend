@@ -2,7 +2,6 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.LearningMedia;
-import com.doyatama.university.model.User;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -55,7 +54,8 @@ public class LearningMediaRepository {
         columnMapping.put("description", "description");
         columnMapping.put("type", "type");
 
-        return client.showDataTable(tableLearningMedias.toString(), columnMapping, learningMediaId, LearningMedia.class);
+        return client.showDataTable(tableLearningMedias.toString(), columnMapping, learningMediaId,
+                LearningMedia.class);
     }
 
     public List<LearningMedia> findByType(String type, int size) throws IOException {
@@ -69,7 +69,8 @@ public class LearningMediaRepository {
         columnMapping.put("description", "description");
         columnMapping.put("type", "type");
 
-        return client.getDataListByColumn(table.toString(), columnMapping, "main", "type", type, LearningMedia.class, size);
+        return client.getDataListByColumn(table.toString(), columnMapping, "main", "type", type, LearningMedia.class,
+                size);
     }
 
     public List<LearningMedia> findAllById(List<String> learningMediaIds) throws IOException {
@@ -85,7 +86,8 @@ public class LearningMediaRepository {
 
         List<LearningMedia> learningMedias = new ArrayList<>();
         for (String learningMediaId : learningMediaIds) {
-            LearningMedia learningMedia = client.showDataTable(table.toString(), columnMapping, learningMediaId, LearningMedia.class);
+            LearningMedia learningMedia = client.showDataTable(table.toString(), columnMapping, learningMediaId,
+                    LearningMedia.class);
             if (learningMedia != null) {
                 learningMedias.add(learningMedia);
             }

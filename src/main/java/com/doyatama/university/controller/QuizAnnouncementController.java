@@ -1,11 +1,9 @@
 package com.doyatama.university.controller;
 
-
 import com.doyatama.university.model.QuizAnnouncement;
 import com.doyatama.university.payload.*;
 import com.doyatama.university.service.QuizAnnouncementService;
 import com.doyatama.university.util.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +20,12 @@ import java.net.URI;
 @RequestMapping("/api/quizAnnouncements")
 public class QuizAnnouncementController {
 
-    private QuizAnnouncementService quizAnnouncementService= new QuizAnnouncementService();
+    private QuizAnnouncementService quizAnnouncementService = new QuizAnnouncementService();
 
-
-      @GetMapping
-    public PagedResponse<QuizAnnouncement> getQuizAnnouncements(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException{
+    @GetMapping
+    public PagedResponse<QuizAnnouncement> getQuizAnnouncements(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         // Validate page and size parameters
         if (page < 1 || size < 1) {
             throw new IllegalArgumentException("Page number and size must be greater than zero.");
@@ -37,7 +35,8 @@ public class QuizAnnouncementController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createQuizAnnouncement(@Valid @RequestBody QuizAnnouncementRequest quizAnnouncementRequest) throws IOException {
+    public ResponseEntity<?> createQuizAnnouncement(@Valid @RequestBody QuizAnnouncementRequest quizAnnouncementRequest)
+            throws IOException {
         QuizAnnouncement quizAnnouncement = quizAnnouncementService.createQuizAnnouncement(quizAnnouncementRequest);
 
         if (quizAnnouncement == null) {
@@ -54,14 +53,16 @@ public class QuizAnnouncementController {
     }
 
     @GetMapping("/{quizAnnouncementId}")
-    public DefaultResponse<QuizAnnouncement> getQuizAnnouncementById(@PathVariable String quizAnnouncementId) throws IOException {
+    public DefaultResponse<QuizAnnouncement> getQuizAnnouncementById(@PathVariable String quizAnnouncementId)
+            throws IOException {
         return quizAnnouncementService.getQuizAnnouncementById(quizAnnouncementId);
     }
 
     @PutMapping("/{quizAnnouncementId}")
     public ResponseEntity<?> updateQuizAnnouncement(@PathVariable String quizAnnouncementId,
-                                                    @Valid @RequestBody QuizAnnouncementRequest quizAnnouncementRequest) throws IOException {
-        QuizAnnouncement quizAnnouncement = quizAnnouncementService.updateQuizAnnouncement(quizAnnouncementId, quizAnnouncementRequest);
+            @Valid @RequestBody QuizAnnouncementRequest quizAnnouncementRequest) throws IOException {
+        QuizAnnouncement quizAnnouncement = quizAnnouncementService.updateQuizAnnouncement(quizAnnouncementId,
+                quizAnnouncementRequest);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{quizAnnouncementId}")
@@ -72,7 +73,8 @@ public class QuizAnnouncementController {
     }
 
     @DeleteMapping("/{quizAnnouncementId}")
-    public HttpStatus deleteQuizAnnouncement(@PathVariable(value = "quizAnnouncementId") String quizAnnouncementId) throws IOException {
+    public HttpStatus deleteQuizAnnouncement(@PathVariable(value = "quizAnnouncementId") String quizAnnouncementId)
+            throws IOException {
         quizAnnouncementService.deleteQuizAnnouncementById(quizAnnouncementId);
         return HttpStatus.FORBIDDEN;
     }

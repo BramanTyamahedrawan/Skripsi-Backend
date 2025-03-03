@@ -15,10 +15,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.stereotype.Repository;
@@ -59,12 +56,11 @@ public class RPSRepository {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         String rowKey;
-            if (rps.getId() != null && !rps.getId().isEmpty()) {
-                rowKey = rps.getId();
-            } else {
-                rowKey = UUID.randomUUID().toString().substring(0, 20);
-            }
-
+        if (rps.getId() != null && !rps.getId().isEmpty()) {
+            rowKey = rps.getId();
+        } else {
+            rowKey = UUID.randomUUID().toString().substring(0, 20);
+        }
 
         TableName tableRPS = TableName.valueOf(tableName);
         client.insertRecord(tableRPS, rowKey, "main", "id", rowKey);
@@ -73,7 +69,7 @@ public class RPSRepository {
         client.insertRecord(tableRPS, rowKey, "main", "semester", rps.getSemester().toString());
         client.insertRecord(tableRPS, rowKey, "main", "cpl_prodi", rps.getCpl_prodi());
         client.insertRecord(tableRPS, rowKey, "main", "cpl_mk", rps.getCpl_mk());
-        
+
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -99,13 +95,14 @@ public class RPSRepository {
             client.insertRecord(tableRPS, rowKey, "requirement_subjects", "req_" + i, subjectJson);
         }
         if (rps.getStudy_program() != null) {
-                client.insertRecord(tableRPS, rowKey, "study_program", "id", rps.getStudy_program().getId());
-                client.insertRecord(tableRPS, rowKey, "study_program", "name", rps.getStudy_program().getName());
-            }
+            client.insertRecord(tableRPS, rowKey, "study_program", "id", rps.getStudy_program().getId());
+            client.insertRecord(tableRPS, rowKey, "study_program", "name", rps.getStudy_program().getName());
+        }
         if (rps.getSubject() != null) {
-                // client.insertRecord(tableRPS, rowKey, "subject", "id", rps.getSubject().getId());
-                client.insertRecord(tableRPS, rowKey, "subject", "name", rps.getSubject().getName());
-            }
+            // client.insertRecord(tableRPS, rowKey, "subject", "id",
+            // rps.getSubject().getId());
+            client.insertRecord(tableRPS, rowKey, "subject", "name", rps.getSubject().getName());
+        }
 
         // dev_lecturers
         for (int i = 0; i < rps.getDev_lecturers().size(); i++) {
@@ -142,31 +139,28 @@ public class RPSRepository {
         return rps;
     }
 
-//    public RPS getRpsWithDevLecturers(String rpsId) throws IOException {
-//        HBaseCustomClient client = new HBaseCustomClient(conf);
-//        TableName tableRps = TableName.valueOf(tableName);
-//        Map<String, String> columnMapping = new HashMap<>();
-//
-//        // Add the mappings to the HashMap
-//        columnMapping.put("id", "id");
-//        columnMapping.put("name", "name");
-//        columnMapping.put("dev_lecturers", "dev_lecturers");
-//
-//        RPS rps = client.showDataTable(tableRps.toString(), columnMapping, rpsId, RPS.class);
-//
-//             // Check if the dev_lecturers field is null
-//        if (rps.getDev_lecturers() == null) {
-//            // If it's null, fetch it from the database and set it in the Rps object
-//            List<Lecture> devLecturers = fetchDevLecturersFromDatabase(rpsId);
-//            rps.setDev_lecturers(devLecturers);
-//        }
-//
-//            return rps;
-//        }
-
-
-
-    
+    // public RPS getRpsWithDevLecturers(String rpsId) throws IOException {
+    // HBaseCustomClient client = new HBaseCustomClient(conf);
+    // TableName tableRps = TableName.valueOf(tableName);
+    // Map<String, String> columnMapping = new HashMap<>();
+    //
+    // // Add the mappings to the HashMap
+    // columnMapping.put("id", "id");
+    // columnMapping.put("name", "name");
+    // columnMapping.put("dev_lecturers", "dev_lecturers");
+    //
+    // RPS rps = client.showDataTable(tableRps.toString(), columnMapping, rpsId,
+    // RPS.class);
+    //
+    // // Check if the dev_lecturers field is null
+    // if (rps.getDev_lecturers() == null) {
+    // // If it's null, fetch it from the database and set it in the Rps object
+    // List<Lecture> devLecturers = fetchDevLecturersFromDatabase(rpsId);
+    // rps.setDev_lecturers(devLecturers);
+    // }
+    //
+    // return rps;
+    // }
 
     public RPS findById(String rpsId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -194,6 +188,7 @@ public class RPSRepository {
         columnMapping.put("created_at", "created_at");
         return client.showDataTable(tableUsers.toString(), columnMapping, rpsId, RPS.class);
     }
+
     public RPS findByIdLecture(String rpsId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -209,9 +204,9 @@ public class RPSRepository {
 
         List<RPS> rpsList = client.showListTable(tableUsers.toString(), columnMapping, RPS.class, Integer.MAX_VALUE);
         return rpsList.stream()
-                    .filter(rps -> rps.getId().equals(rpsId))
-                    .findFirst()
-                    .orElse(null);
+                .filter(rps -> rps.getId().equals(rpsId))
+                .findFirst()
+                .orElse(null);
     }
 
     public RPS update(String rpsId, RPS rps) throws IOException {
@@ -226,19 +221,21 @@ public class RPSRepository {
         // learning_media_software
         for (int i = 0; i < rps.getLearning_media_softwares().size(); i++) {
             LearningMedia learningMedia = rps.getLearning_media_softwares().get(i);
-            client.insertRecord(tableRPS, rpsId, "learning_media_softwares", "soft_" + i, new Gson().toJson(learningMedia));
+            client.insertRecord(tableRPS, rpsId, "learning_media_softwares", "soft_" + i,
+                    new Gson().toJson(learningMedia));
         }
 
         // learning_media_hardware
         for (int i = 0; i < rps.getLearning_media_hardwares().size(); i++) {
             LearningMedia learningMedia = rps.getLearning_media_hardwares().get(i);
-            client.insertRecord(tableRPS, rpsId, "learning_media_hardwares", "hard_" + i,  new Gson().toJson(learningMedia));
+            client.insertRecord(tableRPS, rpsId, "learning_media_hardwares", "hard_" + i,
+                    new Gson().toJson(learningMedia));
         }
 
         // requirement_subject
         for (int i = 0; i < rps.getRequirement_subjects().size(); i++) {
             Subject subject = rps.getRequirement_subjects().get(i);
-            client.insertRecord(tableRPS, rpsId, "requirement_subjects", "req_" + i,  new Gson().toJson(subject));
+            client.insertRecord(tableRPS, rpsId, "requirement_subjects", "req_" + i, new Gson().toJson(subject));
         }
 
         client.insertRecord(tableRPS, rpsId, "study_program", "id", rps.getStudy_program().getId());
@@ -249,19 +246,19 @@ public class RPSRepository {
         // dev_lecturers
         for (int i = 0; i < rps.getDev_lecturers().size(); i++) {
             Lecture lecture = rps.getDev_lecturers().get(i);
-            client.insertRecord(tableRPS, rpsId, "dev_lecturers", "lecture_" + i,  new Gson().toJson(lecture));
+            client.insertRecord(tableRPS, rpsId, "dev_lecturers", "lecture_" + i, new Gson().toJson(lecture));
         }
 
         // teaching_lecturers
         for (int i = 0; i < rps.getTeaching_lecturers().size(); i++) {
             Lecture lecture = rps.getTeaching_lecturers().get(i);
-            client.insertRecord(tableRPS, rpsId, "teaching_lecturers", "lecture_" + i,  new Gson().toJson(lecture));
+            client.insertRecord(tableRPS, rpsId, "teaching_lecturers", "lecture_" + i, new Gson().toJson(lecture));
         }
 
         // coordinator_lecturers
         for (int i = 0; i < rps.getCoordinator_lecturers().size(); i++) {
             Lecture lecture = rps.getCoordinator_lecturers().get(i);
-            client.insertRecord(tableRPS, rpsId, "coordinator_lecturers", "lecture_" + i,  new Gson().toJson(lecture));
+            client.insertRecord(tableRPS, rpsId, "coordinator_lecturers", "lecture_" + i, new Gson().toJson(lecture));
         }
 
         client.insertRecord(tableRPS, rpsId, "ka_study_program", "id", rps.getKa_study_program().getId());

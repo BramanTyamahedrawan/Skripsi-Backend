@@ -8,12 +8,7 @@ import com.doyatama.university.payload.LinguisticValueRequest;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.LinguisticValueRepository;
 import com.doyatama.university.util.AppConstants;
-import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,21 +18,23 @@ import java.util.List;
 public class LinguisticValueService {
     private LinguisticValueRepository linguisticValueRepository = new LinguisticValueRepository();
 
-    private static final Logger logger = LoggerFactory.getLogger(LinguisticValueService.class);
+    // private static final Logger logger =
+    // LoggerFactory.getLogger(LinguisticValueService.class);
 
     public PagedResponse<LinguisticValue> getAllLinguisticValue(int page, int size) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve polls
         List<LinguisticValue> linguisticValueResponse = linguisticValueRepository.findAll(size);
-        return new PagedResponse<>(linguisticValueResponse, linguisticValueResponse.size(), "Successfully get data", 200);
+        return new PagedResponse<>(linguisticValueResponse, linguisticValueResponse.size(), "Successfully get data",
+                200);
     }
 
-public LinguisticValue createLinguisticValue(LinguisticValueRequest linguisticValueRequest, String savePath) throws IOException {
-    LinguisticValue linguisticValue = new LinguisticValue();
-    
-    
-    // Check if the name in the request is not null
+    public LinguisticValue createLinguisticValue(LinguisticValueRequest linguisticValueRequest, String savePath)
+            throws IOException {
+        LinguisticValue linguisticValue = new LinguisticValue();
+
+        // Check if the name in the request is not null
 
         linguisticValue.setName(linguisticValueRequest.getName());
         linguisticValue.setValue1(linguisticValueRequest.getValue1());
@@ -46,17 +43,19 @@ public LinguisticValue createLinguisticValue(LinguisticValueRequest linguisticVa
         linguisticValue.setValue4(linguisticValueRequest.getValue4());
         linguisticValue.setFile_path(savePath.isEmpty() ? null : savePath);
 
-
         return linguisticValueRepository.save(linguisticValue);
-    
-}
+
+    }
+
     public DefaultResponse<LinguisticValue> getLinguisticValueById(String linguisticValueId) throws IOException {
         // Retrieve LinguisticValue
         LinguisticValue linguisticValueResponse = linguisticValueRepository.findById(linguisticValueId);
-        return new DefaultResponse<>(linguisticValueResponse.isValid() ? linguisticValueResponse : null, linguisticValueResponse.isValid() ? 1 : 0, "Successfully get data");
+        return new DefaultResponse<>(linguisticValueResponse.isValid() ? linguisticValueResponse : null,
+                linguisticValueResponse.isValid() ? 1 : 0, "Successfully get data");
     }
 
-    public LinguisticValue updateLinguisticValue(String linguisticValueId, LinguisticValueRequest linguisticValueRequest) throws IOException {
+    public LinguisticValue updateLinguisticValue(String linguisticValueId,
+            LinguisticValueRequest linguisticValueRequest) throws IOException {
         // Fetch the existing LinguisticValue object
         LinguisticValue linguisticValue = linguisticValueRepository.findById(linguisticValueId);
 
@@ -73,22 +72,20 @@ public LinguisticValue createLinguisticValue(LinguisticValueRequest linguisticVa
 
     public void deleteLinguisticValueById(String linguisticValueId) throws IOException {
         LinguisticValue linguisticValueResponse = linguisticValueRepository.findById(linguisticValueId);
-        if(linguisticValueResponse == null){
+        if (linguisticValueResponse == null) {
             throw new ResourceNotFoundException("LinguisticValue", "id", linguisticValueId);
         }
         linguisticValueRepository.deleteById(linguisticValueId);
     }
+
     private void validatePageNumberAndSize(int page, int size) {
-        if(page < 0) {
+        if (page < 0) {
             throw new BadRequestException("Page number cannot be less than zero.");
         }
 
-        if(size > AppConstants.MAX_PAGE_SIZE) {
+        if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }
 
-
-
-    
 }

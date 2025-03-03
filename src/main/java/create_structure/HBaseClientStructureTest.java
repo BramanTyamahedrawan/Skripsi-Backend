@@ -5,8 +5,6 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HBaseClientStructureTest {
 
@@ -24,7 +22,6 @@ public class HBaseClientStructureTest {
         String[] users = { "main", "detail" };
         client.deleteTable(tableUser);
         client.createTable(tableUser, users);
-
 
         // ==============================================================================================
         // INSERT DATA

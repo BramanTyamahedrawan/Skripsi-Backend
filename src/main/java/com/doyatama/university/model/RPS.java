@@ -3,7 +3,6 @@ package com.doyatama.university.model;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import com.doyatama.university.model.Lecture;
 
 public class RPS {
     private String id;
@@ -24,11 +23,14 @@ public class RPS {
     private Instant created_at;
     private List<RPSDetail> rpsDetails; // Add this line
 
-
     public RPS() {
     }
 
-    public RPS(String id, String name, Integer sks, Integer semester, String cpl_prodi, String cpl_mk, List<LearningMedia> learning_media_softwares, List<LearningMedia> learning_media_hardwares, List<Subject> requirement_subjects, StudyProgram study_program, Subject subject, List<Lecture> dev_lecturers, List<Lecture> teaching_lecturers, List<Lecture> coordinator_lecturers, Lecture ka_study_program, Instant created_at) {
+    public RPS(String id, String name, Integer sks, Integer semester, String cpl_prodi, String cpl_mk,
+            List<LearningMedia> learning_media_softwares, List<LearningMedia> learning_media_hardwares,
+            List<Subject> requirement_subjects, StudyProgram study_program, Subject subject,
+            List<Lecture> dev_lecturers, List<Lecture> teaching_lecturers, List<Lecture> coordinator_lecturers,
+            Lecture ka_study_program, Instant created_at) {
         this.id = id;
         this.name = name;
         this.sks = sks;
@@ -95,7 +97,6 @@ public class RPS {
         this.cpl_mk = cpl_mk;
     }
 
-    
     public List<LearningMedia> getLearning_media_softwares() {
         return learning_media_softwares != null ? learning_media_softwares : new ArrayList<>();
     }
@@ -105,7 +106,7 @@ public class RPS {
     }
 
     public List<LearningMedia> getLearning_media_hardwares() {
-        return learning_media_hardwares != null ? learning_media_hardwares :new ArrayList<>() ;
+        return learning_media_hardwares != null ? learning_media_hardwares : new ArrayList<>();
     }
 
     public void setLearning_media_hardwares(List<LearningMedia> learning_media_hardwares) {
@@ -135,9 +136,9 @@ public class RPS {
     public void setSubject(Subject subject) {
         this.subject = subject;
     }
-    
+
     public List<Lecture> getDev_lecturers() {
-        return dev_lecturers != null ? dev_lecturers: new ArrayList<>();
+        return dev_lecturers != null ? dev_lecturers : new ArrayList<>();
     }
 
     public void setDev_lecturers(List<Lecture> dev_lecturers) {
@@ -145,7 +146,7 @@ public class RPS {
     }
 
     public List<Lecture> getTeaching_lecturers() {
-        return teaching_lecturers != null ? teaching_lecturers: new ArrayList<>() ;
+        return teaching_lecturers != null ? teaching_lecturers : new ArrayList<>();
     }
 
     public void setTeaching_lecturers(List<Lecture> teaching_lecturers) {
@@ -153,15 +154,15 @@ public class RPS {
     }
 
     public List<Lecture> getCoordinator_lecturers() {
-        return coordinator_lecturers!= null ? coordinator_lecturers: new ArrayList<>() ;
+        return coordinator_lecturers != null ? coordinator_lecturers : new ArrayList<>();
     }
 
     public void setCoordinator_lecturers(List<Lecture> coordinator_lecturers) {
-        this.coordinator_lecturers = coordinator_lecturers != null ? coordinator_lecturers: new ArrayList<>();
+        this.coordinator_lecturers = coordinator_lecturers != null ? coordinator_lecturers : new ArrayList<>();
     }
 
     public Lecture getKa_study_program() {
-        return ka_study_program ;
+        return ka_study_program;
     }
 
     public void setKa_study_program(Lecture ka_study_program) {
@@ -176,22 +177,21 @@ public class RPS {
         this.created_at = created_at;
     }
 
-     // Add getter and setter for rpsDetails
+    // Add getter and setter for rpsDetails
     public List<RPSDetail> getRpsDetails() {
-        return rpsDetails != null ? rpsDetails:new ArrayList<>();
+        return rpsDetails != null ? rpsDetails : new ArrayList<>();
     }
 
     public void setRpsDetails(List<RPSDetail> rpsDetails) {
         this.rpsDetails = rpsDetails != null ? rpsDetails : new ArrayList<>();
     }
 
-    
     public boolean isValid() {
         return this.id != null &&
                 this.name != null &&
                 this.sks != null &&
                 this.semester != null &&
-            this.cpl_prodi != null &&
+                this.cpl_prodi != null &&
                 this.cpl_mk != null;
     }
 

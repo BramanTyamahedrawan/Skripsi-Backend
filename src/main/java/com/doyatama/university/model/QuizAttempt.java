@@ -18,7 +18,8 @@ public class QuizAttempt {
     public QuizAttempt() {
     }
 
-    public QuizAttempt(String id, double grade, Integer total_right, String state, List<StudentAnswer> student_answers, Quiz quiz, User user, Student student, Integer duration, Instant created_at) {
+    public QuizAttempt(String id, double grade, Integer total_right, String state, List<StudentAnswer> student_answers,
+            Quiz quiz, User user, Student student, Integer duration, Instant created_at) {
         this.id = id;
         this.grade = grade;
         this.total_right = total_right;
@@ -123,12 +124,12 @@ public class QuizAttempt {
             case "id":
                 this.id = value;
                 break;
-            case "grade":
-                this.grade = grade;
-                break;
-            case "total_right":
-                this.total_right = total_right;
-                break;
+            // case "grade":
+            // this.grade = grade;
+            // break;
+            // case "total_right":
+            // this.total_right = total_right;
+            // break;
             case "state":
                 this.state = value;
                 break;

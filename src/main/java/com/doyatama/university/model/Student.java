@@ -1,7 +1,5 @@
 package com.doyatama.university.model;
 
-import java.time.LocalDate;
-
 public class Student {
     private String id;
     private String nisn;
@@ -11,7 +9,7 @@ public class Student {
     private String birth_date;
     private String place_born;
     private String address;
-    
+
     private Religion religion;
     private BidangKeahlian bidangKeahlian;
     private ProgramKeahlian programKeahlian;
@@ -20,8 +18,8 @@ public class Student {
     public Student() {
     }
 
-    public Student(String id, String nisn, String name, String gender, String phone, 
-            String birth_date, String place_born, String address, Religion religion, 
+    public Student(String id, String nisn, String name, String gender, String phone,
+            String birth_date, String place_born, String address, Religion religion,
             BidangKeahlian bidangKeahlian, ProgramKeahlian programKeahlian, KonsentrasiKeahlian konsentrasiKeahlian) {
         this.id = id;
         this.nisn = nisn;
@@ -132,7 +130,7 @@ public class Student {
     public void setKonsentrasiKeahlian(KonsentrasiKeahlian konsentrasiKeahlian) {
         this.konsentrasiKeahlian = konsentrasiKeahlian;
     }
-    
+
     public boolean isValid() {
         return this.id != null &&
                 this.nisn != null &&

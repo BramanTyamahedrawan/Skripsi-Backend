@@ -1,7 +1,6 @@
 package com.doyatama.university.model;
 
 import java.time.Instant;
-import java.util.List;
 
 public class StudentAnswer {
     private String id;

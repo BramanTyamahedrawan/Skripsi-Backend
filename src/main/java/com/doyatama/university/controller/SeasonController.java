@@ -10,8 +10,6 @@ import com.doyatama.university.service.SeasonService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,11 +38,11 @@ public class SeasonController {
     }
 
     @GetMapping
-    public PagedResponse<Season> getSeason(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                           @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+    public PagedResponse<Season> getSeason(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         return seasonService.getAllSeason(page, size);
     }
-
 
     @PostMapping
     public ResponseEntity<?> createSeason(@Valid @RequestBody SeasonRequest seasonRequest) throws IOException {
@@ -64,18 +61,18 @@ public class SeasonController {
         return seasonService.getSeasonById(seasonId);
     }
 
-//    @PutMapping("/{seasonId}")
-//    public ResponseEntity<?> updateSeason(@PathVariable String seasonId,
-//                                          @Valid @RequestBody SeasonRequest seasonRequest) throws IOException {
-//        Season season = seasonService.updateSeason(seasonId, seasonRequest);
-//
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentRequest().path("/{seasonId}")
-//                .buildAndExpand(season.getIdSeason()).toUri();
-//
-//        return ResponseEntity.created(location)
-//                .body(new ApiResponse(true, "Season Updated Successfully"));
-//    }
+    // @PutMapping("/{seasonId}")
+    // public ResponseEntity<?> updateSeason(@PathVariable String seasonId,
+    // @Valid @RequestBody SeasonRequest seasonRequest) throws IOException {
+    // Season season = seasonService.updateSeason(seasonId, seasonRequest);
+    //
+    // URI location = ServletUriComponentsBuilder
+    // .fromCurrentRequest().path("/{seasonId}")
+    // .buildAndExpand(season.getIdSeason()).toUri();
+    //
+    // return ResponseEntity.created(location)
+    // .body(new ApiResponse(true, "Season Updated Successfully"));
+    // }
 
     @DeleteMapping("/{seasonId}")
     public HttpStatus deleteSeason(@PathVariable String seasonId) throws IOException {
@@ -83,4 +80,3 @@ public class SeasonController {
         return HttpStatus.NO_CONTENT;
     }
 }
-

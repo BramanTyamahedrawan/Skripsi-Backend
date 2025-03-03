@@ -4,8 +4,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 public class User {
     private String id;
@@ -23,9 +21,9 @@ public class User {
     @NotBlank
     @Size(max = 100)
     private String password;
-    
+
     private School school;
-    
+
     @NotBlank
     private String roles;
 
@@ -34,7 +32,9 @@ public class User {
     public User() {
 
     }
-    public User(String name, String username, String email, String password, School school, String roles, Instant createdAt) {
+
+    public User(String name, String username, String email, String password, School school, String roles,
+            Instant createdAt) {
         this.name = name;
         this.username = username;
         this.email = email;
@@ -83,7 +83,7 @@ public class User {
     public void setSchool(School school) {
         this.school = school;
     }
-    
+
     public String getPassword() {
         return password;
     }

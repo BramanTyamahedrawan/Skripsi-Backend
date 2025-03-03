@@ -3,14 +3,12 @@ package com.doyatama.university.repository;
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.Acp;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
-import org.springframework.stereotype.Repository;
 
 public class AcpRepository {
     Configuration conf = HBaseConfiguration.create();
@@ -40,7 +38,7 @@ public class AcpRepository {
 
         String rowKey = acp.getIdAcp();
         TableName tableAcp = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+        // Map<String, String> columnMapping = new HashMap<>();
 
         client.insertRecord(tableAcp, rowKey, "main", "idAcp", acp.getIdAcp());
         client.insertRecord(tableAcp, rowKey, "main", "namaAcp", acp.getNamaAcp());
@@ -130,7 +128,7 @@ public class AcpRepository {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableAcp = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+        // Map<String, String> columnMapping = new HashMap<>();
 
         if (acp.getNamaAcp() != null) {
             client.insertRecord(tableAcp, acpId, "main", "namaAcp", acp.getNamaAcp());

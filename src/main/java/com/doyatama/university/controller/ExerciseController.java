@@ -1,7 +1,6 @@
 package com.doyatama.university.controller;
 
 import com.doyatama.university.model.Question;
-import com.doyatama.university.model.StudyProgram;
 import com.doyatama.university.model.Exercise;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.DefaultResponse;
@@ -24,8 +23,9 @@ public class ExerciseController {
     private ExerciseService exerciseService = new ExerciseService();
 
     @GetMapping
-    public PagedResponse<Exercise> getExercises(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+    public PagedResponse<Exercise> getExercises(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         return exerciseService.getAllExercise(page, size);
     }
 
@@ -37,14 +37,15 @@ public class ExerciseController {
             @RequestParam(value = "type_exercise", required = false) String type_exercise) throws IOException {
         return exerciseService.getAllQuestionsByRPS(page, size, rpsID, type_exercise);
     }
+
     @PostMapping
     public ResponseEntity<?> createExercise(@Valid @RequestBody ExerciseRequest exerciseRequest) throws IOException {
         Exercise exercise = exerciseService.createExercise(exerciseRequest);
 
-        if(exercise == null){
+        if (exercise == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Please check relational ID"));
-        }else{
+        } else {
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{exerciseId}")
                     .buildAndExpand(exercise.getId()).toUri();
@@ -59,10 +60,9 @@ public class ExerciseController {
         return exerciseService.getExerciseById(exerciseId);
     }
 
-
     @PutMapping("/{exerciseId}")
     public ResponseEntity<?> updateExercise(@PathVariable String exerciseId,
-                                        @Valid @RequestBody ExerciseRequest exerciseRequest) throws IOException {
+            @Valid @RequestBody ExerciseRequest exerciseRequest) throws IOException {
         Exercise exercise = exerciseService.updateExercise(exerciseId, exerciseRequest);
 
         URI location = ServletUriComponentsBuilder
@@ -74,7 +74,7 @@ public class ExerciseController {
     }
 
     @DeleteMapping("/{exerciseId}")
-    public HttpStatus deleteExercise(@PathVariable (value = "exerciseId") String exerciseId) throws IOException {
+    public HttpStatus deleteExercise(@PathVariable(value = "exerciseId") String exerciseId) throws IOException {
         exerciseService.deleteExerciseById(exerciseId);
         return HttpStatus.FORBIDDEN;
     }
