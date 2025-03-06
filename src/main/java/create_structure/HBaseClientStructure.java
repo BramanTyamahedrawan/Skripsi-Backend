@@ -25,6 +25,9 @@ public class HBaseClientStructure {
                 // CREATE COLLECTION
                 // ==============================================================================================
 
+                // Master Table
+
+                // ==============================================================================================
                 TableName tableKonsentrasiKeahlian = TableName.valueOf("konsentrasiKeahlians");
                 String[] konsentrasiKeahlian = { "main", "programKeahlian", "detail" };
                 client.deleteTable(tableKonsentrasiKeahlian);
@@ -53,6 +56,29 @@ public class HBaseClientStructure {
                 client.deleteTable(tableSchoolProfile);
                 client.createTable(tableSchoolProfile, schoolprofile);
 
+                // ==============================================================================================
+
+                // Table Family Sekolah
+
+                // ==============================================================================================
+                // Create Table Bidang Keahlian Sekolah
+                TableName tableBidangKeahlianSekolah = TableName.valueOf("bidangKeahlianSekolah");
+                String[] bidangKeahlianSekolah = { "main", "school", "bidangKeahlian", "detail" };
+                client.deleteTable(tableBidangKeahlianSekolah);
+                client.createTable(tableBidangKeahlianSekolah, bidangKeahlianSekolah);
+
+                // Create Table Program Keahlian Sekolah
+                TableName tableProgramKeahlianSekolah = TableName.valueOf("programKeahlianSekolah");
+                String[] programKeahlianSekolah = { "main", "school", "programKeahlian", "detail" };
+                client.deleteTable(tableProgramKeahlianSekolah);
+                client.createTable(tableProgramKeahlianSekolah, programKeahlianSekolah);
+
+                // Create Table Konsentrasi Keahlian Sekolah
+                TableName tableKonsentrasiKeahlianSekolah = TableName.valueOf("konsentrasiKeahlianSekolah");
+                String[] konsentrasiKeahlianSekolah = { "main", "school", "konsentrasiKeahlian", "detail" };
+                client.deleteTable(tableKonsentrasiKeahlianSekolah);
+                client.createTable(tableKonsentrasiKeahlianSekolah, konsentrasiKeahlianSekolah);
+
                 // Create Tabel Mata Kuliah
                 TableName tableSubject = TableName.valueOf("subjects");
                 String[] subjects = { "main", "study_program", "subject_group", "detail" };
@@ -61,7 +87,7 @@ public class HBaseClientStructure {
 
                 // Create Tabel Mata Pelajaran
                 TableName tableMapel = TableName.valueOf("mapels");
-                String[] mapel = { "main", "detail" };
+                String[] mapel = { "main", "school", "detail" };
                 client.deleteTable(tableMapel);
                 client.createTable(tableMapel, mapel);
 
@@ -72,39 +98,41 @@ public class HBaseClientStructure {
 
                 // Create Tabel Kelas
                 TableName tableKelas = TableName.valueOf("kelas");
-                String[] kelas = { "main", "detail" };
+                String[] kelas = { "main", "school", "detail" };
                 client.deleteTable(tableKelas);
                 client.createTable(tableKelas, kelas);
 
                 // Create Tabel Tahun Ajaran
                 TableName tableTahun = TableName.valueOf("tahunAjaran");
-                String[] tahun = { "main", "detail" };
+                String[] tahun = { "main", "school", "detail" };
                 client.deleteTable(tableTahun);
                 client.createTable(tableTahun, tahun);
 
                 // Create Tabel Semester
                 TableName tableSemester = TableName.valueOf("semester");
-                String[] semester = { "main", "detail" };
+                String[] semester = { "main", "school", "detail" };
                 client.deleteTable(tableSemester);
                 client.createTable(tableSemester, semester);
 
                 // Create Tabel Elemen Pembelajaran
                 TableName tableElemen = TableName.valueOf("elemen");
-                String[] elemen = { "main", "tahunAjaran", "mapel", "kelas", "semester", "konsentrasiKeahlian",
+                String[] elemen = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester",
+                                "konsentrasiKeahlian",
                                 "detail" };
                 client.deleteTable(tableElemen);
                 client.createTable(tableElemen, elemen);
 
                 // Create Tabel Capaian Pembelajaran
                 TableName tableAcp = TableName.valueOf("acp");
-                String[] acp = { "main", "tahunAjaran", "mapel", "kelas", "semester", "konsentrasiKeahlian", "elemen",
+                String[] acp = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester", "konsentrasiKeahlian",
+                                "elemen",
                                 "detail" };
                 client.deleteTable(tableAcp);
                 client.createTable(tableAcp, acp);
 
                 // Create Tabel Tujuan Pembelajaran
                 TableName tableAtp = TableName.valueOf("atp");
-                String[] atp = { "main", "tahunAjaran", "mapel", "kelas", "semester",
+                String[] atp = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester",
                                 "konsentrasiKeahlian", "elemen", "acp",
                                 "detail" };
                 client.deleteTable(tableAtp);
