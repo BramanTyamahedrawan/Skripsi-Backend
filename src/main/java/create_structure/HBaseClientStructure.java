@@ -79,12 +79,6 @@ public class HBaseClientStructure {
                 client.deleteTable(tableKonsentrasiKeahlianSekolah);
                 client.createTable(tableKonsentrasiKeahlianSekolah, konsentrasiKeahlianSekolah);
 
-                // Create Tabel Mata Kuliah
-                TableName tableSubject = TableName.valueOf("subjects");
-                String[] subjects = { "main", "study_program", "subject_group", "detail" };
-                client.deleteTable(tableSubject);
-                client.createTable(tableSubject, subjects);
-
                 // Create Tabel Mata Pelajaran
                 TableName tableMapel = TableName.valueOf("mapels");
                 String[] mapel = { "main", "school", "detail" };
@@ -154,6 +148,12 @@ public class HBaseClientStructure {
                 String[] chapters = { "main", "subject", "detail" };
                 client.deleteTable(tableChapter);
                 client.createTable(tableChapter, chapters);
+
+                // Create Tabel Mata Kuliah
+                TableName tableSubject = TableName.valueOf("subjects");
+                String[] subjects = { "main", "study_program", "subject_group", "detail" };
+                client.deleteTable(tableSubject);
+                client.createTable(tableSubject, subjects);
 
                 // Create Tabel Rumpun Mata Kuliah
                 TableName tableSubjectGroup = TableName.valueOf("subject_groups");

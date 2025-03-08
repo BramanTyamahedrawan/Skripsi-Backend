@@ -29,9 +29,43 @@ public class SeederData {
 
         // Insert Data Table Bidang Keahlian
         client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
-        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Teknik Informatika");
-        client.insertRecord(tableBidangKeahlian, "BK001", "school", "school_id", "RWK001");
-        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_at", instant.toString());
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Teknologi Konstruksi dan Bangunan");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Teknologi Manufaktur dan Rekayasa");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Energi dan Pertambangan");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Teknologi Informasi");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Kesehatan dan Pekerjaan Sosial");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Agribisnis dan Agriteknologi ");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Kemaritiman");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Bisnis dan Manajemen");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Pariwisata");
+        client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
+
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "id", "BK001");
+        client.insertRecord(tableBidangKeahlian, "BK001", "main", "bidang", "Seni dan Ekonomi Kreatif");
         client.insertRecord(tableBidangKeahlian, "BK001", "detail", "created_by", "Doyatama");
     }
 }
