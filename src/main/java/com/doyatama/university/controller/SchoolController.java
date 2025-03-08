@@ -22,8 +22,9 @@ public class SchoolController {
     private SchoolService schoolService = new SchoolService();
 
     @GetMapping
-    public PagedResponse<School> getSchools(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                    @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
+    public PagedResponse<School> getSchools(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         return schoolService.getAllSchool(page, size);
     }
 
@@ -33,7 +34,7 @@ public class SchoolController {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{schoolId}")
-                .buildAndExpand(school.getId()).toUri();
+                .buildAndExpand(school.getIdSchool()).toUri();
 
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "School Created Successfully"));
@@ -44,22 +45,21 @@ public class SchoolController {
         return schoolService.getSchoolById(schoolId);
     }
 
-
     @PutMapping("/{schoolId}")
     public ResponseEntity<?> updateSchool(@PathVariable String schoolId,
-                                              @Valid @RequestBody SchoolRequest schoolRequest) throws IOException {
+            @Valid @RequestBody SchoolRequest schoolRequest) throws IOException {
         School school = schoolService.updateSchool(schoolId, schoolRequest);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{schoolId}")
-                .buildAndExpand(school.getId()).toUri();
+                .buildAndExpand(school.getIdSchool()).toUri();
 
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "School Updated Successfully"));
     }
 
     @DeleteMapping("/{schoolId}")
-    public HttpStatus deleteSchool(@PathVariable (value = "schoolId") String schoolId) throws IOException {
+    public HttpStatus deleteSchool(@PathVariable(value = "schoolId") String schoolId) throws IOException {
         schoolService.deleteSchoolById(schoolId);
         return HttpStatus.FORBIDDEN;
     }

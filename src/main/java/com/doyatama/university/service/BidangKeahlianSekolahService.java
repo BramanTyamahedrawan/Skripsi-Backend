@@ -93,7 +93,7 @@ public class BidangKeahlianSekolahService {
         BidangKeahlian bidangKeahlianResponse = bidangKeahlianRepository
                 .findById(bidangKeahlianSekolahRequest.getIdBidangKeahlian());
 
-        if (schoolResponse.getId() != null) {
+        if (schoolResponse.getIdSchool() != null) {
             bidangKeahlianSekolah.setNamaBidangSekolah(bidangKeahlianSekolahRequest.getNamaBidangSekolah());
             bidangKeahlianSekolah.setSchool(schoolResponse);
             bidangKeahlianSekolah.setBidangKeahlian(bidangKeahlianResponse);

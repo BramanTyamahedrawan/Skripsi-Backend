@@ -14,7 +14,7 @@ public class UserPrincipal implements UserDetails {
     private String name;
 
     private String username;
-    
+
     private String schoolId;
 
     private String roles;
@@ -27,7 +27,8 @@ public class UserPrincipal implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(String id, String name, String username, String schoolId, String email, String password, String roles) {
+    public UserPrincipal(String id, String name, String username, String schoolId, String email, String password,
+            String roles) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -38,7 +39,7 @@ public class UserPrincipal implements UserDetails {
     }
 
     public static UserPrincipal create(User user) {
-        String schoolId = (user.getSchool() != null) ? user.getSchool().getId() : null;
+        String schoolId = (user.getSchool() != null) ? user.getSchool().getIdSchool() : null;
         return new UserPrincipal(
                 user.getId(),
                 user.getName(),
@@ -46,8 +47,7 @@ public class UserPrincipal implements UserDetails {
                 schoolId,
                 user.getEmail(),
                 user.getPassword(),
-                user.getRoles().toString()
-        );
+                user.getRoles().toString());
     }
 
     public String getId() {
@@ -65,7 +65,6 @@ public class UserPrincipal implements UserDetails {
     public String getSchoolId() {
         return schoolId;
     }
-    
 
     public String getRoles() {
         return roles;
@@ -85,7 +84,6 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
-
 
     @Override
     public boolean isAccountNonExpired() {
@@ -109,8 +107,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserPrincipal that = (UserPrincipal) o;
         return Objects.equals(id, that.id);
     }
@@ -120,8 +120,8 @@ public class UserPrincipal implements UserDetails {
 
         return Objects.hash(id);
     }
-    
-     @Override
+
+    @Override
     public String toString() {
         return "UserPrincipal{" +
                 "id='" + id + '\'' +

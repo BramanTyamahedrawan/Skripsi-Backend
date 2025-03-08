@@ -33,8 +33,8 @@ public class SchoolService {
 
     public School createSchool(SchoolRequest schoolRequest) throws IOException {
         School school = new School();
-        school.setId(schoolRequest.getId());
-        school.setName(schoolRequest.getName());
+        school.setIdSchool(schoolRequest.getIdSchool());
+        school.setNameSchool(schoolRequest.getNameSchool());
         school.setAddress(schoolRequest.getAddress());
         return schoolRepository.save(school);
     }
@@ -48,7 +48,7 @@ public class SchoolService {
 
     public School updateSchool(String schoolId, SchoolRequest schoolRequest) throws IOException {
         School school = new School();
-        school.setName(schoolRequest.getName());
+        school.setNameSchool(schoolRequest.getNameSchool());
         school.setAddress(schoolRequest.getAddress());
         return schoolRepository.update(schoolId, school);
     }
@@ -58,7 +58,7 @@ public class SchoolService {
         if (schoolResponse.isValid()) {
             schoolRepository.deleteById(schoolId);
         } else {
-            throw new ResourceNotFoundException("School", "id", schoolId);
+            throw new ResourceNotFoundException("School", "idSchool", schoolId);
         }
     }
 

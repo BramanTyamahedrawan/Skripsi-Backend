@@ -46,10 +46,10 @@ public class BidangKeahlianSekolahRepository {
                                 bidangKeahlianSekolah.getNamaBidangSekolah());
 
                 // Sekolah
-                client.insertRecord(tableBidangKeahlianSekolah, rowKey, "school", "id",
-                                bidangKeahlianSekolah.getSchool().getId());
-                client.insertRecord(tableBidangKeahlianSekolah, rowKey, "school", "name",
-                                bidangKeahlianSekolah.getSchool().getName());
+                client.insertRecord(tableBidangKeahlianSekolah, rowKey, "school", "idSchool",
+                                bidangKeahlianSekolah.getSchool().getIdSchool());
+                client.insertRecord(tableBidangKeahlianSekolah, rowKey, "school", "nameSchool",
+                                bidangKeahlianSekolah.getSchool().getNameSchool());
 
                 // Bidang Keahlian
                 client.insertRecord(tableBidangKeahlianSekolah, rowKey, "bidangKeahlian", "id",
@@ -107,7 +107,7 @@ public class BidangKeahlianSekolahRepository {
 
                 List<BidangKeahlianSekolah> bidangKeahlianSekolah = client.getDataListByColumn(
                                 tableBidangKeahlianSekolah.toString(),
-                                columnMapping, "school", "id", sekolahID, BidangKeahlianSekolah.class, size);
+                                columnMapping, "school", "idSchool", sekolahID, BidangKeahlianSekolah.class, size);
 
                 return bidangKeahlianSekolah;
         }
@@ -126,13 +126,13 @@ public class BidangKeahlianSekolahRepository {
                 }
 
                 // Sekolah
-                if (bidangKeahlianSekolah.getSchool().getId() != null) {
-                        client.insertRecord(tableBidangKeahlianSekolah, bidangKeahlianSekolahId, "school", "id",
-                                        bidangKeahlianSekolah.getSchool().getId());
+                if (bidangKeahlianSekolah.getSchool().getIdSchool() != null) {
+                        client.insertRecord(tableBidangKeahlianSekolah, bidangKeahlianSekolahId, "school", "idSchool",
+                                        bidangKeahlianSekolah.getSchool().getIdSchool());
                 }
-                if (bidangKeahlianSekolah.getSchool().getName() != null) {
-                        client.insertRecord(tableBidangKeahlianSekolah, bidangKeahlianSekolahId, "school", "name",
-                                        bidangKeahlianSekolah.getSchool().getName());
+                if (bidangKeahlianSekolah.getSchool().getNameSchool() != null) {
+                        client.insertRecord(tableBidangKeahlianSekolah, bidangKeahlianSekolahId, "school", "nameSchool",
+                                        bidangKeahlianSekolah.getSchool().getNameSchool());
                 }
 
                 // Bidang Keahlian

@@ -129,10 +129,11 @@ public class UserRepository {
         columnMapping.put("school", "school");
         columnMapping.put("roles", "roles");
 
-        User user = client.getDataByColumn(tableUsers.toString(), columnMapping, "main", "username", username, User.class);
-        if(user.getUsername() != null){
+        User user = client.getDataByColumn(tableUsers.toString(), columnMapping, "main", "username", username,
+                User.class);
+        if (user.getUsername() != null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -153,9 +154,9 @@ public class UserRepository {
         columnMapping.put("roles", "roles");
 
         User user = client.getDataByColumn(tableUsers.toString(), columnMapping, "main", "email", email, User.class);
-        if(user.getEmail() != null){
+        if (user.getEmail() != null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -171,9 +172,9 @@ public class UserRepository {
         client.insertRecord(tableUsers, rowKey, "main", "username", user.getUsername());
         client.insertRecord(tableUsers, rowKey, "main", "email", user.getEmail());
         client.insertRecord(tableUsers, rowKey, "main", "password", user.getPassword());
-        if (user.getSchool() != null && user.getSchool().getId() != null) {
-        client.insertRecord(tableUsers, rowKey, "school", "id", user.getSchool().getId());
-        client.insertRecord(tableUsers, rowKey, "school", "name", user.getSchool().getName());
+        if (user.getSchool() != null && user.getSchool().getIdSchool() != null) {
+            client.insertRecord(tableUsers, rowKey, "school", "idSchool", user.getSchool().getIdSchool());
+            client.insertRecord(tableUsers, rowKey, "school", "nameSchool", user.getSchool().getNameSchool());
         } else {
             System.out.println("School is null or has no ID");
         }

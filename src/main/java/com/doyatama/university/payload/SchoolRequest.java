@@ -1,34 +1,33 @@
 package com.doyatama.university.payload;
 
 public class SchoolRequest {
-    private String id;
-    private String name;
+    private String idSchool;
+    private String nameSchool;
     private String address;
 
     public SchoolRequest() {
     }
 
-    
-    public SchoolRequest(String id, String name, String address) {
-        this.id = id;
-        this.name = name;
+    public SchoolRequest(String idSchool, String nameSchool, String address) {
+        this.idSchool = idSchool;
+        this.nameSchool = nameSchool;
         this.address = address;
     }
 
-    public String getId() {
-        return id;
+    public String getIdSchool() {
+        return idSchool;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIdSchool(String idSchool) {
+        this.idSchool = idSchool;
     }
 
-    public String getName() {
-        return name;
+    public String getNameSchool() {
+        return nameSchool;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameSchool(String nameSchool) {
+        this.nameSchool = nameSchool;
     }
 
     public String getAddress() {
@@ -38,14 +37,14 @@ public class SchoolRequest {
     public void setAddress(String address) {
         this.address = address;
     }
-    
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
-            case "id":
-                this.id = value;
+            case "idSchool":
+                this.idSchool = value;
                 break;
-            case "name":
-                this.name = value;
+            case "nameSchool":
+                this.nameSchool = value;
                 break;
             case "address":
                 this.address = value;

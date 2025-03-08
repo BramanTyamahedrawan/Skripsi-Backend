@@ -11,7 +11,7 @@ import java.util.*;
 public class SchoolProfileRepository {
     Configuration conf = HBaseConfiguration.create();
     String tableName = "school-profiles";
-    
+
     public List<SchoolProfile> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -32,7 +32,7 @@ public class SchoolProfileRepository {
         columnMapping.put("file_path", "file_path");
         return client.showListTable(profile.toString(), columnMapping, SchoolProfile.class, size);
     }
-    
+
     public SchoolProfile save(SchoolProfile profile) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -47,13 +47,13 @@ public class SchoolProfileRepository {
         client.insertRecord(tableProfile, rowKey, "main", "tglSKPendirian", profile.getTglSKPendirian());
         client.insertRecord(tableProfile, rowKey, "main", "SKIzinOperasional", profile.getSKIzinOperasional());
         client.insertRecord(tableProfile, rowKey, "main", "tglSKOperasional", profile.getTglSKOperasional());
-        client.insertRecord(tableProfile, rowKey, "school", "id", profile.getSchool().getId());
-        client.insertRecord(tableProfile, rowKey, "school", "name", profile.getSchool().getName());
+        client.insertRecord(tableProfile, rowKey, "school", "idSchool", profile.getSchool().getIdSchool());
+        client.insertRecord(tableProfile, rowKey, "school", "nameSchool", profile.getSchool().getNameSchool());
         client.insertRecord(tableProfile, rowKey, "main", "file_path", profile.getFile_path());
         client.insertRecord(tableProfile, rowKey, "detail", "created_by", "Doyatama");
         return profile;
     }
-    
+
     public SchoolProfile findById(String profileId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -75,7 +75,7 @@ public class SchoolProfileRepository {
 
         return client.showDataTable(tableProfile.toString(), columnMapping, profileId, SchoolProfile.class);
     }
-    
+
     public List<SchoolProfile> findAllById(List<String> profileIds) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -95,7 +95,8 @@ public class SchoolProfileRepository {
         columnMapping.put("file_path", "file_path");
         List<SchoolProfile> profiles = new ArrayList<>();
         for (String profileId : profileIds) {
-            SchoolProfile profile = client.showDataTable(tableProfile.toString(), columnMapping, profileId, SchoolProfile.class);
+            SchoolProfile profile = client.showDataTable(tableProfile.toString(), columnMapping, profileId,
+                    SchoolProfile.class);
             if (profile != null) {
                 profiles.add(profile);
             }
@@ -103,7 +104,7 @@ public class SchoolProfileRepository {
 
         return profiles;
     }
-    
+
     public List<SchoolProfile> findSchoolProfileBySchool(String schoolId, int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -122,11 +123,12 @@ public class SchoolProfileRepository {
         columnMapping.put("school", "school");
         columnMapping.put("file_path", "file_path");
 
-        List<SchoolProfile> profile = client.getDataListByColumn(tableProfile.toString(), columnMapping, "school", "id", schoolId, SchoolProfile.class, size);
+        List<SchoolProfile> profile = client.getDataListByColumn(tableProfile.toString(), columnMapping, "school", "id",
+                schoolId, SchoolProfile.class, size);
 
         return profile;
     }
-    
+
     public SchoolProfile update(String profileId, SchoolProfile profile) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -139,13 +141,13 @@ public class SchoolProfileRepository {
         client.insertRecord(tableProfile, profileId, "main", "tglSKPendirian", profile.getTglSKPendirian());
         client.insertRecord(tableProfile, profileId, "main", "SKIzinOperasional", profile.getSKIzinOperasional());
         client.insertRecord(tableProfile, profileId, "main", "tglSKOperasional", profile.getTglSKOperasional());
-        client.insertRecord(tableProfile, profileId, "school", "id", profile.getSchool().getId());
-        client.insertRecord(tableProfile, profileId, "school", "name", profile.getSchool().getName());
+        client.insertRecord(tableProfile, profileId, "school", "idSchool", profile.getSchool().getIdSchool());
+        client.insertRecord(tableProfile, profileId, "school", "nameSchool", profile.getSchool().getNameSchool());
         client.insertRecord(tableProfile, profileId, "main", "file_path", profile.getFile_path());
         client.insertRecord(tableProfile, profileId, "detail", "created_by", "Doyatama");
         return profile;
     }
-    
+
     public boolean deleteById(String profileId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
         client.deleteRecord(tableName, profileId);
