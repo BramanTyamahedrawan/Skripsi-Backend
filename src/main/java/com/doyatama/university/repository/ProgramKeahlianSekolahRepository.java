@@ -13,146 +13,156 @@ import org.apache.hadoop.hbase.TableName;
 
 public class ProgramKeahlianSekolahRepository {
 
-    Configuration conf = HBaseConfiguration.create();
-    String tableName = "programKeahlianSekolah";
+        Configuration conf = HBaseConfiguration.create();
+        String tableName = "programKeahlianSekolah";
 
-    public List<ProgramKeahlianSekolah> findAll(int size) throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
+        public List<ProgramKeahlianSekolah> findAll(int size) throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+                Map<String, String> columnMapping = new HashMap<>();
 
-        // Add the mappings to the HashMap
-        columnMapping.put("idProgramSekolah", "idProgramSekolah");
-        columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
-        columnMapping.put("school", "school");
-        columnMapping.put("programKeahlian", "programKeahlian");
+                // Add the mappings to the HashMap
+                columnMapping.put("idProgramSekolah", "idProgramSekolah");
+                columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
+                columnMapping.put("school", "school");
+                columnMapping.put("programKeahlian", "programKeahlian");
 
-        return client.showListTable(tableProgramKeahlianSekolah.toString(), columnMapping,
-                ProgramKeahlianSekolah.class,
-                size);
-    }
-
-    public ProgramKeahlianSekolah save(ProgramKeahlianSekolah programKeahlianSekolah) throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-
-        String rowKey = programKeahlianSekolah.getIdProgramSekolah();
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
-        // Map<String, String> columnMapping = new HashMap<>();
-
-        client.insertRecord(tableProgramKeahlianSekolah, rowKey, "main", "idProgramSekolah",
-                programKeahlianSekolah.getIdProgramSekolah());
-        client.insertRecord(tableProgramKeahlianSekolah, rowKey, "main", "namaProgramSekolah",
-                programKeahlianSekolah.getNamaProgramSekolah());
-
-        // Sekolah
-        client.insertRecord(tableProgramKeahlianSekolah, rowKey, "school", "idSchool",
-                programKeahlianSekolah.getSchool().getIdSchool());
-        client.insertRecord(tableProgramKeahlianSekolah, rowKey, "school", "nameSchool",
-                programKeahlianSekolah.getSchool().getNameSchool());
-
-        // Program Keahlian
-        client.insertRecord(tableProgramKeahlianSekolah, rowKey, "programKeahlian", "id",
-                programKeahlianSekolah.getProgramKeahlian().getId());
-        client.insertRecord(tableProgramKeahlianSekolah, rowKey, "programKeahlian", "program",
-                programKeahlianSekolah.getProgramKeahlian().getProgram());
-
-        return programKeahlianSekolah;
-    }
-
-    public ProgramKeahlianSekolah findProgramKeahlianSekolahById(String programKeahlianSekolahId) throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
-
-        // Add the mappings to the HashMap
-        columnMapping.put("idProgramSekolah", "idProgramSekolah");
-        columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
-        columnMapping.put("school", "school");
-        columnMapping.put("programKeahlian", "programKeahlian");
-
-        return client.showDataTable(tableProgramKeahlianSekolah.toString(), columnMapping, programKeahlianSekolahId,
-                ProgramKeahlianSekolah.class);
-    }
-
-    public ProgramKeahlianSekolah findById(String programKeahlianSekolahId) throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
-
-        // Add the mappings to the HashMap
-        columnMapping.put("idProgramSekolah", "idProgramSekolah");
-        columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
-        columnMapping.put("school", "school");
-        columnMapping.put("programKeahlian", "programKeahlian");
-
-        return client.showDataTable(tableProgramKeahlianSekolah.toString(), columnMapping, programKeahlianSekolahId,
-                ProgramKeahlianSekolah.class);
-    }
-
-    public List<ProgramKeahlianSekolah> findProgramKeahlianSekolahBySekolah(String sekolahID, int size)
-            throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
-        Map<String, String> columnMapping = new HashMap<>();
-
-        // Add the mappings to the HashMap
-        columnMapping.put("idProgramSekolah", "idProgramSekolah");
-        columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
-        columnMapping.put("school", "school");
-        columnMapping.put("programKeahlian", "programKeahlian");
-
-        List<ProgramKeahlianSekolah> programKeahlianSekolah = client.getDataListByColumn(
-                tableProgramKeahlianSekolah.toString(), columnMapping, "school", "idSchool", sekolahID,
-                ProgramKeahlianSekolah.class, size);
-        return programKeahlianSekolah;
-    }
-
-    public ProgramKeahlianSekolah update(String programKeahlianSekolahId, ProgramKeahlianSekolah programKeahlianSekolah)
-            throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
-
-        if (programKeahlianSekolah.getNamaProgramSekolah() != null) {
-            client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "main", "namaProgramSekolah",
-                    programKeahlianSekolah.getNamaProgramSekolah());
+                return client.showListTable(tableProgramKeahlianSekolah.toString(), columnMapping,
+                                ProgramKeahlianSekolah.class,
+                                size);
         }
 
-        // Sekolah
-        if (programKeahlianSekolah.getSchool() != null) {
-            client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "school", "idSchool",
-                    programKeahlianSekolah.getSchool().getIdSchool());
-            client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "school", "nameSchool",
-                    programKeahlianSekolah.getSchool().getNameSchool());
+        public ProgramKeahlianSekolah save(ProgramKeahlianSekolah programKeahlianSekolah) throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+
+                String rowKey = programKeahlianSekolah.getIdProgramSekolah();
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+                // Map<String, String> columnMapping = new HashMap<>();
+
+                client.insertRecord(tableProgramKeahlianSekolah, rowKey, "main", "idProgramSekolah",
+                                programKeahlianSekolah.getIdProgramSekolah());
+                client.insertRecord(tableProgramKeahlianSekolah, rowKey, "main", "namaProgramSekolah",
+                                programKeahlianSekolah.getNamaProgramSekolah());
+
+                // Sekolah
+                client.insertRecord(tableProgramKeahlianSekolah, rowKey, "school", "idSchool",
+                                programKeahlianSekolah.getSchool().getIdSchool());
+                client.insertRecord(tableProgramKeahlianSekolah, rowKey, "school", "nameSchool",
+                                programKeahlianSekolah.getSchool().getNameSchool());
+
+                // Program Keahlian
+                client.insertRecord(tableProgramKeahlianSekolah, rowKey, "programKeahlian", "id",
+                                programKeahlianSekolah.getProgramKeahlian().getId());
+                client.insertRecord(tableProgramKeahlianSekolah, rowKey, "programKeahlian", "program",
+                                programKeahlianSekolah.getProgramKeahlian().getProgram());
+
+                return programKeahlianSekolah;
         }
 
-        if (programKeahlianSekolah.getProgramKeahlian() != null) {
-            client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "programKeahlian", "id",
-                    programKeahlianSekolah.getProgramKeahlian().getId());
-            client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "programKeahlian", "program",
-                    programKeahlianSekolah.getProgramKeahlian().getProgram());
+        public ProgramKeahlianSekolah findProgramKeahlianSekolahById(String programKeahlianSekolahId)
+                        throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+                Map<String, String> columnMapping = new HashMap<>();
+
+                // Add the mappings to the HashMap
+                columnMapping.put("idProgramSekolah", "idProgramSekolah");
+                columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
+                columnMapping.put("school", "school");
+                columnMapping.put("programKeahlian", "programKeahlian");
+
+                return client.showDataTable(tableProgramKeahlianSekolah.toString(), columnMapping,
+                                programKeahlianSekolahId,
+                                ProgramKeahlianSekolah.class);
         }
 
-        return programKeahlianSekolah;
-    }
+        public ProgramKeahlianSekolah findById(String programKeahlianSekolahId) throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+                Map<String, String> columnMapping = new HashMap<>();
 
-    public boolean deleteById(String programKeahlianSekolahId) throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-        client.deleteRecord(tableName, programKeahlianSekolahId);
-        return true;
-    }
+                // Add the mappings to the HashMap
+                columnMapping.put("idProgramSekolah", "idProgramSekolah");
+                columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
+                columnMapping.put("school", "school");
+                columnMapping.put("programKeahlian", "programKeahlian");
 
-    public boolean existsById(String programKeahlianSekolahId) throws IOException {
-        HBaseCustomClient client = new HBaseCustomClient(conf);
-        TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+                return client.showDataTable(tableProgramKeahlianSekolah.toString(), columnMapping,
+                                programKeahlianSekolahId,
+                                ProgramKeahlianSekolah.class);
+        }
 
-        Map<String, String> columnMapping = new HashMap<>();
+        public List<ProgramKeahlianSekolah> findProgramKeahlianSekolahBySekolah(String schoolID, int size)
+                        throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+                Map<String, String> columnMapping = new HashMap<>();
 
-        columnMapping.put("idProgramSekolah", "idProgramSekolah");
+                // Add the mappings to the HashMap
+                columnMapping.put("idProgramSekolah", "idProgramSekolah");
+                columnMapping.put("namaProgramSekolah", "namaProgramSekolah");
+                columnMapping.put("school", "school");
+                columnMapping.put("programKeahlian", "programKeahlian");
 
-        ProgramKeahlianSekolah programKeahlianSekolah = client.getDataByColumn(tableProgramKeahlianSekolah.toString(),
-                columnMapping, "main", "idProgramSekolah", programKeahlianSekolahId, ProgramKeahlianSekolah.class);
+                List<ProgramKeahlianSekolah> programKeahlianSekolah = client.getDataListByColumn(
+                                tableProgramKeahlianSekolah.toString(), columnMapping, "school", "idSchool", schoolID,
+                                ProgramKeahlianSekolah.class, size);
+                return programKeahlianSekolah;
+        }
 
-        return programKeahlianSekolah != null;
-    }
+        public ProgramKeahlianSekolah update(String programKeahlianSekolahId,
+                        ProgramKeahlianSekolah programKeahlianSekolah)
+                        throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+
+                if (programKeahlianSekolah.getNamaProgramSekolah() != null) {
+                        client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "main",
+                                        "namaProgramSekolah",
+                                        programKeahlianSekolah.getNamaProgramSekolah());
+                }
+
+                // Sekolah
+                if (programKeahlianSekolah.getSchool() != null) {
+                        client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "school", "idSchool",
+                                        programKeahlianSekolah.getSchool().getIdSchool());
+                        client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "school",
+                                        "nameSchool",
+                                        programKeahlianSekolah.getSchool().getNameSchool());
+                }
+
+                if (programKeahlianSekolah.getProgramKeahlian() != null) {
+                        client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "programKeahlian",
+                                        "id",
+                                        programKeahlianSekolah.getProgramKeahlian().getId());
+                        client.insertRecord(tableProgramKeahlianSekolah, programKeahlianSekolahId, "programKeahlian",
+                                        "program",
+                                        programKeahlianSekolah.getProgramKeahlian().getProgram());
+                }
+
+                return programKeahlianSekolah;
+        }
+
+        public boolean deleteById(String programKeahlianSekolahId) throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+                client.deleteRecord(tableName, programKeahlianSekolahId);
+                return true;
+        }
+
+        public boolean existsById(String programKeahlianSekolahId) throws IOException {
+                HBaseCustomClient client = new HBaseCustomClient(conf);
+                TableName tableProgramKeahlianSekolah = TableName.valueOf(tableName);
+
+                Map<String, String> columnMapping = new HashMap<>();
+
+                columnMapping.put("idProgramSekolah", "idProgramSekolah");
+
+                ProgramKeahlianSekolah programKeahlianSekolah = client.getDataByColumn(
+                                tableProgramKeahlianSekolah.toString(),
+                                columnMapping, "main", "idProgramSekolah", programKeahlianSekolahId,
+                                ProgramKeahlianSekolah.class);
+
+                return programKeahlianSekolah != null;
+        }
 }

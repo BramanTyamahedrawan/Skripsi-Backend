@@ -92,7 +92,7 @@ public class BidangKeahlianSekolahRepository {
                                 bidangKeahlianSekolahId, BidangKeahlianSekolah.class);
         }
 
-        public List<BidangKeahlianSekolah> findBidangKeahlianSekolahBySekolah(String sekolahID, int size)
+        public List<BidangKeahlianSekolah> findBidangKeahlianSekolahBySekolah(String schoolID, int size)
                         throws IOException {
                 HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -107,7 +107,7 @@ public class BidangKeahlianSekolahRepository {
 
                 List<BidangKeahlianSekolah> bidangKeahlianSekolah = client.getDataListByColumn(
                                 tableBidangKeahlianSekolah.toString(),
-                                columnMapping, "school", "idSchool", sekolahID, BidangKeahlianSekolah.class, size);
+                                columnMapping, "school", "idSchool", schoolID, BidangKeahlianSekolah.class, size);
 
                 return bidangKeahlianSekolah;
         }
