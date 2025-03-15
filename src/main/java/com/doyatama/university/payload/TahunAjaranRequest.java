@@ -11,13 +11,15 @@ package com.doyatama.university.payload;
 public class TahunAjaranRequest {
     private String idTahun;
     private String tahunAjaran;
+    private String idSekolah;
 
     public TahunAjaranRequest() {
     }
 
-    public TahunAjaranRequest(String idTahun, String tahunAjaran) {
+    public TahunAjaranRequest(String idTahun, String tahunAjaran, String idSekolah) {
         this.idTahun = idTahun;
         this.tahunAjaran = tahunAjaran;
+        this.idSekolah = idSekolah;
     }
 
     public String getIdTahun() {
@@ -35,14 +37,25 @@ public class TahunAjaranRequest {
     public void setTahunAjaran(String tahunAjaran) {
         this.tahunAjaran = tahunAjaran;
     }
-    
+
+    public String getIdSekolah() {
+        return idSekolah;
+    }
+
+    public void setIdSekolah(String idSekolah) {
+        this.idSekolah = idSekolah;
+    }
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
             case "idTahun":
                 this.idTahun = value;
                 break;
             case "tahunAjaran":
-                this.tahunAjaran = value;  
+                this.tahunAjaran = value;
+                break;
+            case "idSekolah":
+                this.idSekolah = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

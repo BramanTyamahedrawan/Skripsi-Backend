@@ -111,7 +111,7 @@ public class BidangKeahlianSekolahService {
         if (bidangKeahlianSekolahResponse.isValid()) {
             bidangKeahlianSekolahRepository.deleteById(bidangKeahlianSekolahId);
         } else {
-            throw new ResourceNotFoundException("Bidang Keahlian Sekolah", "idBidangKeahlianSekolah",
+            throw new ResourceNotFoundException("Bidang Keahlian Sekolah", "id",
                     bidangKeahlianSekolahId);
         }
     }

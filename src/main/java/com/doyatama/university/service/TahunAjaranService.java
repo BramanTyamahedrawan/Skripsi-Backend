@@ -2,56 +2,86 @@ package com.doyatama.university.service;
 
 import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
+import com.doyatama.university.model.BidangKeahlianSekolah;
+import com.doyatama.university.model.School;
 import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.payload.TahunAjaranRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.TahunAjaranRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TahunAjaranService {
     private TahunAjaranRepository tahunRepository = new TahunAjaranRepository();
+    private SchoolRepository schoolRepository = new SchoolRepository();
 
-    // private static final Logger logger =
-    // LoggerFactory.getLogger(TahunAjaranService.class);
-
-    public PagedResponse<TahunAjaran> getAllTahunAjaran(int page, int size) throws IOException {
+    public PagedResponse<TahunAjaran> getAllTahunAjaran(int page, String schoolID, int size) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
-        List<TahunAjaran> tahunResponse = new ArrayList<>();
-        tahunResponse = tahunRepository.findAll(size);
+        List<TahunAjaran> tahunResponse;
+
+        if (schoolID.equalsIgnoreCase("*")) {
+            tahunResponse = tahunRepository.findAll(size);
+        } else {
+            tahunResponse = tahunRepository.findTahunAjaranBySekolah(schoolID, size);
+        }
 
         return new PagedResponse<>(tahunResponse, tahunResponse.size(), "Successfully get data", 200);
     }
 
     public TahunAjaran createTahunAjaran(TahunAjaranRequest tahunRequest) throws IOException {
 
+        if (tahunRequest.getIdTahun() == null) {
+            tahunRequest.setIdTahun(UUID.randomUUID().toString());
+        }
+
+        if (tahunRepository.existsById(tahunRequest.getIdTahun())) {
+            throw new IllegalArgumentException("Tahun Ajaran already exist");
+        }
+
+        School schoolResponse = schoolRepository.findById(tahunRequest.getIdSekolah());
+
         TahunAjaran tahun = new TahunAjaran();
         tahun.setIdTahun(tahunRequest.getIdTahun());
         tahun.setTahunAjaran(tahunRequest.getTahunAjaran());
+
+        tahun.setSchool(schoolResponse);
+
         return tahunRepository.save(tahun);
     }
 
     public DefaultResponse<TahunAjaran> getTahunAjaranById(String tahunId) throws IOException {
-        // Retrieve TahunAjaran
-        TahunAjaran tahun = tahunRepository.findById(tahunId);
-        return new DefaultResponse<>(tahun.isValid() ? tahun : null, tahun.isValid() ? 1 : 0, "Successfully get data");
+        TahunAjaran tahunResponse = tahunRepository.findTahunById(tahunId);
+        return new DefaultResponse<>(tahunResponse.isValid() ? tahunResponse : null, tahunResponse.isValid() ? 1 : 0,
+                "Successfully get data");
     }
 
     public TahunAjaran updateTahunAjaran(String tahunId, TahunAjaranRequest tahunRequest) throws IOException {
+
         TahunAjaran tahun = new TahunAjaran();
-        tahun.setTahunAjaran(tahunRequest.getTahunAjaran());
-        return tahunRepository.update(tahunId, tahun);
+
+        School schoolResponse = schoolRepository.findById(tahunRequest.getIdSekolah());
+
+        if (schoolResponse.getIdSchool() != null) {
+            tahun.setTahunAjaran(tahunRequest.getTahunAjaran());
+            tahun.setSchool(schoolResponse);
+
+            return tahunRepository.update(tahunId, tahun);
+        } else {
+            return null;
+        }
     }
 
     public void deleteTahunAjaranById(String tahunId) throws IOException {
-        TahunAjaran tahunResponse = tahunRepository.findById(tahunId);
+        TahunAjaran tahunResponse = tahunRepository.findTahunById(tahunId);
         if (tahunResponse.isValid()) {
             tahunRepository.deleteById(tahunId);
         } else {

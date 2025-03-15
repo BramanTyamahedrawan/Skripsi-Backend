@@ -24,32 +24,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- *
- * @author senja
- */
-
 @RestController
 @RequestMapping("/api/tahun")
 public class TahunAjaranController {
     private TahunAjaranService tahunService = new TahunAjaranService();
 
     @GetMapping
-    public PagedResponse<TahunAjaran> getTahunAjaran(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                    @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return tahunService.getAllTahunAjaran(page, size);
+    public PagedResponse<TahunAjaran> getTahunAjaran(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+        return tahunService.getAllTahunAjaran(page, schoolID, size);
     }
 
     @PostMapping
     public ResponseEntity<?> createTahunAjaran(@Valid @RequestBody TahunAjaranRequest tahunRequest) throws IOException {
-        TahunAjaran tahun = tahunService.createTahunAjaran(tahunRequest);
+        try {
+            TahunAjaran tahun = tahunService.createTahunAjaran(tahunRequest);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{tahunId}")
-                .buildAndExpand(tahun.getIdTahun()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{tahunId}")
+                    .buildAndExpand(tahun.getIdTahun()).toUri();
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "TahunAjaran Created Successfully"));
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "TahunAjaran Created Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 
     @GetMapping("/{tahunId}")
@@ -57,23 +62,41 @@ public class TahunAjaranController {
         return tahunService.getTahunAjaranById(tahunId);
     }
 
-
     @PutMapping("/{tahunId}")
     public ResponseEntity<?> updateTahunAjaran(@PathVariable String tahunId,
-                                              @Valid @RequestBody TahunAjaranRequest tahunRequest) throws IOException {
-        TahunAjaran tahun = tahunService.updateTahunAjaran(tahunId, tahunRequest);
+            @Valid @RequestBody TahunAjaranRequest tahunRequest) throws IOException {
+        try {
+            TahunAjaran tahun = tahunService.updateTahunAjaran(tahunId, tahunRequest);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{tahunId}")
-                .buildAndExpand(tahun.getIdTahun()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{tahunId}")
+                    .buildAndExpand(tahun.getIdTahun()).toUri();
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "TahunAjaran Updated Successfully"));
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "TahunAjaran Updated Successfully"));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{tahunId}")
-    public HttpStatus deleteTahunAjaran(@PathVariable (value = "tahunId") String tahunId) throws IOException {
-        tahunService.deleteTahunAjaranById(tahunId);
-        return HttpStatus.FORBIDDEN;
+    public ResponseEntity<?> deleteTahunAjaran(@PathVariable String tahunId) throws IOException {
+        try {
+            tahunService.deleteTahunAjaranById(tahunId);
+
+            return ResponseEntity.ok()
+                    .body(new ApiResponse(true, "TahunAjaran Deleted Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 }

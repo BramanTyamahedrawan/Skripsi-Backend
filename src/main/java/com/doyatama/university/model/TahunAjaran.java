@@ -1,23 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.doyatama.university.model;
 
-/**
- *
- * @author Nifan
- */
 public class TahunAjaran {
     private String idTahun;
     private String tahunAjaran;
+    private School school;
 
     public TahunAjaran() {
     }
 
-    public TahunAjaran(String idTahun, String tahunAjaran) {
+    public TahunAjaran(String idTahun, String tahunAjaran, School school) {
         this.idTahun = idTahun;
         this.tahunAjaran = tahunAjaran;
+        this.school = school;
     }
 
     public String getIdTahun() {
@@ -35,9 +29,17 @@ public class TahunAjaran {
     public void setTahunAjaran(String tahunAjaran) {
         this.tahunAjaran = tahunAjaran;
     }
-    
+
+    public School getSchool() {
+        return school;
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
+    }
+
     public boolean isValid() {
-        return this.idTahun != null && this.tahunAjaran != null;
+        return this.idTahun != null && this.tahunAjaran != null && this.school != null;
     }
 
     public void set(String fieldName, String value) {
@@ -46,7 +48,7 @@ public class TahunAjaran {
                 this.idTahun = value;
                 break;
             case "tahunAjaran":
-                this.tahunAjaran = value;  
+                this.tahunAjaran = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);
