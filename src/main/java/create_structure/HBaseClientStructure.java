@@ -349,12 +349,12 @@ public class HBaseClientStructure {
                 Instant instant = zonedDateTime.toInstant();
 
                 // insert school
-                client.insertRecord(tableSchool, "RWK001", "main", "id", "RWK001");
+                client.insertRecord(tableSchool, "RWK001", "main", "idSchool", "RWK001");
                 client.insertRecord(tableSchool, "RWK001", "main", "name", "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableSchool, "RWK001", "main", "address", "jl. raya rowokangkung");
                 client.insertRecord(tableSchool, "RWK001", "detail", "created_by", "Doyatama");
 
-                client.insertRecord(tableSchool, "TMP001", "main", "id", "TMP001");
+                client.insertRecord(tableSchool, "TMP001", "main", "idSchool", "TMP001");
                 client.insertRecord(tableSchool, "TMP001", "main", "name", "SMK Negeri 01 TEMPEH");
                 client.insertRecord(tableSchool, "TMP001", "main", "address", "jl. raya tempeh");
                 client.insertRecord(tableSchool, "TMP001", "detail", "created_by", "Doyatama");
@@ -376,8 +376,8 @@ public class HBaseClientStructure {
                 client.insertRecord(tableUser, "USR002", "main", "username", "operator1");
                 client.insertRecord(tableUser, "USR002", "main", "password",
                                 "$2a$10$SDRWMUk.2fnli0GTmqodJexjRksTw0En98dU8fdKsw7nTbZzMrj.2"); // password
-                client.insertRecord(tableUser, "USR002", "school", "id", "RWK001");
-                client.insertRecord(tableUser, "USR002", "school", "name", "SMK Negeri 01 ROWOKANGKUNG");
+                client.insertRecord(tableUser, "USR002", "school", "idSchool", "RWK001");
+                client.insertRecord(tableUser, "USR002", "school", "nameSchool", "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableUser, "USR002", "main", "roles", "2");
                 client.insertRecord(tableUser, "USR002", "main", "created_at", "2023-05-14T04:56:23.174Z");
                 client.insertRecord(tableUser, "USR002", "detail", "created_by", "Doyatama");
@@ -388,8 +388,8 @@ public class HBaseClientStructure {
                 client.insertRecord(tableUser, "USR003", "main", "username", "operator2");
                 client.insertRecord(tableUser, "USR003", "main", "password",
                                 "$2a$10$SDRWMUk.2fnli0GTmqodJexjRksTw0En98dU8fdKsw7nTbZzMrj.2"); // password
-                client.insertRecord(tableUser, "USR003", "school", "id", "TMP001");
-                client.insertRecord(tableUser, "USR003", "school", "name", "SMK Negeri 01 TEMPEH");
+                client.insertRecord(tableUser, "USR003", "school", "idSchool", "TMP001");
+                client.insertRecord(tableUser, "USR003", "school", "nameSchool", "SMK Negeri 01 TEMPEH");
                 client.insertRecord(tableUser, "USR003", "main", "roles", "2");
                 client.insertRecord(tableUser, "USR003", "main", "created_at", "2023-05-14T04:56:23.174Z");
                 client.insertRecord(tableUser, "USR003", "detail", "created_by", "Doyatama");
@@ -397,58 +397,76 @@ public class HBaseClientStructure {
                 // Insert Religions
                 client.insertRecord(tableReligion, "RLG001", "main", "id", "RLG001");
                 client.insertRecord(tableReligion, "RLG001", "main", "name", "Islam");
-                client.insertRecord(tableReligion, "RLG001", "main", "description", "deskripsi agama islam");
-                client.insertRecord(tableReligion, "RLG001", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableReligion, "RLG001", "main", "description",
+                                "deskripsi agama islam");
+                client.insertRecord(tableReligion, "RLG001", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableReligion, "RLG002", "main", "id", "RLG002");
                 client.insertRecord(tableReligion, "RLG002", "main", "name", "Kristen");
-                client.insertRecord(tableReligion, "RLG002", "main", "description", "deskripsi agama kristen");
-                client.insertRecord(tableReligion, "RLG002", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableReligion, "RLG002", "main", "description",
+                                "deskripsi agama kristen");
+                client.insertRecord(tableReligion, "RLG002", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableReligion, "RLG003", "main", "id", "RLG003");
                 client.insertRecord(tableReligion, "RLG003", "main", "name", "Katolik");
-                client.insertRecord(tableReligion, "RLG003", "main", "description", "deskripsi agama katolik");
-                client.insertRecord(tableReligion, "RLG003", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableReligion, "RLG003", "main", "description",
+                                "deskripsi agama katolik");
+                client.insertRecord(tableReligion, "RLG003", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableReligion, "RLG004", "main", "id", "RLG004");
                 client.insertRecord(tableReligion, "RLG004", "main", "name", "Hindu");
-                client.insertRecord(tableReligion, "RLG004", "main", "description", "deskripsi agama hindu");
-                client.insertRecord(tableReligion, "RLG004", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableReligion, "RLG004", "main", "description",
+                                "deskripsi agama hindu");
+                client.insertRecord(tableReligion, "RLG004", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableReligion, "RLG005", "main", "id", "RLG005");
                 client.insertRecord(tableReligion, "RLG005", "main", "name", "Buddha");
-                client.insertRecord(tableReligion, "RLG005", "main", "description", "deskripsi agama budha");
-                client.insertRecord(tableReligion, "RLG005", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableReligion, "RLG005", "main", "description",
+                                "deskripsi agama budha");
+                client.insertRecord(tableReligion, "RLG005", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableReligion, "RLG006", "main", "id", "RLG006");
                 client.insertRecord(tableReligion, "RLG006", "main", "name", "Kong Hu Chu");
-                client.insertRecord(tableReligion, "RLG006", "main", "description", "deskripsi agama kong hu chu");
-                client.insertRecord(tableReligion, "RLG006", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableReligion, "RLG006", "main", "description",
+                                "deskripsi agama kong hu chu");
+                client.insertRecord(tableReligion, "RLG006", "detail", "created_by",
+                                "Doyatama");
 
                 // Insert Bentuk Pembelajaran
                 client.insertRecord(tableFormLearning, "BP001", "main", "id", "BP001");
                 client.insertRecord(tableFormLearning, "BP001", "main", "name", "Daring");
                 client.insertRecord(tableFormLearning, "BP001", "main", "description",
                                 "Pembelajaran dilakukan secara dalam jaringan / online");
-                client.insertRecord(tableFormLearning, "BP001", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableFormLearning, "BP001", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableFormLearning, "BP002", "main", "id", "BP002");
                 client.insertRecord(tableFormLearning, "BP002", "main", "name", "Luring");
                 client.insertRecord(tableFormLearning, "BP002", "main", "description",
                                 "Pembelajaran dilakukan secara diluar jaringan / offline");
-                client.insertRecord(tableFormLearning, "BP002", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableFormLearning, "BP002", "detail", "created_by",
+                                "Doyatama");
 
                 // Insert Metode Pembelajaran
                 client.insertRecord(tableLearningMethod, "MP001", "main", "id", "MP001");
                 client.insertRecord(tableLearningMethod, "MP001", "main", "name",
                                 "Contextual Teaching and Learning (CTL)");
-                client.insertRecord(tableLearningMethod, "MP001", "main", "description", "Pengertian dari CTL");
-                client.insertRecord(tableLearningMethod, "MP001", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableLearningMethod, "MP001", "main", "description",
+                                "Pengertian dari CTL");
+                client.insertRecord(tableLearningMethod, "MP001", "detail", "created_by",
+                                "Doyatama");
 
                 client.insertRecord(tableLearningMethod, "MP002", "main", "id", "MP002");
                 client.insertRecord(tableLearningMethod, "MP002", "main", "name", "Problem Based Learning");
-                client.insertRecord(tableLearningMethod, "MP002", "main", "description", "Pengertian dari PBL");
-                client.insertRecord(tableLearningMethod, "MP002", "detail", "created_by", "Doyatama");
+                client.insertRecord(tableLearningMethod, "MP002", "main", "description",
+                                "Pengertian dari PBL");
+                client.insertRecord(tableLearningMethod, "MP002", "detail", "created_by",
+                                "Doyatama");
 
         }
 }
