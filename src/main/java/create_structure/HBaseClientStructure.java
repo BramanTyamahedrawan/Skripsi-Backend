@@ -350,12 +350,12 @@ public class HBaseClientStructure {
 
                 // insert school
                 client.insertRecord(tableSchool, "RWK001", "main", "idSchool", "RWK001");
-                client.insertRecord(tableSchool, "RWK001", "main", "name", "SMK Negeri 01 ROWOKANGKUNG");
+                client.insertRecord(tableSchool, "RWK001", "main", "nameSchool", "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableSchool, "RWK001", "main", "address", "jl. raya rowokangkung");
                 client.insertRecord(tableSchool, "RWK001", "detail", "created_by", "Doyatama");
 
                 client.insertRecord(tableSchool, "TMP001", "main", "idSchool", "TMP001");
-                client.insertRecord(tableSchool, "TMP001", "main", "name", "SMK Negeri 01 TEMPEH");
+                client.insertRecord(tableSchool, "TMP001", "main", "nameSchool", "SMK Negeri 01 TEMPEH");
                 client.insertRecord(tableSchool, "TMP001", "main", "address", "jl. raya tempeh");
                 client.insertRecord(tableSchool, "TMP001", "detail", "created_by", "Doyatama");
 
