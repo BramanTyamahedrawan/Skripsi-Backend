@@ -52,8 +52,7 @@ public class ProgramKeahlianSekolahRequest {
     }
 
     public boolean isValid() {
-        return this.idProgramSekolah != null &&
-                this.namaProgramSekolah != null &&
+        return this.namaProgramSekolah != null &&
                 this.idSekolah != null &&
                 this.idProgramKeahlian != null;
     }

@@ -58,7 +58,8 @@ public class ProgramKeahlianSekolahService {
             programKeahlianSekolahRequest.setIdProgramSekolah(UUID.randomUUID().toString());
         }
 
-        if (programKeahlianSekolahRepository.existsById(programKeahlianSekolahRequest.getIdProgramSekolah())) {
+        if (programKeahlianSekolahRepository
+                .existsById(programKeahlianSekolahRequest.getIdProgramSekolah())) {
             throw new IllegalArgumentException("Program Sekolah already exist");
         }
 

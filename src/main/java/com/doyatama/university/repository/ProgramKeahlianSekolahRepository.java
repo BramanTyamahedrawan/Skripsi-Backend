@@ -1,6 +1,7 @@
 package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
+import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.model.ProgramKeahlianSekolah;
 
 import java.io.IOException;
@@ -163,6 +164,7 @@ public class ProgramKeahlianSekolahRepository {
                                 columnMapping, "main", "idProgramSekolah", programKeahlianSekolahId,
                                 ProgramKeahlianSekolah.class);
 
-                return programKeahlianSekolah != null;
+                return programKeahlianSekolah.getIdProgramSekolah() != null;
         }
+
 }
