@@ -7,57 +7,83 @@ package com.doyatama.university.service;
 import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.Mapel;
+import com.doyatama.university.model.School;
 import com.doyatama.university.payload.MapelRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.MapelRepository;
+import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MapelService {
     private MapelRepository mapelRepository = new MapelRepository();
+    private SchoolRepository schoolRepository = new SchoolRepository();
 
-    // private static final Logger logger =
-    // LoggerFactory.getLogger(MapelService.class);
-
-    public PagedResponse<Mapel> getAllMapel(int page, int size) throws IOException {
+    public PagedResponse<Mapel> getAllMapel(int page, int size, String schoolID) throws IOException {
         validatePageNumberAndSize(page, size);
 
-        // Retrieve Polls
-        List<Mapel> mapelResponse = mapelRepository.findAll(size);
+        // Retrieve Mapel
+        List<Mapel> mapelResponse;
+
+        if (schoolID.equalsIgnoreCase("*")) {
+            mapelResponse = mapelRepository.findAll(size);
+        } else {
+            mapelResponse = mapelRepository.findMapelBySekolah(schoolID, size);
+        }
 
         return new PagedResponse<>(mapelResponse, mapelResponse.size(), "Successfully get data", 200);
     }
 
     public Mapel createMapel(MapelRequest mapelRequest) throws IOException {
 
+        if (mapelRequest.getIdMapel() == null) {
+            mapelRequest.setIdMapel(UUID.randomUUID().toString());
+        }
+
+        if (mapelRepository.existsById(mapelRequest.getIdMapel())) {
+            throw new IllegalArgumentException("Mapel already exist");
+        }
+
+        School schoolResponse = schoolRepository.findById(mapelRequest.getIdSekolah());
+
         Mapel mapel = new Mapel();
         mapel.setIdMapel(mapelRequest.getIdMapel());
         mapel.setName(mapelRequest.getName());
+        mapel.setSchool(schoolResponse);
         return mapelRepository.save(mapel);
     }
 
-    public DefaultResponse<Mapel> getMapelById(String mplId) throws IOException {
+    public DefaultResponse<Mapel> getMapelById(String mapelId) throws IOException {
         // Retrieve Mapel
-        Mapel mapel = mapelRepository.findById(mplId);
+        Mapel mapel = mapelRepository.findById(mapelId);
         return new DefaultResponse<>(mapel.isValid() ? mapel : null, mapel.isValid() ? 1 : 0, "Successfully get data");
     }
 
-    public Mapel updateMapel(String mplId, MapelRequest mapelRequest) throws IOException {
+    public Mapel updateMapel(String mapelId, MapelRequest mapelRequest) throws IOException {
         Mapel mapel = new Mapel();
-        mapel.setName(mapelRequest.getName());
-        return mapelRepository.update(mplId, mapel);
+
+        School schoolResponse = schoolRepository.findById(mapelRequest.getIdSekolah());
+
+        if (schoolResponse.getIdSchool() != null) {
+            mapel.setName(mapelRequest.getName());
+            mapel.setSchool(schoolResponse);
+            return mapelRepository.update(mapelId, mapel);
+        } else {
+            return null;
+        }
     }
 
-    public void deleteMapelById(String mplId) throws IOException {
-        Mapel mapelResponse = mapelRepository.findById(mplId);
+    public void deleteMapelById(String mapelId) throws IOException {
+        Mapel mapelResponse = mapelRepository.findById(mapelId);
         if (mapelResponse.isValid()) {
-            mapelRepository.deleteById(mplId);
+            mapelRepository.deleteById(mapelId);
         } else {
-            throw new ResourceNotFoundException("Mapel", "id", mplId);
+            throw new ResourceNotFoundException("Mapel", "id", mapelId);
         }
     }
 

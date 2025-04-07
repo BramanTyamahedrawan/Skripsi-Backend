@@ -35,21 +35,31 @@ public class MapelController {
     private MapelService mapelService = new MapelService();
 
     @GetMapping
-    public PagedResponse<Mapel> getMapel(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                    @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return mapelService.getAllMapel(page, size);
+    public PagedResponse<Mapel> getMapel(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+        return mapelService.getAllMapel(page, size, schoolID);
     }
 
     @PostMapping
     public ResponseEntity<?> createMapel(@Valid @RequestBody MapelRequest mapelRequest) throws IOException {
-        Mapel mapel = mapelService.createMapel(mapelRequest);
+        try {
+            Mapel mapel = mapelService.createMapel(mapelRequest);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{mapelId}")
-                .buildAndExpand(mapel.getIdMapel()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{mapelId}")
+                    .buildAndExpand(mapel.getIdMapel()).toUri();
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "Mapel Created Successfully"));
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "Mapel Created Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
     }
 
     @GetMapping("/{mapelId}")
@@ -57,23 +67,38 @@ public class MapelController {
         return mapelService.getMapelById(mapelId);
     }
 
-
     @PutMapping("/{mapelId}")
     public ResponseEntity<?> updateMapel(@PathVariable String mapelId,
-                                              @Valid @RequestBody MapelRequest mapelRequest) throws IOException {
-        Mapel mapel = mapelService.updateMapel(mapelId, mapelRequest);
+            @Valid @RequestBody MapelRequest mapelRequest) throws IOException {
+        try {
+            Mapel mapel = mapelService.updateMapel(mapelId, mapelRequest);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{mapelId}")
-                .buildAndExpand(mapel.getIdMapel()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{mapelId}")
+                    .buildAndExpand(mapel.getIdMapel()).toUri();
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "Mapel Updated Successfully"));
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "Mapel Updated Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{mapelId}")
-    public HttpStatus deleteMapel(@PathVariable (value = "mapelId") String mapelId) throws IOException {
-        mapelService.deleteMapelById(mapelId);
-        return HttpStatus.FORBIDDEN;
+    public ResponseEntity<?> deleteMapel(@PathVariable String mapelId) throws IOException {
+        try {
+            mapelService.deleteMapelById(mapelId);
+            return ResponseEntity.ok(new ApiResponse(true, "Mapel Deleted Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 }

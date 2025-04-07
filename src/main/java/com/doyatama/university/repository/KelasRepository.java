@@ -93,9 +93,9 @@ public class KelasRepository {
         columnMapping.put("namaKelas", "namaKelas");
         columnMapping.put("school", "school");
 
-        List<Kelas> kelass = client.getDataListByColumn(tableKelas.toString(), columnMapping, "school", "idSchool",
+        List<Kelas> kelas = client.getDataListByColumn(tableKelas.toString(), columnMapping, "school", "idSchool",
                 schoolID, Kelas.class, size);
-        return kelass;
+        return kelas;
     }
 
     public Kelas update(String kelasId, Kelas kelas) throws IOException {

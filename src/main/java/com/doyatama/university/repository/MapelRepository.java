@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
 public class MapelRepository {
     Configuration conf = HBaseConfiguration.create();
     String tableName = "mapels";
-    
+
     public List<Mapel> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -34,9 +34,11 @@ public class MapelRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
+        columnMapping.put("school", "school");
+
         return client.showListTable(tableMapel.toString(), columnMapping, Mapel.class, size);
     }
-     
+
     public Mapel save(Mapel mapel) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
@@ -44,11 +46,16 @@ public class MapelRepository {
         TableName tableMapel = TableName.valueOf(tableName);
         client.insertRecord(tableMapel, rowKey, "main", "idMapel", rowKey);
         client.insertRecord(tableMapel, rowKey, "main", "name", mapel.getName());
+
+        // Sekolah
+        client.insertRecord(tableMapel, rowKey, "school", "idSchool", mapel.getSchool().getIdSchool());
+        client.insertRecord(tableMapel, rowKey, "school", "nameSchool", mapel.getSchool().getNameSchool());
+
         client.insertRecord(tableMapel, rowKey, "detail", "created_by", "Doyatama");
         return mapel;
-    } 
-     
-    public Mapel findById(String mplId) throws IOException {
+    }
+
+    public Mapel findById(String mapelId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableMapel = TableName.valueOf(tableName);
@@ -57,11 +64,12 @@ public class MapelRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
+        columnMapping.put("school", "school");
 
-        return client.showDataTable(tableMapel.toString(), columnMapping, mplId, Mapel.class);
+        return client.showDataTable(tableMapel.toString(), columnMapping, mapelId, Mapel.class);
     }
-         
-    public List<Mapel> findAllById(List<String> mplIds) throws IOException {
+
+    public List<Mapel> findAllById(List<String> mapelIds) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableMapel = TableName.valueOf(tableName);
@@ -69,10 +77,9 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
 
-
         List<Mapel> mapels = new ArrayList<>();
-        for (String mplId : mplIds) {
-            Mapel mapel = client.showDataTable(tableMapel.toString(), columnMapping, mplId, Mapel.class);
+        for (String mapelId : mapelIds) {
+            Mapel mapel = client.showDataTable(tableMapel.toString(), columnMapping, mapelId, Mapel.class);
             if (mapel != null) {
                 mapels.add(mapel);
             }
@@ -80,7 +87,7 @@ public class MapelRepository {
 
         return mapels;
     }
-    
+
     public List<Mapel> findAllByIds(List<List<String>> mapelIdsList) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
         TableName tableMapel = TableName.valueOf(tableName);
@@ -92,8 +99,8 @@ public class MapelRepository {
 
         // Iterate through each List<String> inside List<List<String>>
         for (List<String> mapelIds : mapelIdsList) {
-            for (String mplId : mapelIds) {
-                Mapel mapel = client.showDataTable(tableMapel.toString(), columnMapping, mplId, Mapel.class);
+            for (String mapelId : mapelIds) {
+                Mapel mapel = client.showDataTable(tableMapel.toString(), columnMapping, mapelId, Mapel.class);
                 if (mapel != null) {
                     mapels.add(mapel);
                 }
@@ -103,20 +110,58 @@ public class MapelRepository {
         return mapels;
     }
 
-             
-    public Mapel update(String mplId, Mapel mapel) throws IOException {
+    public List<Mapel> findMapelBySekolah(String schoolID, int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableMapel = TableName.valueOf(tableName);
-        client.insertRecord(tableMapel, mplId, "main", "name", mapel.getName());
-        client.insertRecord(tableMapel, mplId, "detail", "created_by", "Doyatama");
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idMapel", "idMapel");
+        columnMapping.put("name", "name");
+        columnMapping.put("school", "school");
+
+        List<Mapel> mapels = client.getDataListByColumn(tableMapel.toString(), columnMapping, "school", "idSchool",
+                schoolID, Mapel.class, size);
+        return mapels;
+    }
+
+    public Mapel update(String mapelId, Mapel mapel) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableMapel = TableName.valueOf(tableName);
+
+        if (mapel.getName() != null) {
+            client.insertRecord(tableMapel, mapelId, "main", "name", mapel.getName());
+        }
+
+        if (mapel.getSchool().getIdSchool() != null) {
+            client.insertRecord(tableMapel, mapelId, "school", "idSchool", mapel.getSchool().getIdSchool());
+        }
+
+        if (mapel.getSchool().getNameSchool() != null) {
+            client.insertRecord(tableMapel, mapelId, "school", "nameSchool", mapel.getSchool().getNameSchool());
+        }
+
         return mapel;
     }
-        
-        
-    public boolean deleteById(String mplId) throws IOException {
+
+    public boolean deleteById(String mapelId) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
-        client.deleteRecord(tableName, mplId);
+        client.deleteRecord(tableName, mapelId);
         return true;
-    }  
+    }
+
+    public boolean existsById(String mapelId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableMapel = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idMapel", "idMapel");
+
+        Mapel mapel = client.getDataByColumn(tableMapel.toString(), columnMapping, "main", "idMapel", mapelId,
+                Mapel.class);
+        return mapel.getIdMapel() != null;
+    }
 }
