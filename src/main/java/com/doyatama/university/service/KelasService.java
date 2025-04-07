@@ -3,40 +3,54 @@ package com.doyatama.university.service;
 import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.Kelas;
+import com.doyatama.university.model.School;
 import com.doyatama.university.payload.KelasRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.KelasRepository;
+import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KelasService {
     private KelasRepository kelasRepository = new KelasRepository();
+    private SchoolRepository schoolRepository = new SchoolRepository();
 
-    // private static final Logger logger =
-    // LoggerFactory.getLogger(KelasService.class);
-
-    public PagedResponse<Kelas> getAllKelas(int page, int size) throws IOException {
+    public PagedResponse<Kelas> getAllKelas(int page, int size, String schoolID) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
-        List<Kelas> kelasResponse = new ArrayList<>();
-        kelasResponse = kelasRepository.findAll(size);
+        List<Kelas> kelasResponse;
+
+        if (schoolID.equalsIgnoreCase("*")) {
+            kelasResponse = kelasRepository.findAll(size);
+        } else {
+            kelasResponse = kelasRepository.findKelasBySekolah(schoolID, size);
+        }
 
         return new PagedResponse<>(kelasResponse, kelasResponse.size(), "Successfully get data", 200);
     }
 
     public Kelas createKelas(KelasRequest kelasRequest) throws IOException {
 
+        if (kelasRequest.getIdKelas() == null) {
+            kelasRequest.setIdKelas(UUID.randomUUID().toString());
+        }
+
+        if (kelasRepository.existsById(kelasRequest.getIdKelas())) {
+            throw new IllegalArgumentException("Kelas already exist");
+        }
+
+        School schoolResponse = schoolRepository.findById(kelasRequest.getIdSekolah());
+
         Kelas kelas = new Kelas();
         kelas.setIdKelas(kelasRequest.getIdKelas());
         kelas.setNamaKelas(kelasRequest.getNamaKelas());
+        kelas.setSchool(schoolResponse);
         return kelasRepository.save(kelas);
     }
 
@@ -47,9 +61,19 @@ public class KelasService {
     }
 
     public Kelas updateKelas(String kelasId, KelasRequest kelasRequest) throws IOException {
+
         Kelas kelas = new Kelas();
-        kelas.setNamaKelas(kelasRequest.getNamaKelas());
-        return kelasRepository.update(kelasId, kelas);
+
+        School schoolResponse = schoolRepository.findById(kelasRequest.getIdSekolah());
+
+        if (schoolResponse.getIdSchool() != null) {
+            kelas.setNamaKelas(kelasRequest.getNamaKelas());
+            kelas.setSchool(schoolResponse);
+
+            return kelasRepository.update(kelasId, kelas);
+        } else {
+            return null;
+        }
     }
 
     public void deleteKelasById(String kelasId) throws IOException {

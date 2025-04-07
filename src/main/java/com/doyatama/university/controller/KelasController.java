@@ -24,29 +24,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-
-
 @RestController
 @RequestMapping("/api/kelas")
 public class KelasController {
     private KelasService kelasService = new KelasService();
 
     @GetMapping
-    public PagedResponse<Kelas> getKelas(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                    @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return kelasService.getAllKelas(page, size);
+    public PagedResponse<Kelas> getKelas(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+        return kelasService.getAllKelas(page, size, schoolID);
     }
 
     @PostMapping
     public ResponseEntity<?> createKelas(@Valid @RequestBody KelasRequest kelasRequest) throws IOException {
-        Kelas kelas = kelasService.createKelas(kelasRequest);
+        try {
+            Kelas kelas = kelasService.createKelas(kelasRequest);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{kelasId}")
-                .buildAndExpand(kelas.getIdKelas()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{kelasId}")
+                    .buildAndExpand(kelas.getIdKelas()).toUri();
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "Kelas Created Successfully"));
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "Kelas Created Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
     }
 
     @GetMapping("/{kelasId}")
@@ -54,23 +62,40 @@ public class KelasController {
         return kelasService.getKelasById(kelasId);
     }
 
-
     @PutMapping("/{kelasId}")
     public ResponseEntity<?> updateKelas(@PathVariable String kelasId,
-                                              @Valid @RequestBody KelasRequest kelasRequest) throws IOException {
-        Kelas kelas = kelasService.updateKelas(kelasId, kelasRequest);
+            @Valid @RequestBody KelasRequest kelasRequest) throws IOException {
+        try {
+            Kelas kelas = kelasService.updateKelas(kelasId, kelasRequest);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{kelasId}")
-                .buildAndExpand(kelas.getIdKelas()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{kelasId}")
+                    .buildAndExpand(kelas.getIdKelas()).toUri();
 
-        return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "Kelas Updated Successfully"));
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "Kelas Updated Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{kelasId}")
-    public HttpStatus deleteKelas(@PathVariable (value = "kelasId") String kelasId) throws IOException {
-        kelasService.deleteKelasById(kelasId);
-        return HttpStatus.FORBIDDEN;
+    public ResponseEntity<?> deleteKelas(@PathVariable String kelasId) throws IOException {
+        try {
+            kelasService.deleteKelasById(kelasId);
+
+            return ResponseEntity.ok()
+                    .body(new ApiResponse(true, "Kelas Deleted Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, e.getMessage()));
+        }
     }
 }
