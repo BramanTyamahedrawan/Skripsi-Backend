@@ -111,7 +111,7 @@ public class HBaseClientStructure {
                 // Create Tabel Elemen Pembelajaran
                 TableName tableElemen = TableName.valueOf("elemen");
                 String[] elemen = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester",
-                                "konsentrasiKeahlian",
+                                "konsentrasiKeahlianSekolah",
                                 "detail" };
                 client.deleteTable(tableElemen);
                 client.createTable(tableElemen, elemen);

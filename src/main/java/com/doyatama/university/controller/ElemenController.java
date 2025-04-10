@@ -36,10 +36,11 @@ public class ElemenController {
             @RequestParam(value = "tahunAjaranID", defaultValue = "*") String tahunAjaranID,
             @RequestParam(value = "semesterID", defaultValue = "*") String semesterID,
             @RequestParam(value = "kelasID", defaultValue = "*") String kelasID,
-            @RequestParam(value = "konsentrasiKeahlianID", defaultValue = "*") String konsentrasiKeahlianID)
+            @RequestParam(value = "konsentrasiKeahlianSekolahID", defaultValue = "*") String konsentrasiKeahlianSekolahID,
+            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID)
             throws IOException {
         return elemenService.getAllElemen(page, size, mapelID, tahunAjaranID, semesterID, kelasID,
-                konsentrasiKeahlianID);
+                konsentrasiKeahlianSekolahID, schoolID);
     }
 
     @PostMapping

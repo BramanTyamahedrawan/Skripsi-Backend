@@ -7,14 +7,17 @@ import com.doyatama.university.model.Kelas;
 import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.model.Mapel;
+import com.doyatama.university.model.School;
 import com.doyatama.university.model.KonsentrasiKeahlian;
+import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.payload.ElemenRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.ElemenRepository;
 import com.doyatama.university.repository.KelasRepository;
-import com.doyatama.university.repository.KonsentrasiKeahlianRepository;
+import com.doyatama.university.repository.KonsentrasiKeahlianSekolahRepository;
 import com.doyatama.university.repository.MapelRepository;
+import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.SemesterRepository;
 import com.doyatama.university.repository.TahunAjaranRepository;
 import com.doyatama.university.util.AppConstants;
@@ -29,10 +32,12 @@ public class ElemenService {
     private KelasRepository kelasRepository = new KelasRepository();
     private SemesterRepository semesterRepository = new SemesterRepository();
     private MapelRepository mapelRepository = new MapelRepository();
-    private KonsentrasiKeahlianRepository konsentrasiKeahlianRepository = new KonsentrasiKeahlianRepository();
+    private KonsentrasiKeahlianSekolahRepository konsentrasiKeahlianSekolahRepository = new KonsentrasiKeahlianSekolahRepository();
+    private SchoolRepository schoolRepository = new SchoolRepository();
 
     public PagedResponse<Elemen> getAllElemen(int page, int size, String mapelID, String tahunAjaranID,
-            String semesterID, String kelasID, String konsentrasiKeahlianID) throws IOException {
+            String semesterID, String kelasID, String konsentrasiKeahlianSekolahID, String schoolID)
+            throws IOException {
         validatePageNumberAndSize(page, size);
 
         List<Elemen> elemenResponse;
@@ -40,7 +45,7 @@ public class ElemenService {
         if (mapelID.equalsIgnoreCase("*")) {
             elemenResponse = elemenRepository.findAll(size);
         } else {
-            elemenResponse = elemenRepository.findElemenByMapel(mapelID, size);
+            elemenResponse = elemenRepository.findElemenBySekolah(mapelID, size);
         }
 
         return new PagedResponse<>(elemenResponse, elemenResponse.size(), "Successfully get data", 200);
@@ -57,6 +62,11 @@ public class ElemenService {
     }
 
     public Elemen createElemen(ElemenRequest elemenRequest) throws IOException {
+
+        if (elemenRequest.getIdElemen() == null) {
+            elemenRequest.setIdElemen(UUID.randomUUID().toString());
+        }
+
         if (elemenRepository.existsById(elemenRequest.getIdElemen())) {
             throw new IllegalArgumentException("Elemen already exist");
         }
@@ -65,19 +75,20 @@ public class ElemenService {
         Kelas kelasResponse = kelasRepository.findById(elemenRequest.getIdKelas());
         Semester semesterResponse = semesterRepository.findById(elemenRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(elemenRequest.getIdMapel());
-        KonsentrasiKeahlian konsentrasiKeahlianResponse = konsentrasiKeahlianRepository
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
                 .findById(elemenRequest.getIdKonsentrasi());
+        School schoolResponse = schoolRepository.findById(elemenRequest.getIdSekolah());
 
         Elemen elemen = new Elemen();
 
-        elemen.setIdElemen(elemenRequest.getIdElemen() == null ? UUID.randomUUID().toString()
-                : elemenRequest.getIdElemen());
+        elemen.setIdElemen(elemenRequest.getIdElemen());
         elemen.setNamaElemen(elemenRequest.getNamaElemen());
         elemen.setTahunAjaran(tahunAjaranResponse);
         elemen.setKelas(kelasResponse);
         elemen.setSemester(semesterResponse);
         elemen.setMapel(mapelResponse);
-        elemen.setKonsentrasiKeahlian(konsentrasiKeahlianResponse);
+        elemen.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
+        elemen.setSchool(schoolResponse);
 
         return elemenRepository.save(elemen);
     }
@@ -94,16 +105,18 @@ public class ElemenService {
         Kelas kelasResponse = kelasRepository.findById(elemenRequest.getIdKelas());
         Semester semesterResponse = semesterRepository.findById(elemenRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(elemenRequest.getIdMapel());
-        KonsentrasiKeahlian konsentrasiKeahlianResponse = konsentrasiKeahlianRepository
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
                 .findById(elemenRequest.getIdKonsentrasi());
+        School schoolResponse = schoolRepository.findById(elemenRequest.getIdSekolah());
 
-        if (mapelResponse.getIdMapel() != null && semesterResponse.getIdSemester() != null) {
+        if (schoolResponse.getIdSchool() != null) {
             elemen.setNamaElemen(elemenRequest.getNamaElemen());
             elemen.setTahunAjaran(tahunAjaranResponse);
             elemen.setKelas(kelasResponse);
             elemen.setSemester(semesterResponse);
             elemen.setMapel(mapelResponse);
-            elemen.setKonsentrasiKeahlian(konsentrasiKeahlianResponse);
+            elemen.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
+            elemen.setSchool(schoolResponse);
 
             return elemenRepository.update(elemenId, elemen);
         } else {

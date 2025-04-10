@@ -7,20 +7,22 @@ public class Elemen {
     private TahunAjaran tahunAjaran;
     private Semester semester;
     private Kelas kelas;
-    private KonsentrasiKeahlian konsentrasiKeahlian;
+    private KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah;
+    private School school;
 
     public Elemen() {
     }
 
     public Elemen(String idElemen, String namaElemen, Mapel mapel, TahunAjaran tahunAjaran, Semester semester,
-            Kelas kelas, KonsentrasiKeahlian konsentrasiKeahlian) {
+            Kelas kelas, KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah, School school) {
         this.idElemen = idElemen;
         this.namaElemen = namaElemen;
         this.mapel = mapel;
         this.tahunAjaran = tahunAjaran;
         this.semester = semester;
         this.kelas = kelas;
-        this.konsentrasiKeahlian = konsentrasiKeahlian;
+        this.konsentrasiKeahlianSekolah = konsentrasiKeahlianSekolah;
+        this.school = school;
     }
 
     public String getIdElemen() {
@@ -71,12 +73,20 @@ public class Elemen {
         this.kelas = kelas;
     }
 
-    public KonsentrasiKeahlian getKonsentrasiKeahlian() {
-        return konsentrasiKeahlian;
+    public KonsentrasiKeahlianSekolah getKonsentrasiKeahlianSekolah() {
+        return konsentrasiKeahlianSekolah;
     }
 
-    public void setKonsentrasiKeahlian(KonsentrasiKeahlian konsentrasiKeahlian) {
-        this.konsentrasiKeahlian = konsentrasiKeahlian;
+    public void setKonsentrasiKeahlianSekolah(KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah) {
+        this.konsentrasiKeahlianSekolah = konsentrasiKeahlianSekolah;
+    }
+
+    public School getSchool() {
+        return school;
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
     }
 
     public boolean isValid() {

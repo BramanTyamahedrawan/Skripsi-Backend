@@ -28,7 +28,8 @@ public class ElemenRepository {
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
         columnMapping.put("mapel", "mapel");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
 
         return client.showListTable(tableElemen.toString(), columnMapping, Elemen.class, size);
     }
@@ -58,10 +59,13 @@ public class ElemenRepository {
         client.insertRecord(tableElemen, rowKey, "mapel", "idMapel", elemen.getMapel().getIdMapel());
         client.insertRecord(tableElemen, rowKey, "mapel", "name", elemen.getMapel().getName());
         // Konsentrasi Keahlian
-        client.insertRecord(tableElemen, rowKey, "konsentrasiKeahlian", "id",
-                elemen.getKonsentrasiKeahlian().getId());
-        client.insertRecord(tableElemen, rowKey, "konsentrasiKeahlian", "konsentrasi",
-                elemen.getKonsentrasiKeahlian().getKonsentrasi());
+        client.insertRecord(tableElemen, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                elemen.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+        client.insertRecord(tableElemen, rowKey, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                elemen.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
+        // Sekolah
+        client.insertRecord(tableElemen, rowKey, "school", "idSchool", elemen.getSchool().getIdSchool());
+        client.insertRecord(tableElemen, rowKey, "school", "nameSchool", elemen.getSchool().getNameSchool());
 
         client.insertRecord(tableElemen, rowKey, "detail", "created_by", "Polinema");
 
@@ -81,7 +85,8 @@ public class ElemenRepository {
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
         columnMapping.put("mapel", "mapel");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
 
         return client.showDataTable(tableElemen.toString(), columnMapping, elemenId, Elemen.class);
     }
@@ -98,7 +103,8 @@ public class ElemenRepository {
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
         columnMapping.put("mapel", "mapel");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
 
         return client.showDataTable(tableElemen.toString(), columnMapping, elemenId, Elemen.class);
     }
@@ -115,10 +121,32 @@ public class ElemenRepository {
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
         columnMapping.put("mapel", "mapel");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
 
         List<Elemen> elemen = client.getDataListByColumn(tableElemen.toString(), columnMapping, "mapel", "idMapel",
                 mapelID, Elemen.class, size);
+
+        return elemen;
+    }
+
+    public List<Elemen> findElemenBySekolah(String schoolID, int size) throws IOException {
+
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableElemen = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idElemen", "idElemen");
+        columnMapping.put("namaElemen", "namaElemen");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
+
+        List<Elemen> elemen = client.getDataListByColumn(tableElemen.toString(), columnMapping, "school", "idSchool",
+                schoolID, Elemen.class, size);
 
         return elemen;
     }
@@ -160,11 +188,11 @@ public class ElemenRepository {
         }
 
         // Konsentrasi Keahlian
-        if (elemen.getKonsentrasiKeahlian() != null) {
-            client.insertRecord(tableElemen, elemenId, "konsentrasiKeahlian", "id",
-                    elemen.getKonsentrasiKeahlian().getId());
-            client.insertRecord(tableElemen, elemenId, "konsentrasiKeahlian", "konsentrasi",
-                    elemen.getKonsentrasiKeahlian().getKonsentrasi());
+        if (elemen.getKonsentrasiKeahlianSekolah() != null) {
+            client.insertRecord(tableElemen, elemenId, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                    elemen.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+            client.insertRecord(tableElemen, elemenId, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                    elemen.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
         }
 
         client.insertRecord(tableElemen, elemenId, "detail", "updated_by", "Polinema");

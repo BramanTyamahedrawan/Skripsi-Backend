@@ -7,20 +7,22 @@ public class ElemenRequest {
     private String idTahun;
     private String idSemester;
     private String idKelas;
-    private String idKonsentrasi;
+    private String idKonsentrasiSekolah;
+    private String idSekolah;
 
     public ElemenRequest() {
     }
 
     public ElemenRequest(String idElemen, String namaElemen, String idMapel, String idTahun, String idSemester,
-            String idKelas, String idKonsentrasi) {
+            String idKelas, String idKonsentrasiSekolah, String idSekolah) {
         this.idElemen = idElemen;
         this.namaElemen = namaElemen;
         this.idMapel = idMapel;
         this.idTahun = idTahun;
         this.idSemester = idSemester;
         this.idKelas = idKelas;
-        this.idKonsentrasi = idKonsentrasi;
+        this.idKonsentrasiSekolah = idKonsentrasiSekolah;
+        this.idSekolah = idSekolah;
     }
 
     public String getIdElemen() {
@@ -73,11 +75,19 @@ public class ElemenRequest {
     }
 
     public String getIdKonsentrasi() {
-        return idKonsentrasi;
+        return idKonsentrasiSekolah;
     }
 
-    public void setIdKonsentrasi(String idKonsentrasi) {
-        this.idKonsentrasi = idKonsentrasi;
+    public void setIdKonsentrasi(String idKonsentrasiSekolah) {
+        this.idKonsentrasiSekolah = idKonsentrasiSekolah;
+    }
+
+    public String getIdSekolah() {
+        return idSekolah;
+    }
+
+    public void setIdSekolah(String idSekolah) {
+        this.idSekolah = idSekolah;
     }
 
     public boolean isValid() {
@@ -104,8 +114,11 @@ public class ElemenRequest {
             case "idKelas":
                 this.idKelas = value;
                 break;
-            case "idKonsentrasi":
-                this.idKonsentrasi = value;
+            case "idKonsentrasiSekolah":
+                this.idKonsentrasiSekolah = value;
+                break;
+            case "idSekolah":
+                this.idSekolah = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);
