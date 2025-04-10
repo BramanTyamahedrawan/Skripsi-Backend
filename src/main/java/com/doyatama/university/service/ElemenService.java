@@ -8,7 +8,6 @@ import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.model.Mapel;
 import com.doyatama.university.model.School;
-import com.doyatama.university.model.KonsentrasiKeahlian;
 import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.payload.ElemenRequest;
 import com.doyatama.university.payload.DefaultResponse;
@@ -42,10 +41,10 @@ public class ElemenService {
 
         List<Elemen> elemenResponse;
 
-        if (mapelID.equalsIgnoreCase("*")) {
+        if (schoolID.equalsIgnoreCase("*")) {
             elemenResponse = elemenRepository.findAll(size);
         } else {
-            elemenResponse = elemenRepository.findElemenBySekolah(mapelID, size);
+            elemenResponse = elemenRepository.findElemenBySekolah(schoolID, size);
         }
 
         return new PagedResponse<>(elemenResponse, elemenResponse.size(), "Successfully get data", 200);

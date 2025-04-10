@@ -36,11 +36,12 @@ public class AcpController {
             @RequestParam(value = "semester", defaultValue = "*") String semesterID,
             @RequestParam(value = "kelas", defaultValue = "*") String kelasID,
             @RequestParam(value = "mapel", defaultValue = "*") String mapeID,
-            @RequestParam(value = "konsentrasiKeahlian", defaultValue = "*") String konsentrasiKeahlianID,
-            @RequestParam(value = "elemen", defaultValue = "*") String elemenID)
+            @RequestParam(value = "konsentrasiKeahlianSekolah", defaultValue = "*") String konsentrasiKeahlianSekolahID,
+            @RequestParam(value = "elemen", defaultValue = "*") String elemenID,
+            @RequestParam(value = "school", defaultValue = "*") String schoolID)
             throws IOException {
         return acpService.getAllAcp(page, size, tahunAjaranID, semesterID, kelasID,
-                mapeID, konsentrasiKeahlianID, elemenID);
+                mapeID, konsentrasiKeahlianSekolahID, elemenID, schoolID);
     }
 
     @PostMapping

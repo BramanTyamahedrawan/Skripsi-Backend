@@ -7,22 +7,24 @@ public class Acp {
     private TahunAjaran tahunAjaran;
     private Semester semester;
     private Kelas kelas;
-    private KonsentrasiKeahlian konsentrasiKeahlian;
+    private KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah;
     private Elemen elemen;
+    private School school;
 
     public Acp() {
     }
 
     public Acp(String idAcp, String namaAcp, Mapel mapel, TahunAjaran tahunAjaran, Semester semester, Kelas kelas,
-            KonsentrasiKeahlian konsentrasiKeahlian, Elemen elemen) {
+            KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah, Elemen elemen, School school) {
         this.idAcp = idAcp;
         this.namaAcp = namaAcp;
         this.mapel = mapel;
         this.tahunAjaran = tahunAjaran;
         this.semester = semester;
         this.kelas = kelas;
-        this.konsentrasiKeahlian = konsentrasiKeahlian;
+        this.konsentrasiKeahlianSekolah = konsentrasiKeahlianSekolah;
         this.elemen = elemen;
+        this.school = school;
     }
 
     public String getIdAcp() {
@@ -73,12 +75,12 @@ public class Acp {
         this.kelas = kelas;
     }
 
-    public KonsentrasiKeahlian getKonsentrasiKeahlian() {
-        return konsentrasiKeahlian;
+    public KonsentrasiKeahlianSekolah getKonsentrasiKeahlianSekolah() {
+        return konsentrasiKeahlianSekolah;
     }
 
-    public void setKonsentrasiKeahlian(KonsentrasiKeahlian konsentrasiKeahlian) {
-        this.konsentrasiKeahlian = konsentrasiKeahlian;
+    public void setKonsentrasiKeahlianSekolah(KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah) {
+        this.konsentrasiKeahlianSekolah = konsentrasiKeahlianSekolah;
     }
 
     public Elemen getElemen() {
@@ -87,6 +89,14 @@ public class Acp {
 
     public void setElemen(Elemen elemen) {
         this.elemen = elemen;
+    }
+
+    public School getSchool() {
+        return school;
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
     }
 
     public boolean isValid() {

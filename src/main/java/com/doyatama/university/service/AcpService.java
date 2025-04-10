@@ -7,7 +7,8 @@ import com.doyatama.university.model.Kelas;
 import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.model.Mapel;
-import com.doyatama.university.model.KonsentrasiKeahlian;
+import com.doyatama.university.model.School;
+import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.model.Acp;
 import com.doyatama.university.payload.AcpRequest;
 import com.doyatama.university.payload.DefaultResponse;
@@ -15,8 +16,9 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.AcpRepository;
 import com.doyatama.university.repository.ElemenRepository;
 import com.doyatama.university.repository.KelasRepository;
-import com.doyatama.university.repository.KonsentrasiKeahlianRepository;
+import com.doyatama.university.repository.KonsentrasiKeahlianSekolahRepository;
 import com.doyatama.university.repository.MapelRepository;
+import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.SemesterRepository;
 import com.doyatama.university.repository.TahunAjaranRepository;
 import com.doyatama.university.util.AppConstants;
@@ -32,18 +34,20 @@ public class AcpService {
     private KelasRepository kelasRepository = new KelasRepository();
     private SemesterRepository semesterRepository = new SemesterRepository();
     private MapelRepository mapelRepository = new MapelRepository();
-    private KonsentrasiKeahlianRepository konsentrasiKeahlianRepository = new KonsentrasiKeahlianRepository();
+    private KonsentrasiKeahlianSekolahRepository konsentrasiKeahlianSekolahRepository = new KonsentrasiKeahlianSekolahRepository();
+    private SchoolRepository schoolRepository = new SchoolRepository();
 
     public PagedResponse<Acp> getAllAcp(int page, int size, String tahunAjaranID, String semesterID,
-            String kelasID, String mapelID, String konsentrasiKeahlianID, String elemenID) throws IOException {
+            String kelasID, String mapelID, String konsentrasiKeahlianSekolahID, String elemenID, String schoolID)
+            throws IOException {
         validatePageNumberAndSize(page, size);
 
         List<Acp> acpResponse;
 
-        if (mapelID.equalsIgnoreCase("*")) {
+        if (schoolID.equalsIgnoreCase("*")) {
             acpResponse = acpRepository.findAll(size);
         } else {
-            acpResponse = acpRepository.findAcpByMapel(mapelID, size);
+            acpResponse = acpRepository.findAcpBySekolah(schoolID, size);
         }
 
         return new PagedResponse<>(acpResponse, acpResponse.size(), "Successfully get data", 200);
@@ -60,6 +64,10 @@ public class AcpService {
     }
 
     public Acp createAcp(AcpRequest acpRequest) throws IOException {
+        if (acpRequest.getIdAcp() == null) {
+            acpRequest.setIdAcp(UUID.randomUUID().toString());
+        }
+
         if (acpRepository.existsById(acpRequest.getIdAcp())) {
             throw new BadRequestException("Acp already exists");
         }
@@ -68,19 +76,21 @@ public class AcpService {
         Kelas kelasResponse = kelasRepository.findById(acpRequest.getIdKelas());
         Semester semesterResponse = semesterRepository.findById(acpRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(acpRequest.getIdMapel());
-        KonsentrasiKeahlian konsentrasiKeahlianResponse = konsentrasiKeahlianRepository
-                .findById(acpRequest.getIdKonsentrasi());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
+                .findById(acpRequest.getIdKonsentrasiSekolah());
         Elemen elemenResponse = elemenRepository.findById(acpRequest.getIdElemen());
+        School schoolResponse = schoolRepository.findById(acpRequest.getIdSchool());
 
         Acp acp = new Acp();
-        acp.setIdAcp(acpRequest.getIdAcp() == null ? UUID.randomUUID().toString() : acpRequest.getIdAcp());
+        acp.setIdAcp(acpRequest.getIdAcp());
         acp.setNamaAcp(acpRequest.getNamaAcp());
         acp.setTahunAjaran(tahunAjaranResponse);
         acp.setSemester(semesterResponse);
         acp.setKelas(kelasResponse);
         acp.setMapel(mapelResponse);
-        acp.setKonsentrasiKeahlian(konsentrasiKeahlianResponse);
+        acp.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
         acp.setElemen(elemenResponse);
+        acp.setSchool(schoolResponse);
 
         return acpRepository.save(acp);
     }
@@ -99,19 +109,25 @@ public class AcpService {
         Kelas kelasResponse = kelasRepository.findById(acpRequest.getIdKelas());
         Semester semesterResponse = semesterRepository.findById(acpRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(acpRequest.getIdMapel());
-        KonsentrasiKeahlian konsentrasiKeahlianResponse = konsentrasiKeahlianRepository
-                .findById(acpRequest.getIdKonsentrasi());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianResponse = konsentrasiKeahlianSekolahRepository
+                .findById(acpRequest.getIdKonsentrasiSekolah());
         Elemen elemenResponse = elemenRepository.findById(acpRequest.getIdElemen());
+        School schoolResponse = schoolRepository.findById(acpRequest.getIdSchool());
 
-        acp.setNamaAcp(acpRequest.getNamaAcp());
-        acp.setTahunAjaran(tahunAjaranResponse);
-        acp.setSemester(semesterResponse);
-        acp.setKelas(kelasResponse);
-        acp.setMapel(mapelResponse);
-        acp.setKonsentrasiKeahlian(konsentrasiKeahlianResponse);
-        acp.setElemen(elemenResponse);
+        if (acp.getIdAcp() != null && schoolResponse.getIdSchool() != null) {
+            acp.setNamaAcp(acpRequest.getNamaAcp());
+            acp.setTahunAjaran(tahunAjaranResponse);
+            acp.setKelas(kelasResponse);
+            acp.setSemester(semesterResponse);
+            acp.setMapel(mapelResponse);
+            acp.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianResponse);
+            acp.setElemen(elemenResponse);
+            acp.setSchool(schoolResponse);
 
-        return acpRepository.update(acpId, acp);
+            return acpRepository.update(acpId, acp);
+        } else {
+            return null;
+        }
     }
 
     public void deleteAcpById(String acpId) throws IOException {

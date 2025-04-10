@@ -27,8 +27,9 @@ public class AcpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
+        columnMapping.put("school", "school");
 
         return client.showListTable(tableAcp.toString(), columnMapping, Acp.class, size);
     }
@@ -58,13 +59,16 @@ public class AcpRepository {
         client.insertRecord(tableAcp, rowKey, "mapel", "idMapel", acp.getMapel().getIdMapel());
         client.insertRecord(tableAcp, rowKey, "mapel", "name", acp.getMapel().getName());
         // Konsentrasi Keahlian
-        client.insertRecord(tableAcp, rowKey, "konsentrasiKeahlian", "id",
-                acp.getKonsentrasiKeahlian().getId());
-        client.insertRecord(tableAcp, rowKey, "konsentrasiKeahlian", "konsentrasi",
-                acp.getKonsentrasiKeahlian().getKonsentrasi());
+        client.insertRecord(tableAcp, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                acp.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+        client.insertRecord(tableAcp, rowKey, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                acp.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
         // Elemen
         client.insertRecord(tableAcp, rowKey, "elemen", "idElemen", acp.getElemen().getIdElemen());
         client.insertRecord(tableAcp, rowKey, "elemen", "namaElemen", acp.getElemen().getNamaElemen());
+        // School
+        client.insertRecord(tableAcp, rowKey, "school", "idSchool", acp.getSchool().getIdSchool());
+        client.insertRecord(tableAcp, rowKey, "school", "nameSchool", acp.getSchool().getNameSchool());
 
         return acp;
 
@@ -81,8 +85,9 @@ public class AcpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
+        columnMapping.put("school", "school");
 
         return client.showDataTable(tableAcp.toString(), columnMapping, acpId, Acp.class);
     }
@@ -98,8 +103,9 @@ public class AcpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
+        columnMapping.put("school", "school");
 
         return client.showDataTable(tableAcp.toString(), columnMapping, acpId, Acp.class);
     }
@@ -116,11 +122,33 @@ public class AcpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
+        columnMapping.put("school", "school");
 
         List<Acp> acpList = client.getDataListByColumn(tableAcp.toString(), columnMapping, "mapel", "idMapel",
                 mapelId, Acp.class, size);
+        return acpList;
+    }
+
+    public List<Acp> findAcpBySekolah(String schoolID, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAcp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idAcp", "idAcp");
+        columnMapping.put("namaAcp", "namaAcp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("school", "school");
+
+        List<Acp> acpList = client.getDataListByColumn(tableAcp.toString(), columnMapping, "school", "idSchool",
+                schoolID, Acp.class, size);
         return acpList;
     }
 
@@ -161,17 +189,23 @@ public class AcpRepository {
         }
 
         // Konsentrasi Keahlian
-        if (acp.getKonsentrasiKeahlian() != null) {
-            client.insertRecord(tableAcp, acpId, "konsentrasiKeahlian", "id",
-                    acp.getKonsentrasiKeahlian().getId());
-            client.insertRecord(tableAcp, acpId, "konsentrasiKeahlian", "konsentrasi",
-                    acp.getKonsentrasiKeahlian().getKonsentrasi());
+        if (acp.getKonsentrasiKeahlianSekolah() != null) {
+            client.insertRecord(tableAcp, acpId, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                    acp.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+            client.insertRecord(tableAcp, acpId, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                    acp.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
         }
 
         // Elemen
         if (acp.getElemen() != null) {
             client.insertRecord(tableAcp, acpId, "elemen", "idElemen", acp.getElemen().getIdElemen());
             client.insertRecord(tableAcp, acpId, "elemen", "namaElemen", acp.getElemen().getNamaElemen());
+        }
+
+        // School
+        if (acp.getSchool() != null) {
+            client.insertRecord(tableAcp, acpId, "school", "idSchool", acp.getSchool().getIdSchool());
+            client.insertRecord(tableAcp, acpId, "school", "nameSchool", acp.getSchool().getNameSchool());
         }
 
         client.insertRecord(tableAcp, acpId, "detail", "updated_by", "Polinema");

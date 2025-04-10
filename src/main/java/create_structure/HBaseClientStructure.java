@@ -118,7 +118,8 @@ public class HBaseClientStructure {
 
                 // Create Tabel Capaian Pembelajaran
                 TableName tableAcp = TableName.valueOf("acp");
-                String[] acp = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester", "konsentrasiKeahlian",
+                String[] acp = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester",
+                                "konsentrasiKeahlianSekolah",
                                 "elemen",
                                 "detail" };
                 client.deleteTable(tableAcp);
@@ -127,7 +128,7 @@ public class HBaseClientStructure {
                 // Create Tabel Tujuan Pembelajaran
                 TableName tableAtp = TableName.valueOf("atp");
                 String[] atp = { "main", "school", "tahunAjaran", "mapel", "kelas", "semester",
-                                "konsentrasiKeahlian", "elemen", "acp",
+                                "konsentrasiKeahlianSekolah", "elemen", "acp",
                                 "detail" };
                 client.deleteTable(tableAtp);
                 client.createTable(tableAtp, atp);
@@ -137,7 +138,7 @@ public class HBaseClientStructure {
 
                 // Create Tabel Season
                 TableName tableSeason = TableName.valueOf("seasons");
-                String[] season = { "main", "bidangKeahlian", "programKeahlian", "konsentrasiKeahlian", "kelas",
+                String[] season = { "main", "bidangKeahlian", "programKeahlian", "konsentrasiKeahlianSekolah", "kelas",
                                 "tahunAjaran",
                                 "student", "lecture", "jadwalPelajaran", "detail" };
                 client.deleteTable(tableSeason);
