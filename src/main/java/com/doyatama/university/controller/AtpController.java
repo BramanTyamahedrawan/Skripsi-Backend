@@ -37,12 +37,13 @@ public class AtpController {
             @RequestParam(value = "semester", defaultValue = "*") String semesterID,
             @RequestParam(value = "kelas", defaultValue = "*") String kelasID,
             @RequestParam(value = "mapel", defaultValue = "*") String mapeID,
-            @RequestParam(value = "konsentrasiKeahlian", defaultValue = "*") String konsentrasiKeahlianID,
+            @RequestParam(value = "konsentrasiKeahlianSekolah", defaultValue = "*") String konsentrasiKeahlianSekolahID,
             @RequestParam(value = "elemen", defaultValue = "*") String elemenID,
-            @RequestParam(value = "acp", defaultValue = "*") String acpID)
+            @RequestParam(value = "acp", defaultValue = "*") String acpID,
+            @RequestParam(value = "school", defaultValue = "*") String schoolID)
             throws IOException {
         return atpService.getAllAtp(page, size, tahunAjaranID, semesterID, kelasID,
-                mapeID, konsentrasiKeahlianID, elemenID, acpID);
+                mapeID, konsentrasiKeahlianSekolahID, elemenID, acpID, schoolID);
     }
 
     @PostMapping

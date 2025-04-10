@@ -27,9 +27,10 @@ public class AtpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
         columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
 
         return client.showListTable(tableAtp.toString(), columnMapping, Atp.class, size);
     }
@@ -59,16 +60,19 @@ public class AtpRepository {
         client.insertRecord(tableAtp, rowKey, "mapel", "idMapel", atp.getMapel().getIdMapel());
         client.insertRecord(tableAtp, rowKey, "mapel", "name", atp.getMapel().getName());
         // Konsentrasi Keahlian
-        client.insertRecord(tableAtp, rowKey, "konsentrasiKeahlian", "id",
-                atp.getKonsentrasiKeahlian().getId());
-        client.insertRecord(tableAtp, rowKey, "konsentrasiKeahlian", "konsentrasi",
-                atp.getKonsentrasiKeahlian().getKonsentrasi());
+        client.insertRecord(tableAtp, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                atp.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+        client.insertRecord(tableAtp, rowKey, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                atp.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
         // Elemen
         client.insertRecord(tableAtp, rowKey, "elemen", "idElemen", atp.getElemen().getIdElemen());
         client.insertRecord(tableAtp, rowKey, "elemen", "namaElemen", atp.getElemen().getNamaElemen());
         // Acp
         client.insertRecord(tableAtp, rowKey, "acp", "idAcp", atp.getAcp().getIdAcp());
         client.insertRecord(tableAtp, rowKey, "acp", "namaAcp", atp.getAcp().getNamaAcp());
+        // School
+        client.insertRecord(tableAtp, rowKey, "school", "idSchool", atp.getSchool().getIdSchool());
+        client.insertRecord(tableAtp, rowKey, "school", "nameSchool", atp.getSchool().getNameSchool());
 
         return atp;
     }
@@ -85,9 +89,10 @@ public class AtpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
         columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
 
         return client.showDataTable(tableAtp.toString(), columnMapping, atpId, Atp.class);
     }
@@ -104,9 +109,10 @@ public class AtpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
         columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
 
         return client.showDataTable(tableAtp.toString(), columnMapping, atpId, Atp.class);
     }
@@ -124,9 +130,10 @@ public class AtpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
         columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
 
         List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "mapel", "idMapel",
                 mapelId, Atp.class, size);
@@ -147,12 +154,37 @@ public class AtpRepository {
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
-        columnMapping.put("konsentrasiKeahlian", "konsentrasiKeahlian");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("elemen", "elemen");
         columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
 
         List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "user", "id",
                 userId, Atp.class, size);
+
+        return atpList;
+    }
+
+    public List<Atp> findAtpBySekolah(String schoolID, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
+
+        List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "school", "idSchool",
+                schoolID, Atp.class, size);
 
         return atpList;
     }
@@ -195,11 +227,11 @@ public class AtpRepository {
         }
 
         // Konsentrasi Keahlian
-        if (atp.getKonsentrasiKeahlian() != null) {
-            client.insertRecord(tableAtp, atpId, "konsentrasiKeahlian", "id",
-                    atp.getKonsentrasiKeahlian().getId());
-            client.insertRecord(tableAtp, atpId, "konsentrasiKeahlian", "konsentrasi",
-                    atp.getKonsentrasiKeahlian().getKonsentrasi());
+        if (atp.getKonsentrasiKeahlianSekolah() != null) {
+            client.insertRecord(tableAtp, atpId, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                    atp.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+            client.insertRecord(tableAtp, atpId, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                    atp.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
         }
 
         // Elemen
@@ -211,6 +243,12 @@ public class AtpRepository {
         if (atp.getAcp() != null) {
             client.insertRecord(tableAtp, atpId, "acp", "idAcp", atp.getAcp().getIdAcp());
             client.insertRecord(tableAtp, atpId, "acp", "namaAcp", atp.getAcp().getNamaAcp());
+        }
+
+        // School
+        if (atp.getSchool() != null) {
+            client.insertRecord(tableAtp, atpId, "school", "idSchool", atp.getSchool().getIdSchool());
+            client.insertRecord(tableAtp, atpId, "school", "nameSchool", atp.getSchool().getNameSchool());
         }
 
         client.insertRecord(tableAtp, atpId, "detail", "updated_by", "Polinema");

@@ -7,7 +7,8 @@ import com.doyatama.university.model.Kelas;
 import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.model.Mapel;
-import com.doyatama.university.model.KonsentrasiKeahlian;
+import com.doyatama.university.model.School;
+import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.model.Acp;
 import com.doyatama.university.model.Atp;
 import com.doyatama.university.payload.AtpRequest;
@@ -17,8 +18,9 @@ import com.doyatama.university.repository.AtpRepository;
 import com.doyatama.university.repository.AcpRepository;
 import com.doyatama.university.repository.ElemenRepository;
 import com.doyatama.university.repository.KelasRepository;
-import com.doyatama.university.repository.KonsentrasiKeahlianRepository;
+import com.doyatama.university.repository.KonsentrasiKeahlianSekolahRepository;
 import com.doyatama.university.repository.MapelRepository;
+import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.SemesterRepository;
 import com.doyatama.university.repository.TahunAjaranRepository;
 import com.doyatama.university.util.AppConstants;
@@ -35,19 +37,21 @@ public class AtpService {
     private KelasRepository kelasRepository = new KelasRepository();
     private SemesterRepository semesterRepository = new SemesterRepository();
     private MapelRepository mapelRepository = new MapelRepository();
-    private KonsentrasiKeahlianRepository konsentrasiKeahlianRepository = new KonsentrasiKeahlianRepository();
+    private KonsentrasiKeahlianSekolahRepository konsentrasiKeahlianSekolahRepository = new KonsentrasiKeahlianSekolahRepository();
+    private SchoolRepository schoolRepository = new SchoolRepository();
 
     public PagedResponse<Atp> getAllAtp(int page, int size, String tahunAjaranID, String semesterID,
-            String kelasID, String mapelID, String konsentrasiKeahlianID, String elemenID, String acpID)
+            String kelasID, String mapelID, String konsentrasiKeahlianSekolahID, String elemenID, String acpID,
+            String schoolID)
             throws IOException {
         validatePageNumberAndSize(page, size);
 
         List<Atp> atpResponse;
 
-        if (mapelID.equalsIgnoreCase("*")) {
+        if (schoolID.equalsIgnoreCase("*")) {
             atpResponse = atpRepository.findAll(size);
         } else {
-            atpResponse = atpRepository.findAtpByMapel(mapelID, size);
+            atpResponse = atpRepository.findAtpBySekolah(schoolID, size);
         }
 
         return new PagedResponse<>(atpResponse, atpResponse.size(), "Successfully get data", 200);
@@ -65,6 +69,10 @@ public class AtpService {
 
     public Atp createAtp(AtpRequest atpRequest) throws IOException {
 
+        if (atpRequest.getIdAtp() == null) {
+            atpRequest.setIdAtp(UUID.randomUUID().toString());
+        }
+
         if (atpRepository.existsById(atpRequest.getIdAtp())) {
             throw new BadRequestException("Atp already exists");
         }
@@ -73,10 +81,11 @@ public class AtpService {
         Kelas kelasResponse = kelasRepository.findById(atpRequest.getIdKelas());
         Semester semesterResponse = semesterRepository.findById(atpRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(atpRequest.getIdMapel());
-        KonsentrasiKeahlian konsentrasiKeahlianResponse = konsentrasiKeahlianRepository
-                .findById(atpRequest.getIdKonsentrasi());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
+                .findById(atpRequest.getIdKonsentrasiSekolah());
         Elemen elemenResponse = elemenRepository.findById(atpRequest.getIdElemen());
         Acp acpResponse = acpRepository.findById(atpRequest.getIdAcp());
+        School schoolResponse = schoolRepository.findById(atpRequest.getIdSchool());
 
         Atp atp = new Atp();
         atp.setIdAtp(atpRequest.getIdAtp() == null ? UUID.randomUUID().toString() : atpRequest.getIdAtp());
@@ -85,9 +94,10 @@ public class AtpService {
         atp.setSemester(semesterResponse);
         atp.setKelas(kelasResponse);
         atp.setMapel(mapelResponse);
-        atp.setKonsentrasiKeahlian(konsentrasiKeahlianResponse);
+        atp.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
         atp.setElemen(elemenResponse);
         atp.setAcp(acpResponse);
+        atp.setSchool(schoolResponse);
 
         return atpRepository.save(atp);
     }
@@ -106,21 +116,27 @@ public class AtpService {
         Kelas kelasResponse = kelasRepository.findById(atpRequest.getIdKelas());
         Semester semesterResponse = semesterRepository.findById(atpRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(atpRequest.getIdMapel());
-        KonsentrasiKeahlian konsentrasiKeahlianResponse = konsentrasiKeahlianRepository
-                .findById(atpRequest.getIdKonsentrasi());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianResponse = konsentrasiKeahlianSekolahRepository
+                .findById(atpRequest.getIdKonsentrasiSekolah());
         Elemen elemenResponse = elemenRepository.findById(atpRequest.getIdElemen());
         Acp acpResponse = acpRepository.findById(atpRequest.getIdAcp());
+        School schoolResponse = schoolRepository.findById(atpRequest.getIdSchool());
 
-        atp.setNamaAtp(atpRequest.getNamaAtp());
-        atp.setTahunAjaran(tahunAjaranResponse);
-        atp.setSemester(semesterResponse);
-        atp.setKelas(kelasResponse);
-        atp.setMapel(mapelResponse);
-        atp.setKonsentrasiKeahlian(konsentrasiKeahlianResponse);
-        atp.setElemen(elemenResponse);
-        atp.setAcp(acpResponse);
+        if (atp.getIdAtp() != null && schoolResponse.getIdSchool() != null) {
+            atp.setNamaAtp(atpRequest.getNamaAtp());
+            atp.setTahunAjaran(tahunAjaranResponse);
+            atp.setSemester(semesterResponse);
+            atp.setKelas(kelasResponse);
+            atp.setMapel(mapelResponse);
+            atp.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianResponse);
+            atp.setElemen(elemenResponse);
+            atp.setAcp(acpResponse);
+            atp.setSchool(schoolResponse);
 
-        return atpRepository.update(atpId, atp);
+            return atpRepository.save(atp);
+        } else {
+            return null;
+        }
     }
 
     public void deleteAtpById(String atpId) throws IOException {

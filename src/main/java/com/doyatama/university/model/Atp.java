@@ -7,24 +7,26 @@ public class Atp {
     private TahunAjaran tahunAjaran;
     private Semester semester;
     private Kelas kelas;
-    private KonsentrasiKeahlian konsentrasiKeahlian;
+    private KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah;
     private Elemen elemen;
     private Acp acp;
+    private School school;
 
     public Atp() {
     }
 
     public Atp(String idAtp, String namaAtp, Mapel mapel, TahunAjaran tahunAjaran, Semester semester, Kelas kelas,
-            KonsentrasiKeahlian konsentrasiKeahlian, Elemen elemen, Acp acp) {
+            KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah, Elemen elemen, Acp acp, School school) {
         this.idAtp = idAtp;
         this.namaAtp = namaAtp;
         this.mapel = mapel;
         this.tahunAjaran = tahunAjaran;
         this.semester = semester;
         this.kelas = kelas;
-        this.konsentrasiKeahlian = konsentrasiKeahlian;
+        this.konsentrasiKeahlianSekolah = konsentrasiKeahlianSekolah;
         this.elemen = elemen;
         this.acp = acp;
+        this.school = school;
     }
 
     public String getIdAtp() {
@@ -75,12 +77,12 @@ public class Atp {
         this.kelas = kelas;
     }
 
-    public KonsentrasiKeahlian getKonsentrasiKeahlian() {
-        return konsentrasiKeahlian;
+    public KonsentrasiKeahlianSekolah getKonsentrasiKeahlianSekolah() {
+        return konsentrasiKeahlianSekolah;
     }
 
-    public void setKonsentrasiKeahlian(KonsentrasiKeahlian konsentrasiKeahlian) {
-        this.konsentrasiKeahlian = konsentrasiKeahlian;
+    public void setKonsentrasiKeahlianSekolah(KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah) {
+        this.konsentrasiKeahlianSekolah = konsentrasiKeahlianSekolah;
     }
 
     public Elemen getElemen() {
@@ -97,6 +99,14 @@ public class Atp {
 
     public void setAcp(Acp acp) {
         this.acp = acp;
+    }
+
+    public School getSchool() {
+        return school;
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
     }
 
     public boolean isValid() {

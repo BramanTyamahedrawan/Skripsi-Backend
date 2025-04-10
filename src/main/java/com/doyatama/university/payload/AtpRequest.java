@@ -7,24 +7,26 @@ public class AtpRequest {
     private String idTahun;
     private String idSemester;
     private String idKelas;
-    private String idKonsentrasi;
+    private String idKonsentrasiSekolah;
     private String idElemen;
     private String idAcp;
+    private String idSchool;
 
     public AtpRequest() {
     }
 
     public AtpRequest(String idAtp, String namaAtp, String idMapel, String idTahun, String idSemester, String idKelas,
-            String idKonsentrasi, String idElemen, String idAcp) {
+            String idKonsentrasiSekolah, String idElemen, String idAcp, String idSchool) {
         this.idAtp = idAtp;
         this.namaAtp = namaAtp;
         this.idMapel = idMapel;
         this.idTahun = idTahun;
         this.idSemester = idSemester;
         this.idKelas = idKelas;
-        this.idKonsentrasi = idKonsentrasi;
+        this.idKonsentrasiSekolah = idKonsentrasiSekolah;
         this.idElemen = idElemen;
         this.idAcp = idAcp;
+        this.idSchool = idSchool;
     }
 
     public String getIdAtp() {
@@ -75,12 +77,12 @@ public class AtpRequest {
         this.idKelas = idKelas;
     }
 
-    public String getIdKonsentrasi() {
-        return idKonsentrasi;
+    public String getIdKonsentrasiSekolah() {
+        return idKonsentrasiSekolah;
     }
 
-    public void setIdKonsentrasi(String idKonsentrasi) {
-        this.idKonsentrasi = idKonsentrasi;
+    public void setIdKonsentrasiSekolah(String idKonsentrasiSekolah) {
+        this.idKonsentrasiSekolah = idKonsentrasiSekolah;
     }
 
     public String getIdElemen() {
@@ -97,6 +99,14 @@ public class AtpRequest {
 
     public void setIdAcp(String idAcp) {
         this.idAcp = idAcp;
+    }
+
+    public String getIdSchool() {
+        return idSchool;
+    }
+
+    public void setIdSchool(String idSchool) {
+        this.idSchool = idSchool;
     }
 
     public boolean isValid() {
@@ -123,14 +133,17 @@ public class AtpRequest {
             case "idKelas":
                 this.idKelas = value;
                 break;
-            case "idKonsentrasi":
-                this.idKonsentrasi = value;
+            case "idKonsentrasiSekolah":
+                this.idKonsentrasiSekolah = value;
                 break;
             case "idElemen":
                 this.idElemen = value;
                 break;
             case "idAcp":
                 this.idAcp = value;
+                break;
+            case "idSchool":
+                this.idSchool = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);
