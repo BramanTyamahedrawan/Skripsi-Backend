@@ -75,7 +75,7 @@ public class ElemenService {
         Semester semesterResponse = semesterRepository.findById(elemenRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(elemenRequest.getIdMapel());
         KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
-                .findById(elemenRequest.getIdKonsentrasi());
+                .findById(elemenRequest.getIdKonsentrasiSekolah());
         School schoolResponse = schoolRepository.findById(elemenRequest.getIdSekolah());
 
         Elemen elemen = new Elemen();
@@ -105,7 +105,7 @@ public class ElemenService {
         Semester semesterResponse = semesterRepository.findById(elemenRequest.getIdSemester());
         Mapel mapelResponse = mapelRepository.findById(elemenRequest.getIdMapel());
         KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
-                .findById(elemenRequest.getIdKonsentrasi());
+                .findById(elemenRequest.getIdKonsentrasiSekolah());
         School schoolResponse = schoolRepository.findById(elemenRequest.getIdSekolah());
 
         if (schoolResponse.getIdSchool() != null) {

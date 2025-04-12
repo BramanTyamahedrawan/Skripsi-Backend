@@ -10,13 +10,13 @@ public class AtpRequest {
     private String idKonsentrasiSekolah;
     private String idElemen;
     private String idAcp;
-    private String idSchool;
+    private String idSekolah;
 
     public AtpRequest() {
     }
 
     public AtpRequest(String idAtp, String namaAtp, String idMapel, String idTahun, String idSemester, String idKelas,
-            String idKonsentrasiSekolah, String idElemen, String idAcp, String idSchool) {
+            String idKonsentrasiSekolah, String idElemen, String idAcp, String idSekolah) {
         this.idAtp = idAtp;
         this.namaAtp = namaAtp;
         this.idMapel = idMapel;
@@ -26,7 +26,7 @@ public class AtpRequest {
         this.idKonsentrasiSekolah = idKonsentrasiSekolah;
         this.idElemen = idElemen;
         this.idAcp = idAcp;
-        this.idSchool = idSchool;
+        this.idSekolah = idSekolah;
     }
 
     public String getIdAtp() {
@@ -101,12 +101,12 @@ public class AtpRequest {
         this.idAcp = idAcp;
     }
 
-    public String getIdSchool() {
-        return idSchool;
+    public String getIdSekolah() {
+        return idSekolah;
     }
 
-    public void setIdSchool(String idSchool) {
-        this.idSchool = idSchool;
+    public void setIdSekolah(String idSekolah) {
+        this.idSekolah = idSekolah;
     }
 
     public boolean isValid() {
@@ -142,8 +142,8 @@ public class AtpRequest {
             case "idAcp":
                 this.idAcp = value;
                 break;
-            case "idSchool":
-                this.idSchool = value;
+            case "idSekolah":
+                this.idSekolah = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

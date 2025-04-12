@@ -74,11 +74,11 @@ public class ElemenRequest {
         this.idKelas = idKelas;
     }
 
-    public String getIdKonsentrasi() {
+    public String getIdKonsentrasiSekolah() {
         return idKonsentrasiSekolah;
     }
 
-    public void setIdKonsentrasi(String idKonsentrasiSekolah) {
+    public void setIdKonsentrasiSekolah(String idKonsentrasiSekolah) {
         this.idKonsentrasiSekolah = idKonsentrasiSekolah;
     }
 

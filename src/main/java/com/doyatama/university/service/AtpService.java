@@ -85,7 +85,7 @@ public class AtpService {
                 .findById(atpRequest.getIdKonsentrasiSekolah());
         Elemen elemenResponse = elemenRepository.findById(atpRequest.getIdElemen());
         Acp acpResponse = acpRepository.findById(atpRequest.getIdAcp());
-        School schoolResponse = schoolRepository.findById(atpRequest.getIdSchool());
+        School schoolResponse = schoolRepository.findById(atpRequest.getIdSekolah());
 
         Atp atp = new Atp();
         atp.setIdAtp(atpRequest.getIdAtp() == null ? UUID.randomUUID().toString() : atpRequest.getIdAtp());
@@ -120,7 +120,7 @@ public class AtpService {
                 .findById(atpRequest.getIdKonsentrasiSekolah());
         Elemen elemenResponse = elemenRepository.findById(atpRequest.getIdElemen());
         Acp acpResponse = acpRepository.findById(atpRequest.getIdAcp());
-        School schoolResponse = schoolRepository.findById(atpRequest.getIdSchool());
+        School schoolResponse = schoolRepository.findById(atpRequest.getIdSekolah());
 
         if (atp.getIdAtp() != null && schoolResponse.getIdSchool() != null) {
             atp.setNamaAtp(atpRequest.getNamaAtp());
