@@ -2,7 +2,6 @@
 package com.doyatama.university.controller;
 
 import com.doyatama.university.model.TahunAjaran;
-import com.doyatama.university.model.User;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.TahunAjaranRequest;
 import com.doyatama.university.security.CurrentUser;

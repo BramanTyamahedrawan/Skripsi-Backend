@@ -3,6 +3,8 @@ package com.doyatama.university.controller;
 import com.doyatama.university.model.Semester;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.SemesterRequest;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.service.SemesterService;
@@ -32,7 +34,10 @@ public class SemesterController {
     public PagedResponse<Semester> getSemester(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+
+        String schoolID = currentUser.getSchoolId();
+
         return semesterService.getAllSemester(page, size, schoolID);
     }
 

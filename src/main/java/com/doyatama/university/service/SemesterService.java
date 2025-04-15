@@ -11,7 +11,6 @@ import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.SemesterRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,14 +18,11 @@ public class SemesterService {
     private SemesterRepository semesterRepository = new SemesterRepository();
     private SchoolRepository schoolRepository = new SchoolRepository();
 
-    // private static final Logger logger =
-    // LoggerFactory.getLogger(SemesterService.class);
-
     public PagedResponse<Semester> getAllSemester(int page, int size, String schoolID) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
-        List<Semester> semesterResponse = new ArrayList<>();
+        List<Semester> semesterResponse;
 
         if (schoolID.equalsIgnoreCase("*")) {
             semesterResponse = semesterRepository.findAll(size);

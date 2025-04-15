@@ -2,7 +2,6 @@ package com.doyatama.university.service;
 
 import com.doyatama.university.exception.BadRequestException;
 import com.doyatama.university.exception.ResourceNotFoundException;
-import com.doyatama.university.model.BidangKeahlianSekolah;
 import com.doyatama.university.model.School;
 import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.payload.TahunAjaranRequest;
@@ -12,7 +11,6 @@ import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.TahunAjaranRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -101,10 +99,4 @@ public class TahunAjaranService {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
     }
-
-    private boolean isUserAdmin(String roles) {
-        // Asumsi: role "1" adalah admin
-        return "1".equals(roles);
-    }
-
 }
