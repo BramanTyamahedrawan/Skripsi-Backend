@@ -6,6 +6,8 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.MapelRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.MapelService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
@@ -38,7 +40,9 @@ public class MapelController {
     public PagedResponse<Mapel> getMapel(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+
+        String schoolID = currentUser.getSchoolId();
         return mapelService.getAllMapel(page, size, schoolID);
     }
 

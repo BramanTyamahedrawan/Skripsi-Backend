@@ -5,6 +5,8 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.BidangKeahlianSekolahRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.BidangKeahlianSekolahService;
 import com.doyatama.university.util.AppConstants;
 
@@ -28,83 +30,86 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api/bidang-keahlian-sekolah")
 public class BidangKeahlianSekolahController {
-    private BidangKeahlianSekolahService bidangKeahlianSekolahService = new BidangKeahlianSekolahService();
+        private BidangKeahlianSekolahService bidangKeahlianSekolahService = new BidangKeahlianSekolahService();
 
-    @GetMapping
-    public PagedResponse<BidangKeahlianSekolah> getBidangKeahlianSekolah(
-            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID,
-            @RequestParam(value = "bidangKeahlianID", defaultValue = "*") String bidangKeahlianID)
-            throws IOException {
-        return bidangKeahlianSekolahService.getAllBidangKeahlianSekolah(page, size, schoolID, bidangKeahlianID);
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createBidangKeahlianSekolah(
-            @Valid @RequestBody BidangKeahlianSekolahRequest bidangKeahlianSekolahRequest) throws IOException {
-        try {
-            BidangKeahlianSekolah bidangKeahlianSekolah = bidangKeahlianSekolahService
-                    .createBidangKeahlianSekolah(bidangKeahlianSekolahRequest);
-
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest().path("/{bidangKeahlianSekolahId}")
-                    .buildAndExpand(bidangKeahlianSekolah.getIdBidangSekolah()).toUri();
-
-            return ResponseEntity.created(location)
-                    .body(new ApiResponse(true, "Bidang Keahlian Sekolah Created Successfully"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, e.getMessage()));
+        @GetMapping
+        public PagedResponse<BidangKeahlianSekolah> getBidangKeahlianSekolah(
+                        @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+                        @RequestParam(value = "bidangKeahlianID", defaultValue = "*") String bidangKeahlianID,
+                        @CurrentUser UserPrincipal currentUser) throws IOException {
+                String schoolID = currentUser.getSchoolId();
+                return bidangKeahlianSekolahService.getAllBidangKeahlianSekolah(page, size, schoolID, bidangKeahlianID);
         }
-    }
 
-    @GetMapping("/{bidangKeahlianSekolahId}")
-    public DefaultResponse<BidangKeahlianSekolah> getBidangKeahlianSekolahById(
-            @PathVariable String bidangKeahlianSekolahId) throws IOException {
-        return bidangKeahlianSekolahService.getBidangKeahlianSekolahById(bidangKeahlianSekolahId);
-    }
+        @PostMapping
+        public ResponseEntity<?> createBidangKeahlianSekolah(
+                        @Valid @RequestBody BidangKeahlianSekolahRequest bidangKeahlianSekolahRequest)
+                        throws IOException {
+                try {
+                        BidangKeahlianSekolah bidangKeahlianSekolah = bidangKeahlianSekolahService
+                                        .createBidangKeahlianSekolah(bidangKeahlianSekolahRequest);
 
-    @PutMapping("/{bidangKeahlianSekolahId}")
-    public ResponseEntity<?> updateBidangKeahlianSekolah(@PathVariable String bidangKeahlianSekolahId,
-            @Valid @RequestBody BidangKeahlianSekolahRequest bidangKeahlianSekolahRequest) throws IOException {
-        try {
-            BidangKeahlianSekolah bidangKeahlianSekolah = bidangKeahlianSekolahService
-                    .updateBidangKeahlianSekolah(bidangKeahlianSekolahId, bidangKeahlianSekolahRequest);
+                        URI location = ServletUriComponentsBuilder
+                                        .fromCurrentRequest().path("/{bidangKeahlianSekolahId}")
+                                        .buildAndExpand(bidangKeahlianSekolah.getIdBidangSekolah()).toUri();
 
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest().path("/{bidangKeahlianSekolahId}")
-                    .buildAndExpand(bidangKeahlianSekolah.getIdBidangSekolah()).toUri();
-
-            return ResponseEntity.created(location)
-                    .body(new ApiResponse(true, "Bidang Keahlian Sekolah Updated Successfully"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, e.getMessage()));
+                        return ResponseEntity.created(location)
+                                        .body(new ApiResponse(true, "Bidang Keahlian Sekolah Created Successfully"));
+                } catch (IllegalArgumentException e) {
+                        return ResponseEntity.badRequest()
+                                        .body(new ApiResponse(false, e.getMessage()));
+                } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(new ApiResponse(false, e.getMessage()));
+                }
         }
-    }
 
-    @DeleteMapping("/{bidangKeahlianSekolahId}")
-    public ResponseEntity<?> deleteBidangKeahlianSekolah(@PathVariable String bidangKeahlianSekolahId)
-            throws IOException {
-        try {
-            bidangKeahlianSekolahService.deleteBidangKeahlianSekolahById(bidangKeahlianSekolahId);
-
-            return ResponseEntity.ok()
-                    .body(new ApiResponse(true, "Bidang Keahlian Sekolah Deleted Successfully"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, e.getMessage()));
+        @GetMapping("/{bidangKeahlianSekolahId}")
+        public DefaultResponse<BidangKeahlianSekolah> getBidangKeahlianSekolahById(
+                        @PathVariable String bidangKeahlianSekolahId) throws IOException {
+                return bidangKeahlianSekolahService.getBidangKeahlianSekolahById(bidangKeahlianSekolahId);
         }
-    }
+
+        @PutMapping("/{bidangKeahlianSekolahId}")
+        public ResponseEntity<?> updateBidangKeahlianSekolah(@PathVariable String bidangKeahlianSekolahId,
+                        @Valid @RequestBody BidangKeahlianSekolahRequest bidangKeahlianSekolahRequest)
+                        throws IOException {
+                try {
+                        BidangKeahlianSekolah bidangKeahlianSekolah = bidangKeahlianSekolahService
+                                        .updateBidangKeahlianSekolah(bidangKeahlianSekolahId,
+                                                        bidangKeahlianSekolahRequest);
+
+                        URI location = ServletUriComponentsBuilder
+                                        .fromCurrentRequest().path("/{bidangKeahlianSekolahId}")
+                                        .buildAndExpand(bidangKeahlianSekolah.getIdBidangSekolah()).toUri();
+
+                        return ResponseEntity.created(location)
+                                        .body(new ApiResponse(true, "Bidang Keahlian Sekolah Updated Successfully"));
+                } catch (IllegalArgumentException e) {
+                        return ResponseEntity.badRequest()
+                                        .body(new ApiResponse(false, e.getMessage()));
+                } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(new ApiResponse(false, e.getMessage()));
+                }
+        }
+
+        @DeleteMapping("/{bidangKeahlianSekolahId}")
+        public ResponseEntity<?> deleteBidangKeahlianSekolah(@PathVariable String bidangKeahlianSekolahId)
+                        throws IOException {
+                try {
+                        bidangKeahlianSekolahService.deleteBidangKeahlianSekolahById(bidangKeahlianSekolahId);
+
+                        return ResponseEntity.ok()
+                                        .body(new ApiResponse(true, "Bidang Keahlian Sekolah Deleted Successfully"));
+                } catch (IllegalArgumentException e) {
+                        return ResponseEntity.badRequest()
+                                        .body(new ApiResponse(false, e.getMessage()));
+                } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(new ApiResponse(false, e.getMessage()));
+                }
+        }
 
 }

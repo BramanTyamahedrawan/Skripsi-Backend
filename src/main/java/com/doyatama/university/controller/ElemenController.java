@@ -5,6 +5,8 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.ElemenRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.ElemenService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
@@ -37,8 +39,8 @@ public class ElemenController {
             @RequestParam(value = "semesterID", defaultValue = "*") String semesterID,
             @RequestParam(value = "kelasID", defaultValue = "*") String kelasID,
             @RequestParam(value = "konsentrasiKeahlianSekolahID", defaultValue = "*") String konsentrasiKeahlianSekolahID,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID)
-            throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        String schoolID = currentUser.getSchoolId();
         return elemenService.getAllElemen(page, size, mapelID, tahunAjaranID, semesterID, kelasID,
                 konsentrasiKeahlianSekolahID, schoolID);
     }

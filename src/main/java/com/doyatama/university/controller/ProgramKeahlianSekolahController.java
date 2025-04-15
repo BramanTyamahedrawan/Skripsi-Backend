@@ -1,11 +1,11 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.model.ProgramKeahlianSekolah;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.ProgramKeahlianSekolahRequest;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.payload.DefaultResponse;
-import com.doyatama.university.payload.KonsentrasiKeahlianSekolahRequest;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.service.ProgramKeahlianSekolahService;
 import com.doyatama.university.util.AppConstants;
@@ -37,9 +37,9 @@ public class ProgramKeahlianSekolahController {
         public PagedResponse<ProgramKeahlianSekolah> getProgramKeahlianSekolah(
                         @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                         @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-                        @RequestParam(value = "schoolID", defaultValue = "*") String schoolID,
-                        @RequestParam(value = "programKeahlianID", defaultValue = "*") String programKeahlianID)
-                        throws IOException {
+                        @RequestParam(value = "programKeahlianID", defaultValue = "*") String programKeahlianID,
+                        @CurrentUser UserPrincipal currentUser) throws IOException {
+                String schoolID = currentUser.getSchoolId();
                 return programKeahlianSekolahService.getAllProgramKeahlianSekolah(page, size, schoolID,
                                 programKeahlianID);
         }

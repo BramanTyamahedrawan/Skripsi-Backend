@@ -5,6 +5,8 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.KonsentrasiKeahlianSekolahRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.KonsentrasiKeahlianSekolahService;
 import com.doyatama.university.util.AppConstants;
 
@@ -35,9 +37,9 @@ public class KonsentrasiKeahlianSekolahController {
     public PagedResponse<KonsentrasiKeahlianSekolah> getKonsentrasiKeahlianSekolah(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID,
-            @RequestParam(value = "konsentrasiKeahlianID", defaultValue = "*") String konsentrasiKeahlianID)
-            throws IOException {
+            @RequestParam(value = "konsentrasiKeahlianID", defaultValue = "*") String konsentrasiKeahlianID,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        String schoolID = currentUser.getSchoolId();
         return konsentrasiKeahlianSekolahService.getAllKonsentrasiKeahlianSekolah(page, size, schoolID,
                 konsentrasiKeahlianID);
     }

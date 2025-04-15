@@ -5,6 +5,8 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.AcpRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.AcpService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
@@ -38,8 +40,8 @@ public class AcpController {
             @RequestParam(value = "mapel", defaultValue = "*") String mapeID,
             @RequestParam(value = "konsentrasiKeahlianSekolah", defaultValue = "*") String konsentrasiKeahlianSekolahID,
             @RequestParam(value = "elemen", defaultValue = "*") String elemenID,
-            @RequestParam(value = "school", defaultValue = "*") String schoolID)
-            throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        String schoolID = currentUser.getSchoolId();
         return acpService.getAllAcp(page, size, tahunAjaranID, semesterID, kelasID,
                 mapeID, konsentrasiKeahlianSekolahID, elemenID, schoolID);
     }

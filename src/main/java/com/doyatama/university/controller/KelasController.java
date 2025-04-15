@@ -6,10 +6,13 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.KelasRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.KelasService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.net.URI;
+
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +36,10 @@ public class KelasController {
     public PagedResponse<Kelas> getKelas(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+
+        String schoolID = currentUser.getSchoolId();
+
         return kelasService.getAllKelas(page, size, schoolID);
     }
 

@@ -5,6 +5,8 @@ import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.AtpRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.service.AtpService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
@@ -40,8 +42,8 @@ public class AtpController {
             @RequestParam(value = "konsentrasiKeahlianSekolah", defaultValue = "*") String konsentrasiKeahlianSekolahID,
             @RequestParam(value = "elemen", defaultValue = "*") String elemenID,
             @RequestParam(value = "acp", defaultValue = "*") String acpID,
-            @RequestParam(value = "school", defaultValue = "*") String schoolID)
-            throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        String schoolID = currentUser.getSchoolId();
         return atpService.getAllAtp(page, size, tahunAjaranID, semesterID, kelasID,
                 mapeID, konsentrasiKeahlianSekolahID, elemenID, acpID, schoolID);
     }
