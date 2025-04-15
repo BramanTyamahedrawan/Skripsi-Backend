@@ -23,14 +23,17 @@ public class TahunAjaranService {
     private SchoolRepository schoolRepository = new SchoolRepository();
 
     public PagedResponse<TahunAjaran> getAllTahunAjaran(int page, String schoolID, int size) throws IOException {
+        System.out.println("⚙️ [Service] schoolID diterima: " + schoolID);
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
         List<TahunAjaran> tahunResponse;
 
         if (schoolID.equalsIgnoreCase("*")) {
+            System.out.println("🔄 [Service] Menjalankan findAll()");
             tahunResponse = tahunRepository.findAll(size);
         } else {
+            System.out.println("🔍 [Service] Menjalankan findTahunAjaranBySekolah untuk schoolID: " + schoolID);
             tahunResponse = tahunRepository.findTahunAjaranBySekolah(schoolID, size);
         }
 
@@ -97,6 +100,11 @@ public class TahunAjaranService {
         if (size > AppConstants.MAX_PAGE_SIZE) {
             throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
         }
+    }
+
+    private boolean isUserAdmin(String roles) {
+        // Asumsi: role "1" adalah admin
+        return "1".equals(roles);
     }
 
 }

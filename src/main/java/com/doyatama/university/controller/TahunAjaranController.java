@@ -2,14 +2,18 @@
 package com.doyatama.university.controller;
 
 import com.doyatama.university.model.TahunAjaran;
+import com.doyatama.university.model.User;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.TahunAjaranRequest;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.service.TahunAjaranService;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.net.URI;
+
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +37,10 @@ public class TahunAjaranController {
     public PagedResponse<TahunAjaran> getTahunAjaran(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "schoolID", defaultValue = "*") String schoolID) throws IOException {
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+
+        String schoolID = currentUser.getSchoolId();
+        System.out.println("⚙️ [Controller] schoolID diterima: " + schoolID);
         return tahunService.getAllTahunAjaran(page, schoolID, size);
     }
 
@@ -99,4 +106,5 @@ public class TahunAjaranController {
                     .body(new ApiResponse(false, e.getMessage()));
         }
     }
+
 }

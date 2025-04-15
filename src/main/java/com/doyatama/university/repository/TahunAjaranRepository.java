@@ -95,6 +95,7 @@ public class TahunAjaranRepository {
     }
 
     public List<TahunAjaran> findTahunAjaranBySekolah(String schoolID, int size) throws IOException {
+        System.out.println("📡 [Repository] Filter berdasarkan schoolID: " + schoolID);
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         TableName tableTahun = TableName.valueOf(tableName);
