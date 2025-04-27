@@ -35,6 +35,8 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
 
         return client.showListTable(tableMapel.toString(), columnMapping, Mapel.class, size);
     }
@@ -51,6 +53,14 @@ public class MapelRepository {
         client.insertRecord(tableMapel, rowKey, "school", "idSchool", mapel.getSchool().getIdSchool());
         client.insertRecord(tableMapel, rowKey, "school", "nameSchool", mapel.getSchool().getNameSchool());
 
+        // Semester
+        client.insertRecord(tableMapel, rowKey, "semester", "idSemester", mapel.getSemester().getIdSemester());
+        client.insertRecord(tableMapel, rowKey, "semester", "namaSemester", mapel.getSemester().getNamaSemester());
+
+        // Kelas
+        client.insertRecord(tableMapel, rowKey, "kelas", "idKelas", mapel.getKelas().getIdKelas());
+        client.insertRecord(tableMapel, rowKey, "kelas", "namaKelas", mapel.getKelas().getNamaKelas());
+
         client.insertRecord(tableMapel, rowKey, "detail", "created_by", "Doyatama");
         return mapel;
     }
@@ -65,6 +75,8 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
 
         return client.showDataTable(tableMapel.toString(), columnMapping, mapelId, Mapel.class);
     }
@@ -76,6 +88,9 @@ public class MapelRepository {
         Map<String, String> columnMapping = new HashMap<>();
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
+        columnMapping.put("school", "school");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
 
         List<Mapel> mapels = new ArrayList<>();
         for (String mapelId : mapelIds) {
@@ -94,6 +109,9 @@ public class MapelRepository {
         Map<String, String> columnMapping = new HashMap<>();
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
+        columnMapping.put("school", "school");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
 
         List<Mapel> mapels = new ArrayList<>();
 
@@ -120,6 +138,8 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
 
         List<Mapel> mapels = client.getDataListByColumn(tableMapel.toString(), columnMapping, "school", "idSchool",
                 schoolID, Mapel.class, size);
@@ -135,12 +155,28 @@ public class MapelRepository {
             client.insertRecord(tableMapel, mapelId, "main", "name", mapel.getName());
         }
 
+        // Sekolah
         if (mapel.getSchool().getIdSchool() != null) {
             client.insertRecord(tableMapel, mapelId, "school", "idSchool", mapel.getSchool().getIdSchool());
         }
-
         if (mapel.getSchool().getNameSchool() != null) {
             client.insertRecord(tableMapel, mapelId, "school", "nameSchool", mapel.getSchool().getNameSchool());
+        }
+
+        // Semester
+        if (mapel.getSemester().getIdSemester() != null) {
+            client.insertRecord(tableMapel, mapelId, "semester", "idSemester", mapel.getSemester().getIdSemester());
+        }
+        if (mapel.getSemester().getNamaSemester() != null) {
+            client.insertRecord(tableMapel, mapelId, "semester", "namaSemester", mapel.getSemester().getNamaSemester());
+        }
+
+        // Kelas
+        if (mapel.getKelas().getIdKelas() != null) {
+            client.insertRecord(tableMapel, mapelId, "kelas", "idKelas", mapel.getKelas().getIdKelas());
+        }
+        if (mapel.getKelas().getNamaKelas() != null) {
+            client.insertRecord(tableMapel, mapelId, "kelas", "namaKelas", mapel.getKelas().getNamaKelas());
         }
 
         return mapel;

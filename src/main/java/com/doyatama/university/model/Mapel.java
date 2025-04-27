@@ -4,14 +4,18 @@ public class Mapel {
     private String idMapel;
     private String name;
     private School school;
+    private Kelas kelas;
+    private Semester semester;
 
     public Mapel() {
     }
 
-    public Mapel(String idMapel, String name, School school) {
+    public Mapel(String idMapel, String name, School school, Kelas kelas, Semester semester) {
         this.idMapel = idMapel;
         this.name = name;
         this.school = school;
+        this.kelas = kelas;
+        this.semester = semester;
     }
 
     public String getIdMapel() {
@@ -38,10 +42,28 @@ public class Mapel {
         this.school = school;
     }
 
+    public Kelas getKelas() {
+        return kelas;
+    }
+
+    public void setKelas(Kelas kelas) {
+        this.kelas = kelas;
+    }
+
+    public Semester getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Semester semester) {
+        this.semester = semester;
+    }
+
     public boolean isValid() {
         return this.idMapel != null &&
                 this.name != null &&
-                this.school != null;
+                this.school != null &&
+                this.kelas != null &&
+                this.semester != null;
     }
 
     public void set(String fieldName, String value) {

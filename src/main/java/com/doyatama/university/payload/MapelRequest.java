@@ -5,14 +5,18 @@ public class MapelRequest {
     private String idMapel;
     private String name;
     private String idSekolah;
+    private String idKelas;
+    private String idSemester;
 
     public MapelRequest() {
     }
 
-    public MapelRequest(String idMapel, String name, String idSekolah) {
+    public MapelRequest(String idMapel, String name, String idSekolah, String idKelas, String idSemester) {
         this.idMapel = idMapel;
         this.name = name;
         this.idSekolah = idSekolah;
+        this.idKelas = idKelas;
+        this.idSemester = idSemester;
     }
 
     public String getIdMapel() {
@@ -39,6 +43,22 @@ public class MapelRequest {
         this.idSekolah = idSekolah;
     }
 
+    public String getIdKelas() {
+        return idKelas;
+    }
+
+    public void setIdKelas(String idKelas) {
+        this.idKelas = idKelas;
+    }
+
+    public String getIdSemester() {
+        return idSemester;
+    }
+
+    public void setIdSemester(String idSemester) {
+        this.idSemester = idSemester;
+    }
+
     public void set(String fieldName, String value) {
         switch (fieldName) {
             case "idMapel":
@@ -49,6 +69,12 @@ public class MapelRequest {
                 break;
             case "idSekolah":
                 this.idSekolah = value;
+                break;
+            case "idKelas":
+                this.idKelas = value;
+                break;
+            case "idSemester":
+                this.idSemester = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);
