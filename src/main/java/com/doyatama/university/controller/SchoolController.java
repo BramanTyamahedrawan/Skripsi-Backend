@@ -4,6 +4,8 @@ import com.doyatama.university.model.School;
 import com.doyatama.university.payload.ApiResponse;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.SchoolRequest;
+import com.doyatama.university.security.CurrentUser;
+import com.doyatama.university.security.UserPrincipal;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.service.SchoolService;
 import com.doyatama.university.util.AppConstants;
@@ -24,8 +26,12 @@ public class SchoolController {
     @GetMapping
     public PagedResponse<School> getSchools(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return schoolService.getAllSchool(page, size);
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+
+        String schoolID = currentUser.getSchoolId();
+
+        return schoolService.getAllSchool(page, size, schoolID);
     }
 
     @PostMapping

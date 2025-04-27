@@ -72,6 +72,22 @@ public class SchoolRepository {
         return schools;
     }
 
+    public List<School> findSchoolBySekolah(String schoolId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableSchool = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("idSchool", "idSchool");
+        columnMapping.put("nameSchool", "nameSchool");
+        columnMapping.put("address", "address");
+
+        List<School> schoolList = client.getDataListByColumn(tableSchool.toString(), columnMapping, "main", "idSchool",
+                schoolId, School.class, size);
+        return schoolList;
+    }
+
     public School update(String schoolId, School school) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 

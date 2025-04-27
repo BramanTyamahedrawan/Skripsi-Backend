@@ -10,7 +10,6 @@ import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,13 +19,17 @@ public class SchoolService {
     // private static final Logger logger =
     // LoggerFactory.getLogger(SchoolService.class);
 
-    public PagedResponse<School> getAllSchool(int page, int size) throws IOException {
+    public PagedResponse<School> getAllSchool(int page, int size, String schoolID) throws IOException {
         validatePageNumberAndSize(page, size);
 
         // Retrieve Polls
-        List<School> schoolResponse = new ArrayList<>();
+        List<School> schoolResponse;
 
-        schoolResponse = schoolRepository.findAll(size);
+        if (schoolID.equalsIgnoreCase("*")) {
+            schoolResponse = schoolRepository.findAll(size);
+        } else {
+            schoolResponse = schoolRepository.findSchoolBySekolah(schoolID, size);
+        }
 
         return new PagedResponse<>(schoolResponse, schoolResponse.size(), "Successfully get data", 200);
     }
