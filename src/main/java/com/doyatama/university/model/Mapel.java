@@ -6,16 +6,18 @@ public class Mapel {
     private School school;
     private Kelas kelas;
     private Semester semester;
+    private TahunAjaran tahunAjaran;
 
     public Mapel() {
     }
 
-    public Mapel(String idMapel, String name, School school, Kelas kelas, Semester semester) {
+    public Mapel(String idMapel, String name, School school, Kelas kelas, Semester semester, TahunAjaran tahunAjaran) {
         this.idMapel = idMapel;
         this.name = name;
         this.school = school;
         this.kelas = kelas;
         this.semester = semester;
+        this.tahunAjaran = tahunAjaran;
     }
 
     public String getIdMapel() {
@@ -58,12 +60,21 @@ public class Mapel {
         this.semester = semester;
     }
 
+    public TahunAjaran getTahunAjaran() {
+        return tahunAjaran;
+    }
+
+    public void setTahunAjaran(TahunAjaran tahunAjaran) {
+        this.tahunAjaran = tahunAjaran;
+    }
+
     public boolean isValid() {
         return this.idMapel != null &&
                 this.name != null &&
                 this.school != null &&
                 this.kelas != null &&
-                this.semester != null;
+                this.semester != null &&
+                this.tahunAjaran != null;
     }
 
     public void set(String fieldName, String value) {

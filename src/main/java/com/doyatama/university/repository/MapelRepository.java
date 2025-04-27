@@ -35,6 +35,7 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
 
@@ -52,6 +53,10 @@ public class MapelRepository {
         // Sekolah
         client.insertRecord(tableMapel, rowKey, "school", "idSchool", mapel.getSchool().getIdSchool());
         client.insertRecord(tableMapel, rowKey, "school", "nameSchool", mapel.getSchool().getNameSchool());
+
+        // Tahun Ajaran
+        client.insertRecord(tableMapel, rowKey, "tahunAjaran", "idTahun", mapel.getTahunAjaran().getIdTahun());
+        client.insertRecord(tableMapel, rowKey, "tahunAjaran", "tahunAjaran", mapel.getTahunAjaran().getTahunAjaran());
 
         // Semester
         client.insertRecord(tableMapel, rowKey, "semester", "idSemester", mapel.getSemester().getIdSemester());
@@ -75,6 +80,7 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
 
@@ -89,6 +95,7 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
 
@@ -110,6 +117,7 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
 
@@ -138,6 +146,7 @@ public class MapelRepository {
         columnMapping.put("idMapel", "idMapel");
         columnMapping.put("name", "name");
         columnMapping.put("school", "school");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
 
@@ -161,6 +170,15 @@ public class MapelRepository {
         }
         if (mapel.getSchool().getNameSchool() != null) {
             client.insertRecord(tableMapel, mapelId, "school", "nameSchool", mapel.getSchool().getNameSchool());
+        }
+
+        // Tahun Ajaran
+        if (mapel.getTahunAjaran().getIdTahun() != null) {
+            client.insertRecord(tableMapel, mapelId, "tahunAjaran", "idTahun", mapel.getTahunAjaran().getIdTahun());
+        }
+        if (mapel.getTahunAjaran().getTahunAjaran() != null) {
+            client.insertRecord(tableMapel, mapelId, "tahunAjaran", "tahunAjaran",
+                    mapel.getTahunAjaran().getTahunAjaran());
         }
 
         // Semester
