@@ -24,7 +24,7 @@ public class UserController {
     @GetMapping("/user/me")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
         UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName(),
-                currentUser.getSchoolId(),
+                currentUser.getSchoolId(), currentUser.getSchoolName(),
                 currentUser.getRoles().equalsIgnoreCase("1") ? "ROLE_ADMINISTRATOR"
                         : currentUser.getRoles().equalsIgnoreCase("2") ? "ROLE_OPERATOR"
                                 : currentUser.getRoles().equalsIgnoreCase("3") ? "ROLE_TEACHER"

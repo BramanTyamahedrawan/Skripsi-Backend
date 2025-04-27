@@ -59,7 +59,7 @@ public class AuthController {
 
                 String jwt = tokenProvider.generateToken(authentication);
                 UserSummary userSummary = new UserSummary(userPrincipal.getId(), userPrincipal.getUsername(),
-                                userPrincipal.getName(), userPrincipal.getSchoolId(),
+                                userPrincipal.getName(), userPrincipal.getSchoolId(), userPrincipal.getSchoolName(),
                                 userPrincipal.getRoles().equalsIgnoreCase("1") ? "ROLE_ADMINISTRATOR"
                                                 : userPrincipal.getRoles().equalsIgnoreCase("2") ? "ROLE_OPERATOR"
                                                                 : userPrincipal.getRoles().equalsIgnoreCase("3")
