@@ -60,15 +60,6 @@ public class ModulRepository {
         // Mapel
         client.insertRecord(tableModul, rowKey, "mapel", "idMapel", modul.getMapel().getIdMapel());
         client.insertRecord(tableModul, rowKey, "mapel", "name", modul.getMapel().getName());
-        client.insertRecord(tableModul, rowKey, "mapel", "idTahun", modul.getMapel().getTahunAjaran().getIdTahun());
-        client.insertRecord(tableModul, rowKey, "mapel", "tahunAjaran",
-                modul.getMapel().getTahunAjaran().getTahunAjaran());
-        client.insertRecord(tableModul, rowKey, "mapel", "idSemester", modul.getMapel().getSemester().getIdSemester());
-        client.insertRecord(tableModul, rowKey, "mapel", "namaSemester",
-                modul.getMapel().getSemester().getNamaSemester());
-        client.insertRecord(tableModul, rowKey, "mapel", "idKelas", modul.getMapel().getKelas().getIdKelas());
-        client.insertRecord(tableModul, rowKey, "mapel", "namaKelas", modul.getMapel().getKelas().getNamaKelas());
-
         // Sekolah
         client.insertRecord(tableModul, rowKey, "school", "idSchool", modul.getSchool().getIdSchool());
         client.insertRecord(tableModul, rowKey, "school", "nameSchool", modul.getSchool().getNameSchool());
@@ -127,10 +118,10 @@ public class ModulRepository {
         columnMapping.put("mapel", "mapel");
         columnMapping.put("school", "school");
 
-        List<Modul> modul = client.getDataListByColumn(tableModul.toString(), columnMapping, "school", "idSchool",
+        List<Modul> modulList = client.getDataListByColumn(tableModul.toString(), columnMapping, "school", "idSchool",
                 schoolID, Modul.class, size);
 
-        return modul;
+        return modulList;
     }
 
     public Modul update(String modulId, Modul modul) throws IOException {
@@ -170,17 +161,6 @@ public class ModulRepository {
         if (modul.getMapel() != null) {
             client.insertRecord(tableModul, modulId, "mapel", "idMapel", modul.getMapel().getIdMapel());
             client.insertRecord(tableModul, modulId, "mapel", "name", modul.getMapel().getName());
-            client.insertRecord(tableModul, modulId, "mapel", "idTahun",
-                    modul.getMapel().getTahunAjaran().getIdTahun());
-            client.insertRecord(tableModul, modulId, "mapel", "tahunAjaran",
-                    modul.getMapel().getTahunAjaran().getTahunAjaran());
-            client.insertRecord(tableModul, modulId, "mapel", "idSemester",
-                    modul.getMapel().getSemester().getIdSemester());
-            client.insertRecord(tableModul, modulId, "mapel", "namaSemester",
-                    modul.getMapel().getSemester().getNamaSemester());
-            client.insertRecord(tableModul, modulId, "mapel", "idKelas", modul.getMapel().getKelas().getIdKelas());
-            client.insertRecord(tableModul, modulId, "mapel", "namaKelas",
-                    modul.getMapel().getKelas().getNamaKelas());
         }
 
         // Sekolah

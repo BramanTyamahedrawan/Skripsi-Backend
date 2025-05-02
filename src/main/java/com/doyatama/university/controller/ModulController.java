@@ -34,14 +34,14 @@ public class ModulController {
     public PagedResponse<Modul> getModul(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "mapelID", defaultValue = "*") String mapelID,
-            @RequestParam(value = "tahunAjaranID", defaultValue = "*") String tahunAjaranID,
-            @RequestParam(value = "semesterID", defaultValue = "*") String semesterID,
-            @RequestParam(value = "kelasID", defaultValue = "*") String kelasID,
+            @RequestParam(value = "tahunAjaran", defaultValue = "*") String tahunAjaranID,
+            @RequestParam(value = "semester", defaultValue = "*") String semesterID,
+            @RequestParam(value = "kelas", defaultValue = "*") String kelasID,
+            @RequestParam(value = "mapel", defaultValue = "*") String mapelID,
             @CurrentUser UserPrincipal currentUser) throws IOException {
 
         String schoolID = currentUser.getSchoolId();
-        return modulService.getAllModul(page, size, mapelID, tahunAjaranID, semesterID, kelasID, schoolID);
+        return modulService.getAllModul(page, size, tahunAjaranID, semesterID, kelasID, mapelID, schoolID);
     }
 
     @PostMapping
