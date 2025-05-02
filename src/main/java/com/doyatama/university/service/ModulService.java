@@ -110,7 +110,7 @@ public class ModulService {
             modul.setMapel(mapelResponse);
             modul.setSchool(schoolResponse);
 
-            return modulRepository.save(modul);
+            return modulRepository.update(modulId, modul);
         } else {
             return null;
 
