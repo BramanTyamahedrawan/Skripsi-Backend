@@ -91,6 +91,12 @@ public class HBaseClientStructure {
                 client.deleteTable(tableModul);
                 client.createTable(tableModul, modul);
 
+                // Create Table Taksonomi
+                TableName tableTaksonomi = TableName.valueOf("taksonomi");
+                String[] taksonomi = { "main", "school", "detail" };
+                client.deleteTable(tableTaksonomi);
+                client.createTable(tableTaksonomi, taksonomi);
+
                 TableName tableJadwal = TableName.valueOf("jadwalPelajarans");
                 String[] jadwal = { "main", "lecture", "mapel", "detail" };
                 client.deleteTable(tableJadwal);
