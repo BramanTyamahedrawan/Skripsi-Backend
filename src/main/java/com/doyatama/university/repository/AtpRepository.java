@@ -23,6 +23,7 @@ public class AtpRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idAtp", "idAtp");
         columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
         columnMapping.put("mapel", "mapel");
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
@@ -44,6 +45,7 @@ public class AtpRepository {
 
         client.insertRecord(tableAtp, rowKey, "main", "idAtp", atp.getIdAtp());
         client.insertRecord(tableAtp, rowKey, "main", "namaAtp", atp.getNamaAtp());
+        client.insertRecord(tableAtp, rowKey, "main", "jumlahJpl", atp.getJumlahJpl());
 
         // Tahun Ajaran
         client.insertRecord(tableAtp, rowKey, "tahunAjaran", "idTahun", atp.getTahunAjaran().getIdTahun());
@@ -85,6 +87,7 @@ public class AtpRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idAtp", "idAtp");
         columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
         columnMapping.put("mapel", "mapel");
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
@@ -105,6 +108,7 @@ public class AtpRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idAtp", "idAtp");
         columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
         columnMapping.put("mapel", "mapel");
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
@@ -126,6 +130,7 @@ public class AtpRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idAtp", "idAtp");
         columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
         columnMapping.put("mapel", "mapel");
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
@@ -150,6 +155,7 @@ public class AtpRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idAtp", "idAtp");
         columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
         columnMapping.put("mapel", "mapel");
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
@@ -174,6 +180,7 @@ public class AtpRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idAtp", "idAtp");
         columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
         columnMapping.put("mapel", "mapel");
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
@@ -198,6 +205,10 @@ public class AtpRepository {
 
         if (atp.getNamaAtp() != null) {
             client.insertRecord(tableAtp, rowKey, "main", "namaAtp", atp.getNamaAtp());
+        }
+
+        if (atp.getJumlahJpl() != null) {
+            client.insertRecord(tableAtp, rowKey, "main", "jumlahJpl", atp.getJumlahJpl());
         }
 
         // Tahun Ajaran

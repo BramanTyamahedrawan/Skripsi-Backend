@@ -88,8 +88,9 @@ public class AtpService {
         School schoolResponse = schoolRepository.findById(atpRequest.getIdSekolah());
 
         Atp atp = new Atp();
-        atp.setIdAtp(atpRequest.getIdAtp() == null ? UUID.randomUUID().toString() : atpRequest.getIdAtp());
+        atp.setIdAtp(atpRequest.getIdAtp());
         atp.setNamaAtp(atpRequest.getNamaAtp());
+        atp.setJumlahJpl(atpRequest.getJumlahJpl());
         atp.setTahunAjaran(tahunAjaranResponse);
         atp.setSemester(semesterResponse);
         atp.setKelas(kelasResponse);
@@ -124,6 +125,7 @@ public class AtpService {
 
         if (atp.getIdAtp() != null && schoolResponse.getIdSchool() != null) {
             atp.setNamaAtp(atpRequest.getNamaAtp());
+            atp.setJumlahJpl(atpRequest.getJumlahJpl());
             atp.setTahunAjaran(tahunAjaranResponse);
             atp.setSemester(semesterResponse);
             atp.setKelas(kelasResponse);

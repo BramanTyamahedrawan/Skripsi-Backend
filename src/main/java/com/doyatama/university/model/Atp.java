@@ -3,6 +3,7 @@ package com.doyatama.university.model;
 public class Atp {
     private String idAtp;
     private String namaAtp;
+    private String jumlahJpl;
     private Mapel mapel;
     private TahunAjaran tahunAjaran;
     private Semester semester;
@@ -15,10 +16,12 @@ public class Atp {
     public Atp() {
     }
 
-    public Atp(String idAtp, String namaAtp, Mapel mapel, TahunAjaran tahunAjaran, Semester semester, Kelas kelas,
+    public Atp(String idAtp, String namaAtp, String jumlahJpl, Mapel mapel, TahunAjaran tahunAjaran, Semester semester,
+            Kelas kelas,
             KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolah, Elemen elemen, Acp acp, School school) {
         this.idAtp = idAtp;
         this.namaAtp = namaAtp;
+        this.jumlahJpl = jumlahJpl;
         this.mapel = mapel;
         this.tahunAjaran = tahunAjaran;
         this.semester = semester;
@@ -43,6 +46,14 @@ public class Atp {
 
     public void setNamaAtp(String namaAtp) {
         this.namaAtp = namaAtp;
+    }
+
+    public String getJumlahJpl() {
+        return jumlahJpl;
+    }
+
+    public void setJumlahJpl(String jumlahJpl) {
+        this.jumlahJpl = jumlahJpl;
     }
 
     public Mapel getMapel() {
@@ -110,7 +121,7 @@ public class Atp {
     }
 
     public boolean isValid() {
-        return this.idAtp != null && this.namaAtp != null;
+        return this.idAtp != null && this.namaAtp != null && this.jumlahJpl != null;
     }
 
     public void set(String fieldName, String value) {
@@ -120,6 +131,9 @@ public class Atp {
                 break;
             case "namaAtp":
                 this.namaAtp = value;
+                break;
+            case "jumlahJpl":
+                this.jumlahJpl = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

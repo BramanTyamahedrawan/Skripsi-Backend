@@ -3,6 +3,7 @@ package com.doyatama.university.payload;
 public class AtpRequest {
     private String idAtp;
     private String namaAtp;
+    private String jumlahJpl;
     private String idMapel;
     private String idTahun;
     private String idSemester;
@@ -15,10 +16,12 @@ public class AtpRequest {
     public AtpRequest() {
     }
 
-    public AtpRequest(String idAtp, String namaAtp, String idMapel, String idTahun, String idSemester, String idKelas,
+    public AtpRequest(String idAtp, String namaAtp, String jumlahJpl, String idMapel, String idTahun, String idSemester,
+            String idKelas,
             String idKonsentrasiSekolah, String idElemen, String idAcp, String idSekolah) {
         this.idAtp = idAtp;
         this.namaAtp = namaAtp;
+        this.jumlahJpl = jumlahJpl;
         this.idMapel = idMapel;
         this.idTahun = idTahun;
         this.idSemester = idSemester;
@@ -43,6 +46,14 @@ public class AtpRequest {
 
     public void setNamaAtp(String namaAtp) {
         this.namaAtp = namaAtp;
+    }
+
+    public String getJumlahJpl() {
+        return jumlahJpl;
+    }
+
+    public void setJumlahJpl(String jumlahJpl) {
+        this.jumlahJpl = jumlahJpl;
     }
 
     public String getIdMapel() {
@@ -110,7 +121,7 @@ public class AtpRequest {
     }
 
     public boolean isValid() {
-        return this.idAtp != null && this.namaAtp != null;
+        return this.idAtp != null && this.namaAtp != null && this.jumlahJpl != null;
     }
 
     public void set(String fieldName, String value) {
@@ -120,6 +131,9 @@ public class AtpRequest {
                 break;
             case "namaAtp":
                 this.namaAtp = value;
+                break;
+            case "jumlahJpl":
+                this.jumlahJpl = value;
                 break;
             case "idMapel":
                 this.idMapel = value;
