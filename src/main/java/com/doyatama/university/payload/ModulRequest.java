@@ -3,7 +3,6 @@ package com.doyatama.university.payload;
 public class ModulRequest {
     private String idModul;
     private String namaModul;
-    private String jumlahJpl;
     private String idTahun;
     private String idSemester;
     private String idKelas;
@@ -13,11 +12,10 @@ public class ModulRequest {
     public ModulRequest() {
     }
 
-    public ModulRequest(String idModul, String namaModul, String jumlahJpl, String idTahun, String idSemester,
+    public ModulRequest(String idModul, String namaModul, String idTahun, String idSemester,
             String idKelas, String idMapel, String idSekolah) {
         this.idModul = idModul;
         this.namaModul = namaModul;
-        this.jumlahJpl = jumlahJpl;
         this.idTahun = idTahun;
         this.idSemester = idSemester;
         this.idKelas = idKelas;
@@ -39,14 +37,6 @@ public class ModulRequest {
 
     public void setNamaModul(String namaModul) {
         this.namaModul = namaModul;
-    }
-
-    public String getJumlahJpl() {
-        return jumlahJpl;
-    }
-
-    public void setJumlahJpl(String jumlahJpl) {
-        this.jumlahJpl = jumlahJpl;
     }
 
     public String getIdTahun() {
@@ -96,9 +86,6 @@ public class ModulRequest {
                 break;
             case "namaModul":
                 this.namaModul = value;
-                break;
-            case "jumlahJpl":
-                this.jumlahJpl = value;
                 break;
             case "idTahun":
                 this.idTahun = value;

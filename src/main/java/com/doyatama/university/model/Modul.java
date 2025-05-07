@@ -3,7 +3,6 @@ package com.doyatama.university.model;
 public class Modul {
     private String idModul;
     private String namaModul;
-    private String jumlahJpl;
     private TahunAjaran tahunAjaran;
     private Semester semester;
     private Kelas kelas;
@@ -13,11 +12,10 @@ public class Modul {
     public Modul() {
     }
 
-    public Modul(String idModul, String namaModul, String jumlahJpl, TahunAjaran tahunAjaran, Semester semester,
+    public Modul(String idModul, String namaModul, TahunAjaran tahunAjaran, Semester semester,
             Kelas kelas, Mapel mapel, School school) {
         this.idModul = idModul;
         this.namaModul = namaModul;
-        this.jumlahJpl = jumlahJpl;
         this.tahunAjaran = tahunAjaran;
         this.semester = semester;
         this.kelas = kelas;
@@ -39,14 +37,6 @@ public class Modul {
 
     public void setNamaModul(String namaModul) {
         this.namaModul = namaModul;
-    }
-
-    public String getJumlahJpl() {
-        return jumlahJpl;
-    }
-
-    public void setJumlahJpl(String jumlahJpl) {
-        this.jumlahJpl = jumlahJpl;
     }
 
     public TahunAjaran getTahunAjaran() {
@@ -92,7 +82,6 @@ public class Modul {
     public boolean isValid() {
         return idModul != null &&
                 namaModul != null &&
-                jumlahJpl != null &&
                 tahunAjaran != null &&
                 semester != null &&
                 kelas != null &&
@@ -107,9 +96,6 @@ public class Modul {
                 break;
             case "namaModul":
                 this.namaModul = value;
-                break;
-            case "jumlahJpl":
-                this.jumlahJpl = value;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + fieldName);

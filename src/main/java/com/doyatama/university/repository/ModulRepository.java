@@ -24,7 +24,7 @@ public class ModulRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idModul", "idModul");
         columnMapping.put("namaModul", "namaModul");
-        columnMapping.put("jumlahJpl", "jumlahJpl");
+
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
@@ -41,7 +41,6 @@ public class ModulRepository {
         TableName tableModul = TableName.valueOf(tableName);
         client.insertRecord(tableModul, rowKey, "main", "idModul", rowKey);
         client.insertRecord(tableModul, rowKey, "main", "namaModul", modul.getNamaModul());
-        client.insertRecord(tableModul, rowKey, "main", "jumlahJpl", modul.getJumlahJpl());
 
         // Tahun Ajaran
         client.insertRecord(tableModul, rowKey, "tahunAjaran", "idTahun", modul.getTahunAjaran().getIdTahun());
@@ -75,7 +74,7 @@ public class ModulRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idModul", "idModul");
         columnMapping.put("namaModul", "namaModul");
-        columnMapping.put("jumlahJpl", "jumlahJpl");
+
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
@@ -93,7 +92,7 @@ public class ModulRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idModul", "idModul");
         columnMapping.put("namaModul", "namaModul");
-        columnMapping.put("jumlahJpl", "jumlahJpl");
+
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
@@ -111,7 +110,7 @@ public class ModulRepository {
         // Add the mappings to the HashMap
         columnMapping.put("idModul", "idModul");
         columnMapping.put("namaModul", "namaModul");
-        columnMapping.put("jumlahJpl", "jumlahJpl");
+
         columnMapping.put("tahunAjaran", "tahunAjaran");
         columnMapping.put("semester", "semester");
         columnMapping.put("kelas", "kelas");
@@ -131,10 +130,6 @@ public class ModulRepository {
 
         if (modul.getNamaModul() != null) {
             client.insertRecord(tableModul, modulId, "main", "namaModul", modul.getNamaModul());
-        }
-
-        if (modul.getJumlahJpl() != null) {
-            client.insertRecord(tableModul, modulId, "main", "jumlahJpl", modul.getJumlahJpl());
         }
 
         // Tahun Ajaran

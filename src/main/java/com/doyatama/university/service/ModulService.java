@@ -76,7 +76,6 @@ public class ModulService {
         Modul modul = new Modul();
         modul.setIdModul(modulRequest.getIdModul());
         modul.setNamaModul(modulRequest.getNamaModul());
-        modul.setJumlahJpl(modulRequest.getJumlahJpl());
         modul.setTahunAjaran(tahunAjaranResponse);
         modul.setSemester(semesterResponse);
         modul.setKelas(kelasResponse);
@@ -103,7 +102,6 @@ public class ModulService {
 
         if (schoolResponse.getIdSchool() != null) {
             modul.setNamaModul(modulRequest.getNamaModul());
-            modul.setJumlahJpl(modulRequest.getJumlahJpl());
             modul.setTahunAjaran(tahunAjaranResponse);
             modul.setSemester(semesterResponse);
             modul.setKelas(kelasResponse);
