@@ -110,6 +110,7 @@ public class AtpService {
     }
 
     public Atp updateAtp(String atpId, AtpRequest atpRequest) throws IOException {
+        System.out.println("Atp ID: " + atpId);
 
         Atp atp = new Atp();
 
@@ -123,7 +124,7 @@ public class AtpService {
         Acp acpResponse = acpRepository.findById(atpRequest.getIdAcp());
         School schoolResponse = schoolRepository.findById(atpRequest.getIdSekolah());
 
-        if (atp.getIdAtp() != null && schoolResponse.getIdSchool() != null) {
+        if (schoolResponse.getIdSchool() != null) {
             atp.setNamaAtp(atpRequest.getNamaAtp());
             atp.setJumlahJpl(atpRequest.getJumlahJpl());
             atp.setTahunAjaran(tahunAjaranResponse);
@@ -135,7 +136,7 @@ public class AtpService {
             atp.setAcp(acpResponse);
             atp.setSchool(schoolResponse);
 
-            return atpRepository.save(atp);
+            return atpRepository.update(atpId, atp);
         } else {
             return null;
         }

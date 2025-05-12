@@ -145,6 +145,12 @@ public class HBaseClientStructure {
                 client.deleteTable(tableAtp);
                 client.createTable(tableAtp, atp);
 
+                // Create Table Jenis Soal
+                TableName tableJenisSoal = TableName.valueOf("jenisSoal");
+                String[] jenisSoal = { "main", "school", "detail" };
+                client.deleteTable(tableJenisSoal);
+                client.createTable(tableJenisSoal, jenisSoal);
+
                 // Batas Kode Baru
                 // Kode Lama
 
