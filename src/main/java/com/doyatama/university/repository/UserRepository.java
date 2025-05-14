@@ -187,16 +187,6 @@ public class UserRepository {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         String rowKey = user.getId();
-        System.out.println("Data Masuk ke Repository ==========");
-        System.out.println("Id User: " + user.getId());
-        System.out.println("Name User: " + user.getName());
-        System.out.println("Username User: " + user.getUsername());
-        System.out.println("Email User: " + user.getEmail());
-        System.out.println("Password User: " + user.getPassword());
-        System.out.println("Roles User: " + user.getRoles());
-        System.out.println("School Id User: " + user.getSchool().getIdSchool());
-        System.out.println("School Name User: " + user.getSchool().getNameSchool());
-        System.out.println("Created At User: " + user.getCreatedAt());
         TableName tableUsers = TableName.valueOf(tableName);
         client.insertRecord(tableUsers, rowKey, "main", "id", rowKey);
         client.insertRecord(tableUsers, rowKey, "main", "name", user.getName());
@@ -213,6 +203,47 @@ public class UserRepository {
 
         client.insertRecord(tableUsers, rowKey, "main", "created_at", user.getCreatedAt().toString());
         return user;
+    }
+
+    public User update(String userId, User user) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableUsers = TableName.valueOf(tableName);
+        // Map<String, String> columnMapping = new HashMap<>();
+
+        if (user.getName() != null) {
+            client.insertRecord(tableUsers, userId, "main", "name", user.getName());
+        }
+
+        if (user.getUsername() != null) {
+            client.insertRecord(tableUsers, userId, "main", "username", user.getUsername());
+        }
+
+        if (user.getEmail() != null) {
+            client.insertRecord(tableUsers, userId, "main", "email", user.getEmail());
+        }
+
+        if (user.getPassword() != null) {
+            client.insertRecord(tableUsers, userId, "main", "password", user.getPassword());
+        }
+
+        if (user.getRoles() != null) {
+            client.insertRecord(tableUsers, userId, "main", "roles", user.getRoles());
+        }
+
+        // Sekolah
+        if (user.getSchool() != null) {
+            client.insertRecord(tableUsers, userId, "school", "idSchool", user.getSchool().getIdSchool());
+            client.insertRecord(tableUsers, userId, "school", "nameSchool", user.getSchool().getNameSchool());
+        }
+
+        return user;
+    }
+
+    public boolean deleteById(String userId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        client.deleteRecord(tableName, userId);
+        return true;
     }
 
     public boolean existsById(String userId) throws IOException {

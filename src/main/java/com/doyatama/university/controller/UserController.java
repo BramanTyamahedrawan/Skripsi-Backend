@@ -1,5 +1,6 @@
 package com.doyatama.university.controller;
 
+import com.doyatama.university.model.Elemen;
 import com.doyatama.university.model.User;
 import com.doyatama.university.payload.*;
 import com.doyatama.university.security.CurrentUser;
@@ -14,6 +15,7 @@ import java.net.URI;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api")
@@ -89,12 +92,15 @@ public class UserController {
             @CurrentUser UserPrincipal currentUser) throws IOException {
 
         String schoolID = currentUser.getSchoolId();
-        // Cek jika admin tidak memiliki schoolID (null, kosong, atau "-")
-        if (schoolID == null || schoolID.isEmpty() || schoolID.equals("-")) {
-            // Jika admin tidak memiliki sekolah, tampilkan semua user
-            return userService.getAllUser(page, size, "*");
+        String role = currentUser.getRoles(); // Ambil role user saat ini
+
+        if ("1".equals(role)) {
+            // Admin: tampilkan semua user
+            return userService.getAllUser(page, size, "*", true);
+        } else {
+            // Bukan admin: tampilkan user selain admin, hanya dari sekolah yang sama
+            return userService.getAllUser(page, size, schoolID, false);
         }
-        return userService.getAllUser(page, size, schoolID);
     }
 
     @PostMapping("/users/add")
@@ -108,6 +114,43 @@ public class UserController {
 
             return ResponseEntity.created(location)
                     .body(new ApiResponse(true, "User Created Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
+    }
+
+    @PutMapping("/users/edit/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable String userId, @Valid @RequestBody UserRequest userRequest)
+            throws IOException {
+        try {
+            User user = userService.updateUser(userId, userRequest);
+
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{userId}")
+                    .buildAndExpand(user.getId()).toUri();
+
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "User Updated Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
+    }
+
+    @DeleteMapping("/users/delete/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userId) throws IOException {
+        try {
+            userService.deleteUserById(userId);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse(true, "User Deleted Successfully"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));

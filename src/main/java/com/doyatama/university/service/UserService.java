@@ -1,6 +1,7 @@
 package com.doyatama.university.service;
 
 import com.doyatama.university.exception.BadRequestException;
+import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.School;
 import com.doyatama.university.model.User;
 import com.doyatama.university.payload.PagedResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -35,18 +37,25 @@ public class UserService {
     // private static final Logger logger =
     // LoggerFactory.getLogger(UserService.class);
 
-    public PagedResponse<User> getAllUser(int page, int size, String schoolID) throws IOException {
+    public PagedResponse<User> getAllUser(int page, int size, String schoolID, boolean includeAdmin)
+            throws IOException {
         validatePageNumberAndSize(page, size);
 
-        // Retrieve Users
         List<User> userResponse;
 
         if (schoolID == null || schoolID.isEmpty() || schoolID.equals("*") || schoolID.equals("-")) {
-            // Menampilkan semua user tanpa filter sekolah
+            // Tanpa filter sekolah
             userResponse = userRepository.findAll(size);
         } else {
-            // Menampilkan user berdasarkan sekolah
+            // Filter berdasarkan sekolah
             userResponse = userRepository.findUserBySekolah(schoolID, size);
+        }
+
+        // Filter jika bukan admin: buang user dengan role "1"
+        if (!includeAdmin) {
+            userResponse = userResponse.stream()
+                    .filter(user -> !"1".equals(user.getRoles()))
+                    .collect(Collectors.toList());
         }
 
         return new PagedResponse<>(userResponse, userResponse.size(), "Successfully get data", 200);
@@ -106,18 +115,40 @@ public class UserService {
         user.setCreatedAt(Instant.now());
         user.setSchool(schoolResponse);
 
-        System.out.println("Data Masuk ke Service ==========");
-        System.out.println("Id User: " + user.getId());
-        System.out.println("Name User: " + user.getName());
-        System.out.println("Username User: " + user.getUsername());
-        System.out.println("Email User: " + user.getEmail());
-        System.out.println("Password User: " + user.getPassword());
-        System.out.println("Roles User: " + user.getRoles());
-        System.out.println("School Id User: " + user.getSchool().getIdSchool());
-        System.out.println("School Name User: " + user.getSchool().getNameSchool());
-        System.out.println("Created At User: " + user.getCreatedAt());
-
         return userRepository.save(user);
+    }
+
+    public User updateUser(String userId, UserRequest userRequest) throws IOException {
+        System.out.println("Masuk ke service" + userRequest.getIdUser());
+
+        User user = new User();
+
+        School schoolResponse = schoolRepository.findById(userRequest.getSchoolId());
+
+        if (userRequest.getIdUser() != null) {
+            user.setName(userRequest.getName());
+            user.setUsername(userRequest.getUsername());
+            user.setEmail(userRequest.getEmail());
+            if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+            }
+
+            user.setRoles(userRequest.getRoles());
+            user.setSchool(schoolResponse);
+
+            return userRepository.update(userId, user);
+        } else {
+            return null;
+        }
+    }
+
+    public void deleteUserById(String userId) throws IOException {
+        User userResponse = userRepository.findById(userId);
+        if (userResponse.isValid()) {
+            userRepository.deleteById(userId);
+        } else {
+            throw new ResourceNotFoundException("User", "id", userId);
+        }
     }
 
 }
