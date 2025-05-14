@@ -33,8 +33,9 @@ public class User {
 
     }
 
-    public User(String name, String username, String email, String password, School school, String roles,
+    public User(String id, String name, String username, String email, String password, School school, String roles,
             Instant createdAt) {
+        this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
@@ -106,6 +107,12 @@ public class User {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isValid() {
+        return id != null && name != null && username != null
+                && email != null && password != null && school != null
+                && roles != null;
     }
 
     public void set(String fieldName, String value) {

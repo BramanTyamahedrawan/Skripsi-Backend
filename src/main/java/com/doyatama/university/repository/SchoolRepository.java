@@ -3,11 +3,14 @@ package com.doyatama.university.repository;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
+import org.springframework.stereotype.Repository;
+
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.School;
 import java.io.IOException;
 import java.util.*;
 
+@Repository
 public class SchoolRepository {
     Configuration conf = HBaseConfiguration.create();
     String tableName = "schools";

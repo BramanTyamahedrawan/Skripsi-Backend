@@ -100,6 +100,8 @@ public class AuthController {
 
                 // Membuat user baru dengan objek School yang sudah diambil
                 User user = new User(
+                                null, // Using null to let the DB generate ID or use UUID.randomUUID().toString() for
+                                      // custom ID
                                 signUpRequest.getName(),
                                 signUpRequest.getUsername(),
                                 signUpRequest.getEmail(),

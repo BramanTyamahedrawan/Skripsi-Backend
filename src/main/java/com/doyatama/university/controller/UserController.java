@@ -8,18 +8,33 @@ import com.doyatama.university.repository.UserRepository;
 import com.doyatama.university.service.UserService;
 import com.doyatama.university.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URI;
+import javax.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
-    private UserService userService = new UserService();
+    @Autowired
+    public UserController(UserRepository userRepository, UserService userService) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+    }
 
     @GetMapping("/user/me")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
@@ -60,18 +75,46 @@ public class UserController {
         return userProfile;
     }
 
-    @GetMapping("/users")
-    public PagedResponse<User> getUsers(
-            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
-        return userService.getAllUser(page, size);
-    }
-
     @GetMapping("/users/not-used-account")
     public PagedResponse<User> getUserNotUses(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) throws IOException {
         return userService.getUserNotUsedAccount(page, size);
+    }
+
+    @GetMapping("/users")
+    public PagedResponse<User> getUsers(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+
+        String schoolID = currentUser.getSchoolId();
+        // Cek jika admin tidak memiliki schoolID (null, kosong, atau "-")
+        if (schoolID == null || schoolID.isEmpty() || schoolID.equals("-")) {
+            // Jika admin tidak memiliki sekolah, tampilkan semua user
+            return userService.getAllUser(page, size, "*");
+        }
+        return userService.getAllUser(page, size, schoolID);
+    }
+
+    @PostMapping("/users/add")
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserRequest userRequest) throws IOException {
+        try {
+            User user = userService.createUser(userRequest);
+
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{userId}")
+                    .buildAndExpand(user.getId()).toUri();
+
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "User Created Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
     }
 
 }

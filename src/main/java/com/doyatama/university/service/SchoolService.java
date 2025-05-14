@@ -25,9 +25,11 @@ public class SchoolService {
         // Retrieve Polls
         List<School> schoolResponse;
 
-        if (schoolID.equalsIgnoreCase("*")) {
+        if (schoolID == null || schoolID.isEmpty() || schoolID.equals("*") || schoolID.equals("-")) {
+            // Menampilkan semua user tanpa filter sekolah
             schoolResponse = schoolRepository.findAll(size);
         } else {
+            // Menampilkan user berdasarkan sekolah
             schoolResponse = schoolRepository.findSchoolBySekolah(schoolID, size);
         }
 

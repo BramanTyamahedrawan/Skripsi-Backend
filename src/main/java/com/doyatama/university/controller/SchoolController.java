@@ -30,6 +30,11 @@ public class SchoolController {
             @CurrentUser UserPrincipal currentUser) throws IOException {
 
         String schoolID = currentUser.getSchoolId();
+        // Cek jika admin tidak memiliki schoolID (null, kosong, atau "-")
+        if (schoolID == null || schoolID.isEmpty() || schoolID.equals("-")) {
+            // Jika admin tidak memiliki sekolah, tampilkan semua user
+            return schoolService.getAllSchool(page, size, "*");
+        }
 
         return schoolService.getAllSchool(page, size, schoolID);
     }

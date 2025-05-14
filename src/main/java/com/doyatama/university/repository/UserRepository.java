@@ -22,7 +22,7 @@ public class UserRepository {
     public List<User> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        TableName tableUsers = TableName.valueOf(tableName);
+        TableName tableUserFind = TableName.valueOf(tableName);
         Map<String, String> columnMapping = new HashMap<>();
 
         // Add the mappings to the HashMap
@@ -33,7 +33,7 @@ public class UserRepository {
         columnMapping.put("password", "password");
         columnMapping.put("school", "school");
         columnMapping.put("roles", "roles");
-        return client.showListTable(tableUsers.toString(), columnMapping, User.class, size);
+        return client.showListTable(tableUserFind.toString(), columnMapping, User.class, size);
     }
 
     public List<User> findUsersNotUsedInLectures(int size) throws IOException {
@@ -99,7 +99,8 @@ public class UserRepository {
     public User findById(String id) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        TableName tableUsers = TableName.valueOf(tableName);
+        TableName tableUsers = TableName
+                .valueOf(Objects.requireNonNull(tableName, "Table name must not be null or empty"));
         Map<String, String> columnMapping = new HashMap<>();
 
         // Add the mappings to the HashMap
@@ -112,6 +113,27 @@ public class UserRepository {
         columnMapping.put("roles", "roles");
 
         return client.showDataTable(tableUsers.toString(), columnMapping, id, User.class);
+    }
+
+    public List<User> findUserBySekolah(String schoolID, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableUsers = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        // Add the mappings to the HashMap
+        columnMapping.put("id", "id");
+        columnMapping.put("name", "name");
+        columnMapping.put("username", "username");
+        columnMapping.put("email", "email");
+        columnMapping.put("password", "password");
+        columnMapping.put("school", "school");
+        columnMapping.put("roles", "roles");
+
+        List<User> users = client.getDataListByColumn(tableUsers.toString(), columnMapping, "school", "idSchool",
+                schoolID, User.class, size);
+
+        return users;
     }
 
     public boolean existsByUsername(String username) throws IOException {
@@ -164,22 +186,43 @@ public class UserRepository {
     public User save(User user) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        String rowKey = UUID.randomUUID().toString();
-
+        String rowKey = user.getId();
+        System.out.println("Data Masuk ke Repository ==========");
+        System.out.println("Id User: " + user.getId());
+        System.out.println("Name User: " + user.getName());
+        System.out.println("Username User: " + user.getUsername());
+        System.out.println("Email User: " + user.getEmail());
+        System.out.println("Password User: " + user.getPassword());
+        System.out.println("Roles User: " + user.getRoles());
+        System.out.println("School Id User: " + user.getSchool().getIdSchool());
+        System.out.println("School Name User: " + user.getSchool().getNameSchool());
+        System.out.println("Created At User: " + user.getCreatedAt());
         TableName tableUsers = TableName.valueOf(tableName);
         client.insertRecord(tableUsers, rowKey, "main", "id", rowKey);
         client.insertRecord(tableUsers, rowKey, "main", "name", user.getName());
         client.insertRecord(tableUsers, rowKey, "main", "username", user.getUsername());
         client.insertRecord(tableUsers, rowKey, "main", "email", user.getEmail());
         client.insertRecord(tableUsers, rowKey, "main", "password", user.getPassword());
-        if (user.getSchool() != null && user.getSchool().getIdSchool() != null) {
+        client.insertRecord(tableUsers, rowKey, "main", "roles", user.getRoles());
+
+        // Sekolah
+        if (user.getSchool() != null) {
             client.insertRecord(tableUsers, rowKey, "school", "idSchool", user.getSchool().getIdSchool());
             client.insertRecord(tableUsers, rowKey, "school", "nameSchool", user.getSchool().getNameSchool());
-        } else {
-            System.out.println("School is null or has no ID");
         }
-        client.insertRecord(tableUsers, rowKey, "main", "roles", user.getRoles());
+
         client.insertRecord(tableUsers, rowKey, "main", "created_at", user.getCreatedAt().toString());
         return user;
+    }
+
+    public boolean existsById(String userId) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableUsers = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+        columnMapping.put("id", "id");
+
+        User user = client.getDataByColumn(tableUsers.toString(), columnMapping, "main", "id", userId, User.class);
+
+        return user.getId() != null;
     }
 }
