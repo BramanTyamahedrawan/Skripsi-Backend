@@ -202,7 +202,6 @@ public class SoalUjianRepository {
         indexedFields.put("opsi", "MAP");
         indexedFields.put("pasangan", "MAP");
         indexedFields.put("jawabanBenar", "LIST");
-        indexedFields.put("toleransiTypo", "INTEGER");
 
         List<SoalUjian> soalUjianList = client.getDataListByColumnIndeks(
                 tableSoalUjian.toString(),

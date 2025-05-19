@@ -18,9 +18,11 @@ import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.regex.Pattern;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
+import java.util.Set;
 
 public class SoalUjianService {
     private SoalUjianRepository soalUjianRepository = new SoalUjianRepository();
@@ -156,25 +158,43 @@ public class SoalUjianService {
             throw new IllegalArgumentException("Jawaban benar wajib diisi untuk COCOK");
         }
 
-        // Validate pair format
-        Pattern pasanganPattern = Pattern.compile("^\\d+_(kiri|kanan)$");
-        for (String key : request.getPasangan().keySet()) {
-            if (!pasanganPattern.matcher(key).matches()) {
-                throw new IllegalArgumentException("Format pasangan tidak valid: " + key);
+        // Kumpulkan semua nilai dari sisi kiri dan kanan
+        Set<String> nilaiKiri = new HashSet<>();
+        Set<String> nilaiKanan = new HashSet<>();
+
+        for (Map.Entry<String, String> entry : request.getPasangan().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (key.contains("_kiri")) {
+                nilaiKiri.add(value);
+            } else if (key.contains("_kanan")) {
+                nilaiKanan.add(value);
             }
         }
 
-        // Validate answer format
-        Pattern jawabanPattern = Pattern.compile("^\\d+_kiri=\\d+_kanan$");
+        if (nilaiKiri.isEmpty() || nilaiKanan.isEmpty()) {
+            throw new IllegalArgumentException("Pasangan harus memiliki nilai untuk sisi kiri dan kanan");
+        }
+
+        // Validasi format jawaban - format baru "a=f", "b=d", dll
         for (String jawaban : request.getJawabanBenar()) {
-            if (!jawabanPattern.matcher(jawaban).matches()) {
+            if (!jawaban.contains("=")) {
                 throw new IllegalArgumentException("Format jawaban tidak valid: " + jawaban);
             }
 
             String[] parts = jawaban.split("=");
-            if (!request.getPasangan().containsKey(parts[0]) ||
-                    !request.getPasangan().containsKey(parts[1])) {
-                throw new IllegalArgumentException("Jawaban merujuk ke pasangan yang tidak ada: " + jawaban);
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("Format jawaban tidak valid: " + jawaban);
+            }
+
+            // Validasi ketat: nilai harus persis ada di kumpulan nilai kiri dan kanan
+            if (!nilaiKiri.contains(parts[0])) {
+                throw new IllegalArgumentException("Nilai kiri '" + parts[0] + "' tidak ada dalam pasangan");
+            }
+
+            if (!nilaiKanan.contains(parts[1])) {
+                throw new IllegalArgumentException("Nilai kanan '" + parts[1] + "' tidak ada dalam pasangan");
             }
         }
     }
