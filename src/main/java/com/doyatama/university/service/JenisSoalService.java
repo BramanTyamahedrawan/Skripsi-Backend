@@ -57,10 +57,7 @@ public class JenisSoalService {
 
         JenisSoal jenisSoal = new JenisSoal();
         jenisSoal.setIdJenisSoal(jenisSoalRequest.getIdJenisSoal());
-        jenisSoal.setPilihanGanda(jenisSoalRequest.getPilihanGanda());
-        jenisSoal.setIsian(jenisSoalRequest.getIsian());
-        jenisSoal.setMencocokkan(jenisSoalRequest.getMencocokkan());
-        jenisSoal.setPilihanBanyakJawaban(jenisSoalRequest.getPilihanBanyakJawaban());
+        jenisSoal.setNamaJenisSoal(jenisSoalRequest.getNamaJenisSoal());
         jenisSoal.setSchool(schoolResponse);
         return jenisSoalRepository.save(jenisSoal);
     }
@@ -78,10 +75,7 @@ public class JenisSoalService {
         School schoolResponse = schoolRepository.findById(jenisSoalRequest.getIdSekolah());
 
         if (schoolResponse.getIdSchool() != null) {
-            jenisSoal.setPilihanGanda(jenisSoalRequest.getPilihanGanda());
-            jenisSoal.setIsian(jenisSoalRequest.getIsian());
-            jenisSoal.setMencocokkan(jenisSoalRequest.getMencocokkan());
-            jenisSoal.setPilihanBanyakJawaban(jenisSoalRequest.getPilihanBanyakJawaban());
+            jenisSoal.setNamaJenisSoal(jenisSoalRequest.getNamaJenisSoal());
             jenisSoal.setSchool(schoolResponse);
             return jenisSoalRepository.update(jenisSoalId, jenisSoal);
         } else {

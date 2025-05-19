@@ -24,10 +24,7 @@ public class JenisSoalRepository {
 
         // Add the mappings to the HashMap
         columnMapping.put("idJenisSoal", "idJenisSoal");
-        columnMapping.put("pilihanGanda", "pilihanGanda");
-        columnMapping.put("isian", "isian");
-        columnMapping.put("pilihanBanyakJawaban", "pilihanBanyakJawaban");
-        columnMapping.put("mencocokkan", "mencocokkan");
+        columnMapping.put("namaJenisSoal", "namaJenisSoal");
         columnMapping.put("school", "school");
         return client.showListTable(tableJenisSoal.toString(), columnMapping, JenisSoal.class, size);
     }
@@ -38,12 +35,7 @@ public class JenisSoalRepository {
         String rowKey = jenisSoal.getIdJenisSoal();
         TableName tableJenisSoal = TableName.valueOf(tableName);
         client.insertRecord(tableJenisSoal, rowKey, "main", "idJenisSoal", rowKey);
-        client.insertRecord(tableJenisSoal, rowKey, "main", "pilihanGanda", jenisSoal.getPilihanGanda());
-        client.insertRecord(tableJenisSoal, rowKey, "main", "isian", jenisSoal.getIsian());
-        client.insertRecord(tableJenisSoal, rowKey, "main", "pilihanBanyakJawaban",
-                jenisSoal.getPilihanBanyakJawaban());
-        client.insertRecord(tableJenisSoal, rowKey, "main", "mencocokkan", jenisSoal.getMencocokkan());
-
+        client.insertRecord(tableJenisSoal, rowKey, "main", "namaJenisSoal", jenisSoal.getNamaJenisSoal());
         // School
         client.insertRecord(tableJenisSoal, rowKey, "school", "idSchool", jenisSoal.getSchool().getIdSchool());
         client.insertRecord(tableJenisSoal, rowKey, "school", "nameSchool", jenisSoal.getSchool().getNameSchool());
@@ -60,10 +52,7 @@ public class JenisSoalRepository {
 
         // Add the mappings to the HashMap
         columnMapping.put("idJenisSoal", "idJenisSoal");
-        columnMapping.put("pilihanGanda", "pilihanGanda");
-        columnMapping.put("isian", "isian");
-        columnMapping.put("pilihanBanyakJawaban", "pilihanBanyakJawaban");
-        columnMapping.put("mencocokkan", "mencocokkan");
+        columnMapping.put("namaJenisSoal", "namaJenisSoal");
         columnMapping.put("school", "school");
 
         return client.showDataTable(tableJenisSoal.toString(), columnMapping, jenisSoalId, JenisSoal.class);
@@ -77,10 +66,7 @@ public class JenisSoalRepository {
 
         // Add the mappings to the HashMap
         columnMapping.put("idJenisSoal", "idJenisSoal");
-        columnMapping.put("pilihanGanda", "pilihanGanda");
-        columnMapping.put("isian", "isian");
-        columnMapping.put("pilihanBanyakJawaban", "pilihanBanyakJawaban");
-        columnMapping.put("mencocokkan", "mencocokkan");
+        columnMapping.put("namaJenisSoal", "namaJenisSoal");
         columnMapping.put("school", "school");
 
         List<JenisSoal> jenisSoalList = new ArrayList<>();
@@ -102,10 +88,7 @@ public class JenisSoalRepository {
 
         // Add the mappings to the HashMap
         columnMapping.put("idJenisSoal", "idJenisSoal");
-        columnMapping.put("pilihanGanda", "pilihanGanda");
-        columnMapping.put("isian", "isian");
-        columnMapping.put("pilihanBanyakJawaban", "pilihanBanyakJawaban");
-        columnMapping.put("mencocokkan", "mencocokkan");
+        columnMapping.put("namaJenisSoal", "namaJenisSoal");
         columnMapping.put("school", "school");
 
         List<JenisSoal> jenisSoalList = client.getDataListByColumn(tableJenisSoal.toString(), columnMapping, "school",
@@ -118,21 +101,8 @@ public class JenisSoalRepository {
 
         TableName tableJenisSoal = TableName.valueOf(tableName);
 
-        if (jenisSoal.getPilihanGanda() != null) {
-            client.insertRecord(tableJenisSoal, jenisSoalId, "main", "pilihanGanda", jenisSoal.getPilihanGanda());
-        }
-
-        if (jenisSoal.getIsian() != null) {
-            client.insertRecord(tableJenisSoal, jenisSoalId, "main", "isian", jenisSoal.getIsian());
-        }
-
-        if (jenisSoal.getPilihanBanyakJawaban() != null) {
-            client.insertRecord(tableJenisSoal, jenisSoalId, "main", "pilihanBanyakJawaban",
-                    jenisSoal.getPilihanBanyakJawaban());
-        }
-
-        if (jenisSoal.getMencocokkan() != null) {
-            client.insertRecord(tableJenisSoal, jenisSoalId, "main", "mencocokkan", jenisSoal.getMencocokkan());
+        if (jenisSoal.getNamaJenisSoal() != null) {
+            client.insertRecord(tableJenisSoal, jenisSoalId, "main", "namaJenisSoal", jenisSoal.getNamaJenisSoal());
         }
 
         // School

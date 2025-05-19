@@ -1,6 +1,5 @@
 package com.doyatama.university.controller;
 
-import com.doyatama.university.model.Elemen;
 import com.doyatama.university.model.User;
 import com.doyatama.university.payload.*;
 import com.doyatama.university.security.CurrentUser;
