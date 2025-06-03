@@ -56,8 +56,15 @@ public class ElemenRepository {
         client.insertRecord(tableElemen, rowKey, "kelas", "idKelas", elemen.getKelas().getIdKelas());
         client.insertRecord(tableElemen, rowKey, "kelas", "namaKelas", elemen.getKelas().getNamaKelas());
         // Mapel
-        client.insertRecord(tableElemen, rowKey, "mapel", "idMapel", elemen.getMapel().getIdMapel());
-        client.insertRecord(tableElemen, rowKey, "mapel", "name", elemen.getMapel().getName());
+        if (elemen.getMapel() != null) {
+            client.insertRecord(tableElemen, rowKey, "mapel", "idMapel", elemen.getMapel().getIdMapel());
+            client.insertRecord(tableElemen, rowKey, "mapel", "name", elemen.getMapel().getName());
+            if (elemen.getMapel().getKelas() != null) {
+                client.insertRecord(tableElemen, rowKey, "mapel", "idKelas", elemen.getMapel().getKelas().getIdKelas());
+                client.insertRecord(tableElemen, rowKey, "mapel", "namaKelas",
+                        elemen.getMapel().getKelas().getNamaKelas());
+            }
+        }
         // Konsentrasi Keahlian
         client.insertRecord(tableElemen, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
                 elemen.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());

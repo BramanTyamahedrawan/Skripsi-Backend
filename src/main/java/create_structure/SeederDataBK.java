@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class SeederData {
+public class SeederDataBK {
     public static void main(String[] args) throws IOException {
 
         Configuration conf = HBaseConfiguration.create();

@@ -442,6 +442,30 @@ public class HBaseClientStructure {
                 client.insertRecord(tableUser, "USR003", "main", "created_at", "2023-05-14T04:56:23.174Z");
                 client.insertRecord(tableUser, "USR003", "detail", "created_by", "Doyatama");
 
+                client.insertRecord(tableUser, "USR004", "main", "id", "USR004");
+                client.insertRecord(tableUser, "USR004", "main", "email", "guru@gmail.com");
+                client.insertRecord(tableUser, "USR004", "main", "name", "Guru SMK Rowokangkung");
+                client.insertRecord(tableUser, "USR004", "main", "username", "gurusmk1");
+                client.insertRecord(tableUser, "USR004", "main", "password",
+                                "$2a$10$SDRWMUk.2fnli0GTmqodJexjRksTw0En98dU8fdKsw7nTbZzMrj.2"); // password
+                client.insertRecord(tableUser, "USR004", "school", "idSchool", "RWK001");
+                client.insertRecord(tableUser, "USR004", "school", "nameSchool", "SMK Negeri 01 ROWOKANGKUNG");
+                client.insertRecord(tableUser, "USR004", "main", "roles", "3");
+                client.insertRecord(tableUser, "USR004", "main", "created_at", Instant.now().toString());
+                client.insertRecord(tableUser, "USR004", "detail", "created_by", "Doyatama");
+
+                client.insertRecord(tableUser, "USR005", "main", "id", "USR005");
+                client.insertRecord(tableUser, "USR005", "main", "email", "murid@gmail.com");
+                client.insertRecord(tableUser, "USR005", "main", "name", "Murid SMK Rowokangkung");
+                client.insertRecord(tableUser, "USR005", "main", "username", "muridsmk1");
+                client.insertRecord(tableUser, "USR005", "main", "password",
+                                "$2a$10$SDRWMUk.2fnli0GTmqodJexjRksTw0En98dU8fdKsw7nTbZzMrj.2"); // password
+                client.insertRecord(tableUser, "USR005", "school", "idSchool", "RWK001");
+                client.insertRecord(tableUser, "USR005", "school", "nameSchool", "SMK Negeri 01 ROWOKANGKUNG");
+                client.insertRecord(tableUser, "USR005", "main", "roles", "5");
+                client.insertRecord(tableUser, "USR005", "main", "created_at", Instant.now().toString());
+                client.insertRecord(tableUser, "USR005", "detail", "created_by", "Doyatama");
+
                 // // Insert Religions
                 // client.insertRecord(tableReligion, "RLG001", "main", "id", "RLG001");
                 // client.insertRecord(tableReligion, "RLG001", "main", "name", "Islam");

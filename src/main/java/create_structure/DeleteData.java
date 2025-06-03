@@ -13,7 +13,16 @@ public class DeleteData {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         // Hanya menghapus data kelahiran
-        TableName tableSoalUjian = TableName.valueOf("soalUjian");
-        client.truncateTable(tableSoalUjian, conf);
+        TableName tableMapels = TableName.valueOf("mapels");
+        client.truncateTable(tableMapels, conf);
+
+        TableName tableElemen = TableName.valueOf("elemen");
+        client.truncateTable(tableElemen, conf);
+
+        TableName tableAcp = TableName.valueOf("acp");
+        client.truncateTable(tableAcp, conf);
+
+        TableName tableAtp = TableName.valueOf("atp");
+        client.truncateTable(tableAtp, conf);
     }
 }

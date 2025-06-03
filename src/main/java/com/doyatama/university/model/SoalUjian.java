@@ -22,13 +22,21 @@ public class SoalUjian {
     private Atp atp; // atp yang diujikan
     private School school; // sekolah
 
+    private TahunAjaran tahunAjaran;
+    private Semester semester;
+    private Mapel mapel;
+    private Kelas kelas;
+    private Elemen elemen;
+    private Acp acp;
+
     public SoalUjian() {
     }
 
     public SoalUjian(String idSoalUjian, String namaUjian, String pertanyaan, String bobot, String jenisSoal,
             Map<String, String> opsi,
             Map<String, String> pasangan, List<String> jawabanBenar, String toleransiTypo, User user, School school,
-            Instant createdAt) {
+            Instant createdAt, Taksonomi taksonomi, Atp atp, TahunAjaran tahunAjaran, Semester semester, Mapel mapel,
+            Kelas kelas, Elemen elemen, Acp acp) {
         this.idSoalUjian = idSoalUjian;
         this.namaUjian = namaUjian;
         this.pertanyaan = pertanyaan;
@@ -41,6 +49,14 @@ public class SoalUjian {
         this.user = user;
         this.school = school;
         this.createdAt = createdAt;
+        this.taksonomi = taksonomi;
+        this.atp = atp;
+        this.tahunAjaran = tahunAjaran;
+        this.semester = semester;
+        this.mapel = mapel;
+        this.kelas = kelas;
+        this.elemen = elemen;
+        this.acp = acp;
     }
 
     public String getIdSoalUjian() {
@@ -153,6 +169,54 @@ public class SoalUjian {
 
     public void setAtp(Atp atp) {
         this.atp = atp;
+    }
+
+    public TahunAjaran getTahunAjaran() {
+        return tahunAjaran;
+    }
+
+    public void setTahunAjaran(TahunAjaran tahunAjaran) {
+        this.tahunAjaran = tahunAjaran;
+    }
+
+    public Semester getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Semester semester) {
+        this.semester = semester;
+    }
+
+    public Mapel getMapel() {
+        return mapel;
+    }
+
+    public void setMapel(Mapel mapel) {
+        this.mapel = mapel;
+    }
+
+    public Kelas getKelas() {
+        return kelas;
+    }
+
+    public void setKelas(Kelas kelas) {
+        this.kelas = kelas;
+    }
+
+    public Elemen getElemen() {
+        return elemen;
+    }
+
+    public void setElemen(Elemen elemen) {
+        this.elemen = elemen;
+    }
+
+    public Acp getAcp() {
+        return acp;
+    }
+
+    public void setAcp(Acp acp) {
+        this.acp = acp;
     }
 
     public School getSchool() {
