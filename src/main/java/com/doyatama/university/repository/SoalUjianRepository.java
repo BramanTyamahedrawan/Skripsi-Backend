@@ -35,7 +35,7 @@ public class SoalUjianRepository {
         columnMapping.put("createdAt", "createdAt");
         columnMapping.put("user", "user");
         columnMapping.put("taksonomi", "taksonomi");
-        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("school", "school");
 
         // Definisikan field yang menggunakan indeks
@@ -99,9 +99,12 @@ public class SoalUjianRepository {
             client.insertRecord(table, rowKey, "taksonomi", "namaTaksonomi", soal.getTaksonomi().getNamaTaksonomi());
         }
 
-        if (soal.getAtp() != null) {
-            client.insertRecord(table, rowKey, "atp", "idAtp", soal.getAtp().getIdAtp());
-            client.insertRecord(table, rowKey, "atp", "namaAtp", soal.getAtp().getNamaAtp());
+        if (soal.getKonsentrasiKeahlianSekolah() != null) {
+            client.insertRecord(table, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                    soal.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+            client.insertRecord(table, rowKey, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                    soal.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
+
         }
 
         if (soal.getSchool() != null) {
@@ -170,7 +173,7 @@ public class SoalUjianRepository {
         columnMapping.put("createdAt", "createdAt");
         columnMapping.put("user", "user");
         columnMapping.put("taksonomi", "taksonomi");
-        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("school", "school");
 
         return client.showDataTable(tableSoalUjian.toString(), columnMapping, soalUjianId, SoalUjian.class);
@@ -194,7 +197,7 @@ public class SoalUjianRepository {
         columnMapping.put("createdAt", "createdAt");
         columnMapping.put("user", "user");
         columnMapping.put("taksonomi", "taksonomi");
-        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
         columnMapping.put("school", "school");
 
         // Define indexed fields with their types
@@ -287,13 +290,11 @@ public class SoalUjianRepository {
             client.insertRecord(table, rowKey, "taksonomi", "namaTaksonomi", soal.getTaksonomi().getNamaTaksonomi());
         }
 
-        if (soal.getAtp() != null) {
-            client.insertRecord(table, rowKey, "atp", "idAtp", soal.getAtp().getIdAtp());
-            client.insertRecord(table, rowKey, "atp", "namaAtp", soal.getAtp().getNamaAtp());
-            if (soal.getAtp().getElemen() != null) {
-                client.insertRecord(table, rowKey, "atp", "idElemen", soal.getAtp().getElemen().getIdElemen());
-                client.insertRecord(table, rowKey, "atp", "namaElemen", soal.getAtp().getElemen().getNamaElemen());
-            }
+        if (soal.getKonsentrasiKeahlianSekolah() != null) {
+            client.insertRecord(table, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                    soal.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+            client.insertRecord(table, rowKey, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                    soal.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
         }
 
         if (soal.getSchool() != null) {

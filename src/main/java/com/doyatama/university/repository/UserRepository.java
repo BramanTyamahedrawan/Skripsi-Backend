@@ -99,8 +99,7 @@ public class UserRepository {
     public User findById(String id) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        TableName tableUsers = TableName
-                .valueOf(Objects.requireNonNull(tableName, "Table name must not be null or empty"));
+        TableName tableUsers = TableName.valueOf(tableName);
         Map<String, String> columnMapping = new HashMap<>();
 
         // Add the mappings to the HashMap

@@ -153,7 +153,7 @@ public class HBaseClientStructure {
 
                 // Create Table Soal Ujian
                 TableName tableSoalUjian = TableName.valueOf("soalUjian");
-                String[] soalUjian = { "main", "school", "atp", "taksonomi", "user", "detail" };
+                String[] soalUjian = { "main", "school", "konsentrasiKeahlianSekolah", "taksonomi", "user", "detail" };
                 client.deleteTable(tableSoalUjian);
                 client.createTable(tableSoalUjian, soalUjian);
 

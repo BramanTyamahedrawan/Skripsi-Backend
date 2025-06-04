@@ -5,7 +5,7 @@ import com.doyatama.university.exception.ResourceNotFoundException;
 import com.doyatama.university.model.SoalUjian;
 import com.doyatama.university.model.Taksonomi;
 import com.doyatama.university.model.User;
-import com.doyatama.university.model.Atp;
+import com.doyatama.university.model.KonsentrasiKeahlianSekolah;
 import com.doyatama.university.model.School;
 import com.doyatama.university.payload.SoalUjianRequest;
 import com.doyatama.university.payload.DefaultResponse;
@@ -13,7 +13,7 @@ import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.SoalUjianRepository;
 import com.doyatama.university.repository.TaksonomiRepository;
 import com.doyatama.university.repository.UserRepository;
-import com.doyatama.university.repository.AtpRepository;
+import com.doyatama.university.repository.KonsentrasiKeahlianSekolahRepository;
 import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
@@ -27,11 +27,11 @@ import java.util.Set;
 public class SoalUjianService {
     private SoalUjianRepository soalUjianRepository = new SoalUjianRepository();
     private UserRepository userRepository = new UserRepository();
-    private AtpRepository atpRepository = new AtpRepository();
     private TaksonomiRepository taksonomiRepository = new TaksonomiRepository();
     private SchoolRepository schoolRepository = new SchoolRepository();
+    private KonsentrasiKeahlianSekolahRepository konsentrasiKeahlianSekolahRepository = new KonsentrasiKeahlianSekolahRepository();
 
-    public PagedResponse<SoalUjian> getAllSoalUjian(int page, int size, String userID, String atpID, String schoolID)
+    public PagedResponse<SoalUjian> getAllSoalUjian(int page, int size, String userID, String schoolID)
             throws IOException {
         validatePageNumberAndSize(page, size);
 
@@ -69,7 +69,8 @@ public class SoalUjianService {
         // Get related entities
         User userResponse = userRepository.findById(soalUjianRequest.getIdUser());
         Taksonomi taksonomiResponse = taksonomiRepository.findById(soalUjianRequest.getIdTaksonomi());
-        Atp atpResponse = atpRepository.findById(soalUjianRequest.getIdAtp());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
+                .findById(soalUjianRequest.getIdKonsentrasiSekolah());
         School schoolResponse = schoolRepository.findById(soalUjianRequest.getIdSchool());
 
         // Validate question type
@@ -87,7 +88,7 @@ public class SoalUjianService {
         soal.setCreatedAt(soalUjianRequest.getCreatedAt() != null ? soalUjianRequest.getCreatedAt() : Instant.now());
         soal.setUser(userResponse);
         soal.setTaksonomi(taksonomiResponse);
-        soal.setAtp(atpResponse);
+        soal.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
         soal.setSchool(schoolResponse);
 
         // Handle different question types
@@ -225,7 +226,8 @@ public class SoalUjianService {
         // Get related entities
         User userResponse = userRepository.findById(soalUjianRequest.getIdUser());
         Taksonomi taksonomiResponse = taksonomiRepository.findById(soalUjianRequest.getIdTaksonomi());
-        Atp atpResponse = atpRepository.findById(soalUjianRequest.getIdAtp());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
+                .findById(soalUjianRequest.getIdKonsentrasiSekolah());
         School schoolResponse = schoolRepository.findById(soalUjianRequest.getIdSchool());
 
         // Validate question type
@@ -243,7 +245,7 @@ public class SoalUjianService {
         updatedSoal.setCreatedAt(existingSoal.getCreatedAt()); // Keep original creation date
         updatedSoal.setUser(userResponse);
         updatedSoal.setTaksonomi(taksonomiResponse);
-        updatedSoal.setAtp(atpResponse);
+        updatedSoal.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
         updatedSoal.setSchool(schoolResponse);
 
         // Handle different question types

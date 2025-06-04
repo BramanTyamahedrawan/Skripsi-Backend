@@ -35,12 +35,11 @@ public class SoalUjianController {
     public PagedResponse<SoalUjian> getSoalUjian(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-            @RequestParam(value = "atpID", defaultValue = "*") String atpID,
             @RequestParam(value = "userID", defaultValue = "*") String userID,
             @CurrentUser UserPrincipal currentUser) throws IOException {
 
         String schoolID = currentUser.getSchoolId();
-        return soalUjianService.getAllSoalUjian(page, size, atpID, userID, schoolID);
+        return soalUjianService.getAllSoalUjian(page, size, userID, schoolID);
     }
 
     @PostMapping

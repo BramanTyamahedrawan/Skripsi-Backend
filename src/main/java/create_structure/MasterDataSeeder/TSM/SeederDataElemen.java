@@ -42,7 +42,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "mapel", "idMapel", "MAP029");
-                client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "mapel", "namaMapel", "Bahasa Indonesia");
+                client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "mapel", "name", "Bahasa Indonesia");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL001", "kelas", "idKelas", "KLS002");
@@ -64,7 +64,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "mapel", "idMapel", "MAP029");
-                client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "mapel", "namaMapel", "Bahasa Indonesia");
+                client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "mapel", "name", "Bahasa Indonesia");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL002", "kelas", "idKelas", "KLS002");
@@ -87,7 +87,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "mapel", "idMapel", "MAP029");
-                client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "mapel", "namaMapel", "Bahasa Indonesia");
+                client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "mapel", "name", "Bahasa Indonesia");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL003", "kelas", "idKelas", "KLS002");
@@ -109,7 +109,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "mapel", "idMapel", "MAP029");
-                client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "mapel", "namaMapel", "Bahasa Indonesia");
+                client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "mapel", "name", "Bahasa Indonesia");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMBIKLSFGL004", "kelas", "idKelas", "KLS002");
@@ -141,7 +141,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "mapel", "idMapel", "MAP004");
-                client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "mapel", "namaMapel", "Informatika");
+                client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "mapel", "name", "Informatika");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL001", "kelas", "idKelas", "KLS001");
@@ -163,7 +163,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "mapel", "idMapel", "MAP004");
-                client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "mapel", "namaMapel", "Informatika");
+                client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "mapel", "name", "Informatika");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL002", "kelas", "idKelas", "KLS001");
@@ -184,7 +184,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "mapel", "idMapel", "MAP004");
-                client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "mapel", "namaMapel", "Informatika");
+                client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "mapel", "name", "Informatika");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL003", "kelas", "idKelas", "KLS001");
@@ -206,7 +206,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "mapel", "idMapel", "MAP004");
-                client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "mapel", "namaMapel", "Informatika");
+                client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "mapel", "name", "Informatika");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMINKLSEGL004", "kelas", "idKelas", "KLS001");
@@ -234,7 +234,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "mapel", "idMapel", "MAP005");
-                client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "mapel", "namaMapel", "Matematika");
+                client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "mapel", "name", "Matematika");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL005", "kelas", "idKelas", "KLS001");
@@ -255,7 +255,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "mapel", "idMapel", "MAP005");
-                client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "mapel", "namaMapel", "Matematika");
+                client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "mapel", "name", "Matematika");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL006", "kelas", "idKelas", "KLS001");
@@ -276,7 +276,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "mapel", "idMapel", "MAP005");
-                client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "mapel", "namaMapel", "Matematika");
+                client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "mapel", "name", "Matematika");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL007", "kelas", "idKelas", "KLS001");
@@ -298,7 +298,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "mapel", "idMapel", "MAP005");
-                client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "mapel", "namaMapel", "Matematika");
+                client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "mapel", "name", "Matematika");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "tahunAjaran", "tahunAjaran", "2025/2026");
                 client.insertRecord(tableElemen, "ELETSMMMKLSEGL008", "kelas", "idKelas", "KLS001");
@@ -326,7 +326,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL009", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL009", "mapel", "idMapel", "MAP011");
-                client.insertRecord(tableElemen, "ELETSMIPKLSEGL009", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMIPKLSEGL009", "mapel", "name",
                                 "Projek Ilmu Pengetahuan Alam dan Sosial");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL009", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL009", "tahunAjaran", "tahunAjaran", "2025/2026");
@@ -349,7 +349,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL010", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL010", "mapel", "idMapel", "MAP011");
-                client.insertRecord(tableElemen, "ELETSMIPKLSEGL010", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMIPKLSEGL010", "mapel", "name",
                                 "Projek Ilmu Pengetahuan Alam dan Sosial");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL010", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL010", "tahunAjaran", "tahunAjaran", "2025/2026");
@@ -372,7 +372,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL011", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL011", "mapel", "idMapel", "MAP011");
-                client.insertRecord(tableElemen, "ELETSMIPKLSEGL011", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMIPKLSEGL011", "mapel", "name",
                                 "Projek Ilmu Pengetahuan Alam dan Sosial");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL011", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMIPKLSEGL011", "tahunAjaran", "tahunAjaran", "2025/2026");
@@ -400,7 +400,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL012", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL012", "mapel", "idMapel", "MAP009");
-                client.insertRecord(tableElemen, "ELETSMPPKLSEGL012", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMPPKLSEGL012", "mapel", "name",
                                 "Pendidikan Pancasila");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL012", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL012", "tahunAjaran", "tahunAjaran", "2025/2026");
@@ -423,7 +423,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL013", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL013", "mapel", "idMapel", "MAP009");
-                client.insertRecord(tableElemen, "ELETSMPPKLSEGL013", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMPPKLSEGL013", "mapel", "name",
                                 "Pendidikan Pancasila");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL013", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL013", "tahunAjaran", "tahunAjaran", "2025/2026");
@@ -446,7 +446,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL014", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL014", "mapel", "idMapel", "MAP009");
-                client.insertRecord(tableElemen, "ELETSMPPKLSEGL014", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMPPKLSEGL014", "mapel", "name",
                                 "Pendidikan Pancasila");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL014", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL014", "tahunAjaran", "tahunAjaran", "2025/2026");
@@ -469,7 +469,7 @@ public class SeederDataElemen {
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL015", "school", "nameSchool",
                                 "SMK Negeri 01 ROWOKANGKUNG");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL015", "mapel", "idMapel", "MAP009");
-                client.insertRecord(tableElemen, "ELETSMPPKLSEGL015", "mapel", "namaMapel",
+                client.insertRecord(tableElemen, "ELETSMPPKLSEGL015", "mapel", "name",
                                 "Pendidikan Pancasila");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL015", "tahunAjaran", "idTahun", "TA001");
                 client.insertRecord(tableElemen, "ELETSMPPKLSEGL015", "tahunAjaran", "tahunAjaran", "2025/2026");

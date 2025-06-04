@@ -18,14 +18,8 @@ public class SoalUjianRequest {
 
     private String idUser;
     private String idTaksonomi; // taksonomi kesulitan
-    private String idAtp; // atp yang diujikan
-    private String idTahun; // tahun ajaran
-    private String idSemester; // semester
-    private String idMapel; // mapel
-    private String idKelas; // kelas
-    private String idElemen; // elemen
-    private String idAcp; // acp
     private String idSchool; // sekolah
+    private String idKonsentrasiSekolah;
 
     public SoalUjianRequest() {
     }
@@ -33,8 +27,8 @@ public class SoalUjianRequest {
     public SoalUjianRequest(String idSoalUjian, String namaUjian, String pertanyaan, String bobot, String jenisSoal,
             Map<String, String> opsi,
             Map<String, String> pasangan, List<String> jawabanBenar, String toleransiTypo, String idUser,
-            String idTaksonomi, String idAtp, String idTahun, String idSemester, String idMapel, String idKelas,
-            String idElemen, String idAcp, String idSchool) {
+            String idKonsentrasiSekolah,
+            String idTaksonomi, String idSchool) {
         this.idSoalUjian = idSoalUjian;
         this.namaUjian = namaUjian;
         this.pertanyaan = pertanyaan;
@@ -46,14 +40,8 @@ public class SoalUjianRequest {
         this.toleransiTypo = toleransiTypo;
         this.idUser = idUser;
         this.idTaksonomi = idTaksonomi;
-        this.idAtp = idAtp;
-        this.idTahun = idTahun;
-        this.idSemester = idSemester;
-        this.idMapel = idMapel;
-        this.idKelas = idKelas;
-        this.idElemen = idElemen;
-        this.idAcp = idAcp;
         this.idSchool = idSchool;
+        this.idKonsentrasiSekolah = idKonsentrasiSekolah;
     }
 
     public String getIdSoalUjian() {
@@ -152,68 +140,20 @@ public class SoalUjianRequest {
         this.idTaksonomi = idTaksonomi;
     }
 
-    public String getIdAtp() {
-        return idAtp;
-    }
-
-    public void setIdAtp(String idAtp) {
-        this.idAtp = idAtp;
-    }
-
-    public String getIdTahun() {
-        return idTahun;
-    }
-
-    public void setIdTahun(String idTahun) {
-        this.idTahun = idTahun;
-    }
-
-    public String getIdSemester() {
-        return idSemester;
-    }
-
-    public void setIdSemester(String idSemester) {
-        this.idSemester = idSemester;
-    }
-
-    public String getIdMapel() {
-        return idMapel;
-    }
-
-    public void setIdMapel(String idMapel) {
-        this.idMapel = idMapel;
-    }
-
-    public String getIdKelas() {
-        return idKelas;
-    }
-
-    public void setIdKelas(String idKelas) {
-        this.idKelas = idKelas;
-    }
-
-    public String getIdElemen() {
-        return idElemen;
-    }
-
-    public void setIdElemen(String idElemen) {
-        this.idElemen = idElemen;
-    }
-
-    public String getIdAcp() {
-        return idAcp;
-    }
-
-    public void setIdAcp(String idAcp) {
-        this.idAcp = idAcp;
-    }
-
     public String getIdSchool() {
         return idSchool;
     }
 
     public void setIdSchool(String idSchool) {
         this.idSchool = idSchool;
+    }
+
+    public String getIdKonsentrasiSekolah() {
+        return idKonsentrasiSekolah;
+    }
+
+    public void setIdKonsentrasiSekolah(String idKonsentrasiSekolah) {
+        this.idKonsentrasiSekolah = idKonsentrasiSekolah;
     }
 
 }
