@@ -157,6 +157,14 @@ public class HBaseClientStructure {
                 client.deleteTable(tableSoalUjian);
                 client.createTable(tableSoalUjian, soalUjian);
 
+                // Create Table Bank Soal
+                TableName tableSoalBank = TableName.valueOf("bankSoal");
+                String[] soalBank = { "main", "school", "soalUjian", "taksonomi", "tahunAjaran", "mapel", "kelas",
+                                "semester", "elemen", "acp",
+                                "konsentrasiKeahlianSekolah", "atp", "detail" };
+                client.deleteTable(tableSoalBank);
+                client.createTable(tableSoalBank, soalBank);
+
                 // // Create Table Jawaban Siswa
                 // TableName tableJawaban = TableName.valueOf("jawabanSiswa");
                 // String[] jawaban = { "main", "school", "soal", "detail", "timing" };

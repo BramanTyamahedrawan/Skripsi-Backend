@@ -15,16 +15,19 @@ public class DeleteData {
         // TableName tableMapels = TableName.valueOf("mapels");
         // client.truncateTable(tableMapels, conf);
 
-        TableName tableElemen = TableName.valueOf("elemen");
-        client.truncateTable(tableElemen, conf);
-
-        TableName tableAcp = TableName.valueOf("acp");
-        client.truncateTable(tableAcp, conf);
-
-        TableName tableAtp = TableName.valueOf("atp");
-        client.truncateTable(tableAtp, conf);
+//        TableName tableElemen = TableName.valueOf("elemen");
+//        client.truncateTable(tableElemen, conf);
+//
+//        TableName tableAcp = TableName.valueOf("acp");
+//        client.truncateTable(tableAcp, conf);
+//
+//        TableName tableAtp = TableName.valueOf("atp");
+//        client.truncateTable(tableAtp, conf);
 
         // TableName tableSoalUjian = TableName.valueOf("soalUjian");
         // client.truncateTable(tableSoalUjian, conf);
+
+         TableName tableBankSoal = TableName.valueOf("bankSoal");
+         client.truncateTable(tableBankSoal, conf);
     }
 }

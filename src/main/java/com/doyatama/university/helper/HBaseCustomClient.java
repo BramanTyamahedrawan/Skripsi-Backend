@@ -1022,6 +1022,28 @@ public class HBaseCustomClient {
         } else if (fieldType == Question.ExamType3.class) {
             Question.ExamType3 examType3Value = Question.ExamType3.valueOf(value);
             field.set(object, examType3Value);
+        } else if (List.class.isAssignableFrom(fieldType)) {
+            // Handling List types
+            try {
+                // Untuk field List, gunakan TypeReference untuk parsing yang lebih akurat
+                TypeReference<List<String>> typeRef = new TypeReference<List<String>>() {
+                };
+                List<String> listValue = objectMapper.readValue(value, typeRef);
+                field.set(object, listValue);
+            } catch (Exception e) {
+                System.out.println("Error parsing List field " + field.getName() + ": " + e.getMessage());
+            }
+        } else if (Map.class.isAssignableFrom(fieldType)) {
+            // Handling Map types
+            try {
+                // Untuk field Map, gunakan TypeReference untuk parsing yang lebih akurat
+                TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+                };
+                Map<String, String> mapValue = objectMapper.readValue(value, typeRef);
+                field.set(object, mapValue);
+            } catch (Exception e) {
+                System.out.println("Error parsing Map field " + field.getName() + ": " + e.getMessage());
+            }
         } else {
             // Tipe data yang tidak dikenal, lewati saja
             System.out.println("Tipe data " + fieldType + " tidak dikenali.");
