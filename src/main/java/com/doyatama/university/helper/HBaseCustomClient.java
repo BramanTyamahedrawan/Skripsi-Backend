@@ -987,7 +987,7 @@ public class HBaseCustomClient {
             field.setDouble(object, doubleValue);
         } else if (fieldType == Double.class) {
             Double doubleValue = Double.valueOf(value);
-            field.setDouble(object, doubleValue);
+            field.set(object, doubleValue);
         } else if (fieldType == boolean.class) {
             boolean booleanValue = Boolean.parseBoolean(value);
             field.setBoolean(object, booleanValue);

@@ -27,7 +27,7 @@ public class DeleteData {
         // TableName tableSoalUjian = TableName.valueOf("soalUjian");
         // client.truncateTable(tableSoalUjian, conf);
 
-         TableName tableBankSoal = TableName.valueOf("bankSoal");
-         client.truncateTable(tableBankSoal, conf);
+         TableName tableUjian = TableName.valueOf("ujian");
+         client.truncateTable(tableUjian, conf);
     }
 }

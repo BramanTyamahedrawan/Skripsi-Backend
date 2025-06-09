@@ -2,9 +2,9 @@ package com.doyatama.university.repository;
 
 import com.doyatama.university.helper.HBaseCustomClient;
 import com.doyatama.university.model.BankSoal;
-import com.doyatama.university.model.SoalUjian;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,6 +219,9 @@ public class BankSoalRepository {
         columnMapping.put("pertanyaan", "pertanyaan");
         columnMapping.put("bobot", "bobot");
         columnMapping.put("jenisSoal", "jenisSoal");
+        columnMapping.put("opsi", "opsi");
+        columnMapping.put("pasangan", "pasangan");
+        columnMapping.put("jawabanBenar", "jawabanBenar");
         columnMapping.put("toleransiTypo", "toleransiTypo");
         columnMapping.put("createdAt", "createdAt");
         columnMapping.put("soalUjian", "soalUjian");
@@ -286,6 +289,68 @@ public class BankSoalRepository {
                 indexedFields);
 
         return bankSoalList;
+    }
+
+    public List<BankSoal> findAllById(List<String> bankSoalIds) throws IOException {
+        if (bankSoalIds == null || bankSoalIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+
+        // Standard column mappings
+        Map<String, String> columnMapping = new HashMap<>();
+        columnMapping.put("idBankSoal", "idBankSoal");
+        columnMapping.put("idSoalUjian", "idSoalUjian");
+        columnMapping.put("namaUjian", "namaUjian");
+        columnMapping.put("pertanyaan", "pertanyaan");
+        columnMapping.put("bobot", "bobot");
+        columnMapping.put("jenisSoal", "jenisSoal");
+        columnMapping.put("opsi", "opsi");
+        columnMapping.put("pasangan", "pasangan");
+        columnMapping.put("jawabanBenar", "jawabanBenar");
+        columnMapping.put("toleransiTypo", "toleransiTypo");
+        columnMapping.put("createdAt", "createdAt");
+        columnMapping.put("soalUjian", "soalUjian");
+        columnMapping.put("taksonomi", "taksonomi");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
+
+        // Definisikan field yang menggunakan indeks
+        Map<String, String> indexedFields = new HashMap<>();
+        indexedFields.put("opsi", "MAP");
+        indexedFields.put("pasangan", "MAP");
+        indexedFields.put("jawabanBenar", "LIST");
+
+        List<BankSoal> result = new ArrayList<>();
+
+        // Fetch each BankSoal by ID
+        for (String bankSoalId : bankSoalIds) {
+            try {
+                BankSoal bankSoal = client.showDataTable(
+                        tableBankSoal.toString(),
+                        columnMapping,
+                        bankSoalId,
+                        BankSoal.class);
+
+                if (bankSoal != null) {
+                    result.add(bankSoal);
+                }
+            } catch (Exception e) {
+                // Log the error for debugging but continue processing other IDs
+                System.err.println("Error fetching BankSoal with ID: " + bankSoalId + " - " + e.getMessage());
+            }
+        }
+
+        return result;
     }
 
     public boolean deleteById(String bankSoalId) throws IOException {
