@@ -514,7 +514,14 @@ public class Ujian {
     }
 
     public boolean hasBankSoal(String idBankSoal) {
-        return this.idBankSoalList != null && this.idBankSoalList.contains(idBankSoal);
+        if (this.idBankSoalList != null && this.idBankSoalList.contains(idBankSoal)) {
+            return true;
+        }
+        if (this.bankSoalList != null) {
+            return this.bankSoalList.stream()
+                    .anyMatch(soal -> idBankSoal.equals(soal.getIdBankSoal()));
+        }
+        return false;
     }
 
     // Basic state management methods
