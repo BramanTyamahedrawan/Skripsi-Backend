@@ -112,8 +112,11 @@ public class UjianSessionController {
             @Valid @RequestBody UjianSessionRequest.SaveJawabanRequest request,
             @CurrentUser UserPrincipal currentUser) throws IOException {
         try {
-            // Validate user access
+            // Set peserta dari user login
             request.setIdPeserta(currentUser.getId());
+
+            // Pastikan frontend mengirim idBankSoal, bukan nomorSoal
+            // Jika frontend masih mengirim nomorSoal, mapping ke idBankSoal di sini
 
             UjianSession session = ujianSessionService.saveJawaban(request);
 
@@ -134,8 +137,7 @@ public class UjianSessionController {
             response.put("message", "Jawaban berhasil disimpan");
             response.put("data", responseData);
 
-            return ResponseEntity.ok()
-                    .body(response);
+            return ResponseEntity.ok().body(response);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()

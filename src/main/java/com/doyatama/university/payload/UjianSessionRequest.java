@@ -94,13 +94,11 @@ public class UjianSessionRequest {
         }
     }
 
-    // Subclass for saving individual answer
+    // Subclass untuk simpan jawaban individual
     public static class SaveJawabanRequest extends UjianSessionRequest {
-        private String idBankSoal;
-        private Object jawaban; // Langsung Object, bukan JSON string
-        private Integer attemptNumber;
+        private String idBankSoal; // Pastikan frontend mengirim idBankSoal
+        private Object jawaban;
         private Integer currentSoalIndex;
-        private String jenisSoal;
 
         public SaveJawabanRequest() {
             super();
@@ -122,14 +120,6 @@ public class UjianSessionRequest {
             this.jawaban = jawaban;
         }
 
-        public Integer getAttemptNumber() {
-            return attemptNumber;
-        }
-
-        public void setAttemptNumber(Integer attemptNumber) {
-            this.attemptNumber = attemptNumber;
-        }
-
         public Integer getCurrentSoalIndex() {
             return currentSoalIndex;
         }
@@ -137,21 +127,12 @@ public class UjianSessionRequest {
         public void setCurrentSoalIndex(Integer currentSoalIndex) {
             this.currentSoalIndex = currentSoalIndex;
         }
-
-        public String getJenisSoal() {
-            return jenisSoal;
-        }
-
-        public void setJenisSoal(String jenisSoal) {
-            this.jenisSoal = jenisSoal;
-        }
     }
 
-    // Subclass for auto-saving progress
+    // Subclass untuk auto-save progress
     public static class AutoSaveProgressRequest extends UjianSessionRequest {
-        private Map<String, Object> answers; // Langsung Map, bukan JSON
+        private Map<String, Object> answers;
         private Integer currentSoalIndex;
-        private Integer answeredQuestions;
         private Integer timeRemaining;
 
         public AutoSaveProgressRequest() {
@@ -164,7 +145,6 @@ public class UjianSessionRequest {
 
         public void setAnswers(Map<String, Object> answers) {
             this.answers = answers;
-            this.answeredQuestions = answers != null ? answers.size() : 0;
         }
 
         public Integer getCurrentSoalIndex() {
@@ -173,14 +153,6 @@ public class UjianSessionRequest {
 
         public void setCurrentSoalIndex(Integer currentSoalIndex) {
             this.currentSoalIndex = currentSoalIndex;
-        }
-
-        public Integer getAnsweredQuestions() {
-            return answeredQuestions;
-        }
-
-        public void setAnsweredQuestions(Integer answeredQuestions) {
-            this.answeredQuestions = answeredQuestions;
         }
 
         public Integer getTimeRemaining() {
@@ -192,14 +164,13 @@ public class UjianSessionRequest {
         }
     }
 
-    // Subclass for submitting the exam
+    // Subclass untuk submit ujian
     public static class SubmitUjianRequest {
         private String sessionId;
         private String idUjian;
         private String idPeserta;
         private Map<String, Object> answers;
         private Boolean isAutoSubmit;
-        private String autoSubmitReason; // TAMBAHAN
         private Integer finalTimeRemaining;
 
         // Constructors
@@ -245,15 +216,6 @@ public class UjianSessionRequest {
 
         public void setIsAutoSubmit(Boolean isAutoSubmit) {
             this.isAutoSubmit = isAutoSubmit;
-        }
-
-        // TAMBAHAN: Getter/Setter untuk autoSubmitReason
-        public String getAutoSubmitReason() {
-            return autoSubmitReason;
-        }
-
-        public void setAutoSubmitReason(String autoSubmitReason) {
-            this.autoSubmitReason = autoSubmitReason;
         }
 
         public Integer getFinalTimeRemaining() {

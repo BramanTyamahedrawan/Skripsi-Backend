@@ -377,6 +377,25 @@ public class UjianAnalysisRepository {
                         analysis.getGeneratedByUser().getUsername());
             }
         }
+
+        // Save violationIds
+        if (analysis.getViolationIds() != null && !analysis.getViolationIds().isEmpty()) {
+            try {
+                String violationIdsJson = objectMapper.writeValueAsString(analysis.getViolationIds());
+                client.insertRecord(table, rowKey, "cheating", "violationIds", violationIdsJson);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to serialize violationIds", e);
+            }
+        }
+        // Save cheatDetections
+        if (analysis.getCheatDetections() != null && !analysis.getCheatDetections().isEmpty()) {
+            try {
+                String cheatDetectionsJson = objectMapper.writeValueAsString(analysis.getCheatDetections());
+                client.insertRecord(table, rowKey, "cheating", "cheatDetections", cheatDetectionsJson);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to serialize cheatDetections", e);
+            }
+        }
     }
 
     private void saveMetadata(HBaseCustomClient client, TableName table, String rowKey, UjianAnalysis analysis) {
@@ -621,6 +640,9 @@ public class UjianAnalysisRepository {
         columnMapping.put("ujian", "ujian");
         columnMapping.put("school", "school");
         columnMapping.put("generatedByUser", "generatedByUser");
+        // Cheating/Violation Integration
+        columnMapping.put("violationIds", "violationIds");
+        columnMapping.put("cheatDetections", "cheatDetections");
 
         return columnMapping;
     }
@@ -656,6 +678,8 @@ public class UjianAnalysisRepository {
         indexedFields.put("studyRecommendations", "MAP");
         indexedFields.put("analysisMetadata", "MAP");
         indexedFields.put("configurationUsed", "MAP");
+        indexedFields.put("violationIds", "LIST");
+        indexedFields.put("cheatDetections", "LIST");
 
         return indexedFields;
     }

@@ -59,6 +59,10 @@ public class UjianAnalysis {
     private Integer flaggedParticipants;
     private Double integrityScore; // Overall exam integrity score (0.0 - 1.0)
 
+    // Cheating/Violation Integration
+    private List<String> violationIds;
+    private List<Object> cheatDetections; // Use Object for generic, or replace with CheatDetection if available
+
     // Recommendations
     private List<String> recommendations;
     private List<String> improvementSuggestions;
@@ -380,6 +384,8 @@ public class UjianAnalysis {
         this.generatedAt = Instant.now();
         this.updatedAt = Instant.now();
         this.analysisVersion = "1.0";
+        this.violationIds = new ArrayList<>();
+        this.cheatDetections = new ArrayList<>();
     }
 
     public UjianAnalysis(String idUjian, String idSchool, String analysisType) {
@@ -676,6 +682,23 @@ public class UjianAnalysis {
 
     public void setIntegrityScore(Double integrityScore) {
         this.integrityScore = integrityScore;
+    }
+
+    // Cheating/Violation Integration getters and setters
+    public List<String> getViolationIds() {
+        return violationIds;
+    }
+
+    public void setViolationIds(List<String> violationIds) {
+        this.violationIds = violationIds;
+    }
+
+    public List<Object> getCheatDetections() {
+        return cheatDetections;
+    }
+
+    public void setCheatDetections(List<Object> cheatDetections) {
+        this.cheatDetections = cheatDetections;
     }
 
     // Recommendations getters and setters

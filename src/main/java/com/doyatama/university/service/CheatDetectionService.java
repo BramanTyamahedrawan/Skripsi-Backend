@@ -473,11 +473,26 @@ public class CheatDetectionService {
             logger.warn("Could not update existing HasilUjian with violation: {}", e.getMessage());
         }
 
-        // Take action
-        processViolationAction(savedDetection, session);
-
-        logger.info("Violation recorded: {} for session: {}", request.getTypeViolation(), request.getSessionId());
-        return savedDetection;
+        // Tambahkan ke UjianSession
+        if (session != null) {
+            if (session.getViolationIds() == null)
+                session.setViolationIds(new ArrayList<>());
+            session.getViolationIds().add(detection.getIdDetection());
+            ujianSessionRepository.save(session);
+        }
+        // Tambahkan ke HasilUjian jika sudah ada
+        List<HasilUjian> hasilList = hasilUjianRepository.findByUjianAndPeserta(request.getIdUjian(), request.getIdPeserta());
+        HasilUjian hasil = hasilList.stream()
+            .filter(h -> request.getSessionId().equals(h.getSessionId()))
+            .findFirst()
+            .orElse(null);
+        if (hasil != null) {
+            if (hasil.getViolationIds() == null)
+                hasil.setViolationIds(new ArrayList<>());
+            hasil.getViolationIds().add(detection.getIdDetection());
+            hasilUjianRepository.save(hasil);
+        }
+        return detection;
     }
 
     /**

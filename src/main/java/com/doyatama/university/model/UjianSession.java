@@ -150,19 +150,19 @@ public class UjianSession {
         return answers;
     }
 
-    public void setAnswers(Map<String, Object> answers) {
-        this.answers = answers;
-        this.updatedAt = Instant.now();
-        this.answeredQuestions = answers != null ? answers.size() : 0;
-    }
-
     public void addAnswer(String idBankSoal, Object jawaban) {
         if (this.answers == null) {
             this.answers = new HashMap<>();
         }
         this.answers.put(idBankSoal, jawaban);
         this.answeredQuestions = this.answers.size();
-        this.updatedAt = Instant.now();
+        this.updatedAt = java.time.Instant.now();
+    }
+
+    public void setAnswers(Map<String, Object> answers) {
+        this.answers = answers != null ? answers : new HashMap<>();
+        this.answeredQuestions = this.answers.size();
+        this.updatedAt = java.time.Instant.now();
     }
 
     public Integer getAttemptNumber() {
@@ -326,6 +326,17 @@ public class UjianSession {
         this.securityMetadata = securityMetadata;
     }
 
+    // TAMBAHAN: Track cheat detections
+    private List<CheatDetection> cheatDetections;
+
+    public List<CheatDetection> getCheatDetections() {
+        return cheatDetections;
+    }
+
+    public void setCheatDetections(List<CheatDetection> cheatDetections) {
+        this.cheatDetections = cheatDetections;
+    }
+
     /**
      * TAMBAHAN: Method untuk add violation ke session
      */
@@ -392,11 +403,11 @@ public class UjianSession {
     }
 
     public boolean isActive() {
-        return "ACTIVE".equals(status) && !isSubmitted;
+        return "ACTIVE".equalsIgnoreCase(this.status) && !Boolean.TRUE.equals(this.isSubmitted);
     }
 
     public boolean isCompleted() {
-        return "COMPLETED".equals(status);
+        return "COMPLETED".equalsIgnoreCase(this.status) || Boolean.TRUE.equals(this.isSubmitted);
     }
 
     public void finalizeSession(boolean isAuto) {

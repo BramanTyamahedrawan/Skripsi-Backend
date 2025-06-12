@@ -139,111 +139,98 @@ public class UjianSessionService {
      * Save individual answer
      */
     public UjianSession saveJawaban(UjianSessionRequest.SaveJawabanRequest request) throws IOException {
-        logger.debug("Saving answer for session: {} soal: {}", request.getSessionId(), request.getIdBankSoal());
-
-        // Validate request
+        // Validasi request
         validateSaveJawabanRequest(request);
 
-        // Get active session
-        UjianSession session = getValidActiveSession(request.getIdUjian(), request.getIdPeserta());
+        // Ambil session aktif berdasarkan sessionId (bukan hanya idUjian & idPeserta)
+        UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
+        if (session == null || !session.isActive()) {
+            throw new BadRequestException("Session tidak ditemukan atau tidak aktif");
+        }
 
-        // Validate soal exists in ujian
+        // Validasi idBankSoal
         validateSoalInUjian(session.getUjian(), request.getIdBankSoal());
 
-        // Save answer
+        // Simpan jawaban ke map answers (key = idBankSoal)
         session.addAnswer(request.getIdBankSoal(), request.getJawaban());
 
-        // Update current soal index if provided
+        // Update currentSoalIndex jika ada
         if (request.getCurrentSoalIndex() != null) {
             session.setCurrentSoalIndex(request.getCurrentSoalIndex());
         }
 
-        // Save session
-        UjianSession updatedSession = ujianSessionRepository.save(session);
+        // Update waktu update
+        session.setUpdatedAt(java.time.Instant.now());
 
-        logger.debug("Answer saved for soal: {}", request.getIdBankSoal());
-        return updatedSession;
+        // Simpan session
+        return ujianSessionRepository.save(session);
     }
 
     /**
      * Auto save progress (bulk save)
      */
     public UjianSession autoSaveProgress(UjianSessionRequest.AutoSaveProgressRequest request) throws IOException {
-        logger.debug("Auto saving progress for session: {}", request.getSessionId());
-
-        // Validate request
+        // Validasi request
         validateAutoSaveRequest(request);
 
-        // Get active session
-        UjianSession session = getValidActiveSession(request.getIdUjian(), request.getIdPeserta());
+        UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
+        if (session == null || !session.isActive()) {
+            throw new BadRequestException("Session tidak ditemukan atau tidak aktif");
+        }
 
-        // Update answers if provided
-        if (request.getAnswers() != null && !request.getAnswers().isEmpty()) {
+        // Update answers (bulk)
+        if (request.getAnswers() != null) {
             session.setAnswers(request.getAnswers());
         }
 
-        // Update current soal index
+        // Update currentSoalIndex
         if (request.getCurrentSoalIndex() != null) {
             session.setCurrentSoalIndex(request.getCurrentSoalIndex());
         }
 
-        // Update time remaining
+        // Update timeRemaining
         if (request.getTimeRemaining() != null) {
             session.setTimeRemaining(request.getTimeRemaining());
         }
 
-        // Mark auto save
         session.autoSave();
 
-        // Save session
-        UjianSession updatedSession = ujianSessionRepository.save(session);
-
-        logger.debug("Progress auto saved for session: {}", request.getSessionId());
-        return updatedSession;
+        return ujianSessionRepository.save(session);
     }
 
     /**
      * Submit ujian - delegasi ke HasilUjianService untuk create hasil
      */
     public HasilUjian submitUjian(UjianSessionRequest.SubmitUjianRequest request, String schoolId) throws IOException {
-        logger.info("Submitting ujian for session: {}", request.getSessionId());
-
-        // Validate request
         validateSubmitRequest(request);
 
-        // Get active session
-        UjianSession session = getValidActiveSession(request.getIdUjian(), request.getIdPeserta());
-
-        // Validate session can be submitted
-        if (session.getIsSubmitted()) {
-            throw new BadRequestException("Session sudah pernah di-submit");
+        UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
+        if (session == null || !session.isActive()) {
+            throw new BadRequestException("Session tidak ditemukan atau tidak aktif");
         }
 
-        // Final save of answers
-        if (request.getAnswers() != null && !request.getAnswers().isEmpty()) {
+        // Update answers terakhir
+        if (request.getAnswers() != null) {
             session.setAnswers(request.getAnswers());
         }
 
-        // Finalize session
-        session.finalizeSession(request.getIsAutoSubmit());
-
-        // Update final time remaining
+        // Update waktu tersisa terakhir
         if (request.getFinalTimeRemaining() != null) {
             session.setTimeRemaining(request.getFinalTimeRemaining());
         }
 
-        // Save final session state
+        // Finalisasi session
+        session.finalizeSession(Boolean.TRUE.equals(request.getIsAutoSubmit()));
+
         ujianSessionRepository.save(session);
 
-        // Delegate to HasilUjianService untuk create hasil ujian
-        HasilUjian hasilUjian = hasilUjianService.createHasilUjianFromSession(
+        // Buat hasil ujian
+        return hasilUjianService.createHasilUjianFromSession(
                 session.getSessionId(),
                 session.getAnswers(),
-                request.getIsAutoSubmit(),
-                request.getAutoSubmitReason());
-
-        logger.info("Ujian submitted successfully. Hasil ID: {}", hasilUjian.getIdHasilUjian());
-        return hasilUjian;
+                Boolean.TRUE.equals(request.getIsAutoSubmit()),
+                null
+        );
     }
 
     // ==================== SESSION MONITORING ====================

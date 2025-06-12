@@ -222,6 +222,16 @@ public class UjianAnalysisService {
         // Calculate performance by categories
         generateCategoryPerformance(analysis, hasilUjianList, ujian);
 
+        // Ambil dan set violationIds serta cheatDetections ke analysis
+        List<String> allViolationIds = cheatDetectionList.stream()
+                .map(CheatDetection::getIdDetection)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        analysis.setViolationIds(allViolationIds);
+        // Cast ke Object agar kompatibel dengan List<Object> (atau ganti tipe jika
+        // sudah pasti)
+        analysis.setCheatDetections(new ArrayList<>(cheatDetectionList));
+
         // Save analysis
         return ujianAnalysisRepository.save(analysis);
     }

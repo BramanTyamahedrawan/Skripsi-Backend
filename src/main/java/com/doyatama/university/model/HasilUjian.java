@@ -110,6 +110,10 @@ public class HasilUjian {
     private Integer violationCount;
     private Instant flaggedAt;
 
+    // Tambahan: relasi ke CheatDetection
+    private List<String> violationIds; // Menyimpan ID pelanggaran dari CheatDetection
+    private List<CheatDetection> cheatDetections; // (opsional) Menyimpan objek CheatDetection
+
     // Constructors
     public HasilUjian() {
         this.jawabanPeserta = new HashMap<>();
@@ -827,6 +831,23 @@ public class HasilUjian {
 
     public void setFlaggedAt(Instant flaggedAt) {
         this.flaggedAt = flaggedAt;
+    }
+
+    // Getters and Setters for CheatDetection relations
+    public List<String> getViolationIds() {
+        return violationIds;
+    }
+
+    public void setViolationIds(List<String> violationIds) {
+        this.violationIds = violationIds;
+    }
+
+    public List<CheatDetection> getCheatDetections() {
+        return cheatDetections;
+    }
+
+    public void setCheatDetections(List<CheatDetection> cheatDetections) {
+        this.cheatDetections = cheatDetections;
     }
 
     // Business Logic Methods

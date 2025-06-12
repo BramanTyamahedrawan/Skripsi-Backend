@@ -228,7 +228,13 @@ public class HasilUjianService {
         // Override answers jika ada final answers
         if (finalAnswers != null && !finalAnswers.isEmpty()) {
             hasilUjian.setJawabanPeserta(finalAnswers);
+        } else {
+            hasilUjian.setJawabanPeserta(session.getAnswers());
         }
+
+        // Ambil violationIds dan cheatDetections dari session
+        hasilUjian.setViolationIds(session.getViolationIds());
+        hasilUjian.setCheatDetections(session.getCheatDetections());
 
         // TAMBAHAN: Ambil dan proses cheat detections
         try {

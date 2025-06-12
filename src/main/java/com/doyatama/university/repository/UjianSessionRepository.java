@@ -213,7 +213,11 @@ public class UjianSessionRepository {
                 1,
                 indexedFields);
 
-        return sessions.isEmpty() ? null : sessions.get(0);
+        // Pastikan sessionId benar-benar cocok (hindari duplikasi)
+        return sessions.stream()
+                .filter(s -> sessionId.equals(s.getSessionId()))
+                .findFirst()
+                .orElse(null);
     }
 
     public UjianSession findActiveSessionByUjianAndPeserta(String idUjian, String idPeserta) throws IOException {
@@ -474,7 +478,7 @@ public class UjianSessionRepository {
             client.insertRecord(tableUjianSession, sessionId, "main", "answers", answersJson);
             client.insertRecord(tableUjianSession, sessionId, "main", "updatedAt", Instant.now().toString());
             client.insertRecord(tableUjianSession, sessionId, "tracking", "answeredQuestions",
-                    String.valueOf(answers.size()));
+                    String.valueOf(answers != null ? answers.size() : 0));
 
             return true;
         } catch (JsonProcessingException e) {
@@ -554,5 +558,23 @@ public class UjianSessionRepository {
                 .filter(session -> session.getLastKeepAliveTime().isBefore(thresholdTime))
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Update session metadata - optimized for metadata updates
+     */
+    public boolean updateSessionMetadata(String sessionId, Map<String, Object> sessionMetadata) throws IOException {
+        try {
+            HBaseCustomClient client = new HBaseCustomClient(conf);
+            TableName tableUjianSession = TableName.valueOf(tableName);
+
+            String metadataJson = objectMapper.writeValueAsString(sessionMetadata);
+            client.insertRecord(tableUjianSession, sessionId, "main", "sessionMetadata", metadataJson);
+            client.insertRecord(tableUjianSession, sessionId, "main", "updatedAt", Instant.now().toString());
+
+            return true;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize session metadata", e);
+        }
     }
 }

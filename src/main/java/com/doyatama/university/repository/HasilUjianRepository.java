@@ -375,6 +375,15 @@ public class HasilUjianRepository {
                 client.insertRecord(table, rowKey, "qa", "appealData", "{}");
             }
 
+            if (hasilUjian.getViolationIds() != null) {
+                client.insertRecord(table, rowKey, "security", "violationIds",
+                        objectMapper.writeValueAsString(hasilUjian.getViolationIds()));
+            }
+            if (hasilUjian.getCheatDetections() != null) {
+                client.insertRecord(table, rowKey, "security", "cheatDetections",
+                        objectMapper.writeValueAsString(hasilUjian.getCheatDetections()));
+            }
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize security data", e);
         }
