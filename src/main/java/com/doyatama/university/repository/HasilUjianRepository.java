@@ -16,6 +16,9 @@ import org.apache.hadoop.hbase.TableName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Repository;
+
+@Repository
 
 public class HasilUjianRepository {
 
@@ -59,20 +62,31 @@ public class HasilUjianRepository {
     }
 
     private void saveMainInfo(HBaseCustomClient client, TableName table, String rowKey, HasilUjian hasilUjian) {
-        client.insertRecord(table, rowKey, "main", "idHasilUjian", hasilUjian.getIdHasilUjian());
-        client.insertRecord(table, rowKey, "main", "idUjian", hasilUjian.getIdUjian());
-        client.insertRecord(table, rowKey, "main", "idPeserta", hasilUjian.getIdPeserta());
-        client.insertRecord(table, rowKey, "main", "sessionId", hasilUjian.getSessionId());
-        client.insertRecord(table, rowKey, "main", "idSchool", hasilUjian.getIdSchool());
+        // Save required fields with null checks
+        client.insertRecord(table, rowKey, "main", "idHasilUjian",
+                hasilUjian.getIdHasilUjian() != null ? hasilUjian.getIdHasilUjian() : "");
+        client.insertRecord(table, rowKey, "main", "idUjian",
+                hasilUjian.getIdUjian() != null ? hasilUjian.getIdUjian() : "");
+        client.insertRecord(table, rowKey, "main", "idPeserta",
+                hasilUjian.getIdPeserta() != null ? hasilUjian.getIdPeserta() : "");
+        client.insertRecord(table, rowKey, "main", "sessionId",
+                hasilUjian.getSessionId() != null ? hasilUjian.getSessionId() : "");
+        client.insertRecord(table, rowKey, "main", "idSchool",
+                hasilUjian.getIdSchool() != null ? hasilUjian.getIdSchool() : "");
 
         if (hasilUjian.getAttemptNumber() != null) {
             client.insertRecord(table, rowKey, "main", "attemptNumber", hasilUjian.getAttemptNumber().toString());
+        } else {
+            client.insertRecord(table, rowKey, "main", "attemptNumber", "1");
         }
 
-        client.insertRecord(table, rowKey, "main", "statusPengerjaan", hasilUjian.getStatusPengerjaan());
+        client.insertRecord(table, rowKey, "main", "statusPengerjaan",
+                hasilUjian.getStatusPengerjaan() != null ? hasilUjian.getStatusPengerjaan() : "SELESAI");
 
         if (hasilUjian.getIsAutoSubmit() != null) {
             client.insertRecord(table, rowKey, "main", "isAutoSubmit", hasilUjian.getIsAutoSubmit().toString());
+        } else {
+            client.insertRecord(table, rowKey, "main", "isAutoSubmit", "false");
         }
 
         if (hasilUjian.getWaktuMulai() != null) {
@@ -91,70 +105,83 @@ public class HasilUjianRepository {
             client.insertRecord(table, rowKey, "main", "sisaWaktu", hasilUjian.getSisaWaktu().toString());
         }
 
-        client.insertRecord(table, rowKey, "main", "createdAt", hasilUjian.getCreatedAt().toString());
-        client.insertRecord(table, rowKey, "main", "updatedAt", hasilUjian.getUpdatedAt().toString());
+        client.insertRecord(table, rowKey, "main", "createdAt",
+                hasilUjian.getCreatedAt() != null ? hasilUjian.getCreatedAt().toString() : Instant.now().toString());
+        client.insertRecord(table, rowKey, "main", "updatedAt",
+                hasilUjian.getUpdatedAt() != null ? hasilUjian.getUpdatedAt().toString() : Instant.now().toString());
     }
 
     private void saveScoreData(HBaseCustomClient client, TableName table, String rowKey, HasilUjian hasilUjian) {
         try {
-            // Save answers data
+            // Ensure we always save score status
+            client.insertRecord(table, rowKey, "main", "score_saved", "true");
+
+            // Save answers data - using main column family
             if (hasilUjian.getJawabanPeserta() != null && !hasilUjian.getJawabanPeserta().isEmpty()) {
                 String jawabanPesertaJson = objectMapper.writeValueAsString(hasilUjian.getJawabanPeserta());
-                client.insertRecord(table, rowKey, "score", "jawabanPeserta", jawabanPesertaJson);
+                client.insertRecord(table, rowKey, "main", "jawabanPeserta", jawabanPesertaJson);
             } else {
-                client.insertRecord(table, rowKey, "score", "jawabanPeserta", "{}");
+                client.insertRecord(table, rowKey, "main", "jawabanPeserta", "{}");
             }
 
             // Save correct answers mapping
             if (hasilUjian.getJawabanBenar() != null && !hasilUjian.getJawabanBenar().isEmpty()) {
                 String jawabanBenarJson = objectMapper.writeValueAsString(hasilUjian.getJawabanBenar());
-                client.insertRecord(table, rowKey, "score", "jawabanBenar", jawabanBenarJson);
+                client.insertRecord(table, rowKey, "main", "jawabanBenar", jawabanBenarJson);
             } else {
-                client.insertRecord(table, rowKey, "score", "jawabanBenar", "{}");
+                client.insertRecord(table, rowKey, "main", "jawabanBenar", "{}");
             }
 
             // Save score per question
             if (hasilUjian.getSkorPerSoal() != null && !hasilUjian.getSkorPerSoal().isEmpty()) {
                 String skorPerSoalJson = objectMapper.writeValueAsString(hasilUjian.getSkorPerSoal());
-                client.insertRecord(table, rowKey, "score", "skorPerSoal", skorPerSoalJson);
+                client.insertRecord(table, rowKey, "main", "skorPerSoal", skorPerSoalJson);
             } else {
-                client.insertRecord(table, rowKey, "score", "skorPerSoal", "{}");
+                client.insertRecord(table, rowKey, "main", "skorPerSoal", "{}");
             }
 
             // Save total scores
             if (hasilUjian.getTotalSkor() != null) {
-                client.insertRecord(table, rowKey, "score", "totalSkor", hasilUjian.getTotalSkor().toString());
+                client.insertRecord(table, rowKey, "main", "totalSkor", hasilUjian.getTotalSkor().toString());
+            } else {
+                client.insertRecord(table, rowKey, "main", "totalSkor", "0.0");
             }
 
             if (hasilUjian.getSkorMaksimal() != null) {
-                client.insertRecord(table, rowKey, "score", "skorMaksimal", hasilUjian.getSkorMaksimal().toString());
+                client.insertRecord(table, rowKey, "main", "skorMaksimal", hasilUjian.getSkorMaksimal().toString());
+            } else {
+                client.insertRecord(table, rowKey, "main", "skorMaksimal", "0.0");
             }
-
             if (hasilUjian.getPersentase() != null) {
-                client.insertRecord(table, rowKey, "score", "persentase", hasilUjian.getPersentase().toString());
+                client.insertRecord(table, rowKey, "main", "persentase", hasilUjian.getPersentase().toString());
+            } else {
+                client.insertRecord(table, rowKey, "main", "persentase", "0.0");
             }
 
-            client.insertRecord(table, rowKey, "score", "nilaiHuruf", hasilUjian.getNilaiHuruf());
+            client.insertRecord(table, rowKey, "main", "nilaiHuruf",
+                    hasilUjian.getNilaiHuruf() != null ? hasilUjian.getNilaiHuruf() : "F");
 
             if (hasilUjian.getLulus() != null) {
-                client.insertRecord(table, rowKey, "score", "lulus", hasilUjian.getLulus().toString());
+                client.insertRecord(table, rowKey, "main", "lulus", hasilUjian.getLulus().toString());
+            } else {
+                client.insertRecord(table, rowKey, "main", "lulus", "false");
             }
 
-            // Save analysis data
+            // Save analysis data - using main column family
             if (hasilUjian.getJumlahBenar() != null) {
-                client.insertRecord(table, rowKey, "analysis", "jumlahBenar", hasilUjian.getJumlahBenar().toString());
+                client.insertRecord(table, rowKey, "main", "jumlahBenar", hasilUjian.getJumlahBenar().toString());
             }
 
             if (hasilUjian.getJumlahSalah() != null) {
-                client.insertRecord(table, rowKey, "analysis", "jumlahSalah", hasilUjian.getJumlahSalah().toString());
+                client.insertRecord(table, rowKey, "main", "jumlahSalah", hasilUjian.getJumlahSalah().toString());
             }
 
             if (hasilUjian.getJumlahKosong() != null) {
-                client.insertRecord(table, rowKey, "analysis", "jumlahKosong", hasilUjian.getJumlahKosong().toString());
+                client.insertRecord(table, rowKey, "main", "jumlahKosong", hasilUjian.getJumlahKosong().toString());
             }
 
             if (hasilUjian.getTotalSoal() != null) {
-                client.insertRecord(table, rowKey, "analysis", "totalSoal", hasilUjian.getTotalSoal().toString());
+                client.insertRecord(table, rowKey, "main", "totalSoal", hasilUjian.getTotalSoal().toString());
             }
 
             // Save metadata
@@ -172,6 +199,9 @@ public class HasilUjianRepository {
 
     private void saveAnalyticsData(HBaseCustomClient client, TableName table, String rowKey, HasilUjian hasilUjian) {
         try {
+            // Ensure we always insert at least one column - start with a default status
+            client.insertRecord(table, rowKey, "analytics", "analytics_saved", "true");
+
             // Time Analytics
             if (hasilUjian.getTimeSpentPerQuestion() != null && !hasilUjian.getTimeSpentPerQuestion().isEmpty()) {
                 String timeSpentJson = objectMapper.writeValueAsString(hasilUjian.getTimeSpentPerQuestion());
@@ -193,7 +223,6 @@ public class HasilUjianRepository {
             } else {
                 client.insertRecord(table, rowKey, "analytics", "answerHistory", "{}");
             }
-
             if (hasilUjian.getAttemptCountPerQuestion() != null && !hasilUjian.getAttemptCountPerQuestion().isEmpty()) {
                 String attemptCountJson = objectMapper.writeValueAsString(hasilUjian.getAttemptCountPerQuestion());
                 client.insertRecord(table, rowKey, "analytics", "attemptCountPerQuestion", attemptCountJson);
@@ -202,24 +231,32 @@ public class HasilUjianRepository {
             }
 
             // Behavioral Analytics
-            client.insertRecord(table, rowKey, "analytics", "workingPattern", hasilUjian.getWorkingPattern());
+            client.insertRecord(table, rowKey, "analytics", "workingPattern",
+                    hasilUjian.getWorkingPattern() != null ? hasilUjian.getWorkingPattern() : "NORMAL");
 
             if (hasilUjian.getConsistencyScore() != null) {
                 client.insertRecord(table, rowKey, "analytics", "consistencyScore",
                         hasilUjian.getConsistencyScore().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "consistencyScore", "0.5");
             }
 
             if (hasilUjian.getHasSignsOfGuessing() != null) {
                 client.insertRecord(table, rowKey, "analytics", "hasSignsOfGuessing",
                         hasilUjian.getHasSignsOfGuessing().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "hasSignsOfGuessing", "false");
             }
 
             if (hasilUjian.getHasSignsOfAnxiety() != null) {
                 client.insertRecord(table, rowKey, "analytics", "hasSignsOfAnxiety",
                         hasilUjian.getHasSignsOfAnxiety().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "hasSignsOfAnxiety", "false");
             }
 
-            client.insertRecord(table, rowKey, "analytics", "confidenceLevel", hasilUjian.getConfidenceLevel());
+            client.insertRecord(table, rowKey, "analytics", "confidenceLevel",
+                    hasilUjian.getConfidenceLevel() != null ? hasilUjian.getConfidenceLevel() : "MEDIUM");
 
             // Performance Insights
             if (hasilUjian.getTopicPerformance() != null && !hasilUjian.getTopicPerformance().isEmpty()) {
@@ -255,17 +292,19 @@ public class HasilUjianRepository {
                 client.insertRecord(table, rowKey, "analytics", "recommendedStudyAreas", recommendedAreasJson);
             } else {
                 client.insertRecord(table, rowKey, "analytics", "recommendedStudyAreas", "[]");
-            }
-
-            // Answer Pattern Analysis
+            } // Answer Pattern Analysis
             if (hasilUjian.getTotalAnswerChanges() != null) {
                 client.insertRecord(table, rowKey, "analytics", "totalAnswerChanges",
                         hasilUjian.getTotalAnswerChanges().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "totalAnswerChanges", "0");
             }
 
             if (hasilUjian.getAnswerChangeSuccessRate() != null) {
                 client.insertRecord(table, rowKey, "analytics", "answerChangeSuccessRate",
                         hasilUjian.getAnswerChangeSuccessRate().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "answerChangeSuccessRate", "0.0");
             }
 
             if (hasilUjian.getFrequentlyChangedQuestions() != null
@@ -276,7 +315,6 @@ public class HasilUjianRepository {
             } else {
                 client.insertRecord(table, rowKey, "analytics", "frequentlyChangedQuestions", "[]");
             }
-
             if (hasilUjian.getChangePatterns() != null && !hasilUjian.getChangePatterns().isEmpty()) {
                 String changePatternsJson = objectMapper.writeValueAsString(hasilUjian.getChangePatterns());
                 client.insertRecord(table, rowKey, "analytics", "changePatterns", changePatternsJson);
@@ -285,7 +323,8 @@ public class HasilUjianRepository {
             }
 
             // Learning Analytics
-            client.insertRecord(table, rowKey, "analytics", "learningStyle", hasilUjian.getLearningStyle());
+            client.insertRecord(table, rowKey, "analytics", "learningStyle",
+                    hasilUjian.getLearningStyle() != null ? hasilUjian.getLearningStyle() : "MIXED");
 
             if (hasilUjian.getLearningInsights() != null && !hasilUjian.getLearningInsights().isEmpty()) {
                 String learningInsightsJson = objectMapper.writeValueAsString(hasilUjian.getLearningInsights());
@@ -300,28 +339,36 @@ public class HasilUjianRepository {
             } else {
                 client.insertRecord(table, rowKey, "analytics", "studyStrategies", "[]");
             }
-
             if (hasilUjian.getAdaptiveDifficultyScore() != null) {
                 client.insertRecord(table, rowKey, "analytics", "adaptiveDifficultyScore",
                         hasilUjian.getAdaptiveDifficultyScore().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "adaptiveDifficultyScore", "0.5");
             }
 
             // Comparative Analysis
             if (hasilUjian.getRankInClass() != null) {
                 client.insertRecord(table, rowKey, "analytics", "rankInClass", hasilUjian.getRankInClass().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "rankInClass", "0");
             }
 
             if (hasilUjian.getRankInSchool() != null) {
                 client.insertRecord(table, rowKey, "analytics", "rankInSchool",
                         hasilUjian.getRankInSchool().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "rankInSchool", "0");
             }
 
             if (hasilUjian.getPercentileRank() != null) {
                 client.insertRecord(table, rowKey, "analytics", "percentileRank",
                         hasilUjian.getPercentileRank().toString());
+            } else {
+                client.insertRecord(table, rowKey, "analytics", "percentileRank", "0.0");
             }
 
-            client.insertRecord(table, rowKey, "analytics", "relativePerformance", hasilUjian.getRelativePerformance());
+            client.insertRecord(table, rowKey, "analytics", "relativePerformance",
+                    hasilUjian.getRelativePerformance() != null ? hasilUjian.getRelativePerformance() : "AVERAGE");
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize analytics data", e);
@@ -330,49 +377,60 @@ public class HasilUjianRepository {
 
     private void saveSecurityData(HBaseCustomClient client, TableName table, String rowKey, HasilUjian hasilUjian) {
         try {
+            // Ensure we always insert at least one column - start with a default status
+            client.insertRecord(table, rowKey, "security", "security_saved", "true");
+
             // Security & Integrity
-            client.insertRecord(table, rowKey, "security", "resultHash", hasilUjian.getResultHash());
+            client.insertRecord(table, rowKey, "security", "resultHash",
+                    hasilUjian.getResultHash() != null ? hasilUjian.getResultHash() : "");
 
             if (hasilUjian.getIsVerified() != null) {
                 client.insertRecord(table, rowKey, "security", "isVerified", hasilUjian.getIsVerified().toString());
+            } else {
+                client.insertRecord(table, rowKey, "security", "isVerified", "false");
             }
 
-            client.insertRecord(table, rowKey, "security", "verifiedBy", hasilUjian.getVerifiedBy());
+            client.insertRecord(table, rowKey, "security", "verifiedBy",
+                    hasilUjian.getVerifiedBy() != null ? hasilUjian.getVerifiedBy() : "");
 
             if (hasilUjian.getVerificationTime() != null) {
                 client.insertRecord(table, rowKey, "security", "verificationTime",
                         hasilUjian.getVerificationTime().toString());
             }
 
-            client.insertRecord(table, rowKey, "security", "securityStatus", hasilUjian.getSecurityStatus());
+            client.insertRecord(table, rowKey, "security", "securityStatus",
+                    hasilUjian.getSecurityStatus() != null ? hasilUjian.getSecurityStatus() : "CLEAN");
 
             if (hasilUjian.getSecurityFlags() != null && !hasilUjian.getSecurityFlags().isEmpty()) {
                 String securityFlagsJson = objectMapper.writeValueAsString(hasilUjian.getSecurityFlags());
                 client.insertRecord(table, rowKey, "security", "securityFlags", securityFlagsJson);
             } else {
                 client.insertRecord(table, rowKey, "security", "securityFlags", "{}");
-            }
-
-            // Quality Assurance
+            } // Quality Assurance - moved to security column family since qa doesn't exist
             if (hasilUjian.getHasAppeal() != null) {
-                client.insertRecord(table, rowKey, "qa", "hasAppeal", hasilUjian.getHasAppeal().toString());
+                client.insertRecord(table, rowKey, "security", "hasAppeal", hasilUjian.getHasAppeal().toString());
+            } else {
+                client.insertRecord(table, rowKey, "security", "hasAppeal", "false");
             }
 
-            client.insertRecord(table, rowKey, "qa", "appealReason", hasilUjian.getAppealReason());
-            client.insertRecord(table, rowKey, "qa", "appealStatus", hasilUjian.getAppealStatus());
+            client.insertRecord(table, rowKey, "security", "appealReason",
+                    hasilUjian.getAppealReason() != null ? hasilUjian.getAppealReason() : "");
+            client.insertRecord(table, rowKey, "security", "appealStatus",
+                    hasilUjian.getAppealStatus() != null ? hasilUjian.getAppealStatus() : "");
 
             if (hasilUjian.getAppealSubmittedAt() != null) {
-                client.insertRecord(table, rowKey, "qa", "appealSubmittedAt",
+                client.insertRecord(table, rowKey, "security", "appealSubmittedAt",
                         hasilUjian.getAppealSubmittedAt().toString());
             }
 
-            client.insertRecord(table, rowKey, "qa", "appealReviewedBy", hasilUjian.getAppealReviewedBy());
+            client.insertRecord(table, rowKey, "security", "appealReviewedBy",
+                    hasilUjian.getAppealReviewedBy() != null ? hasilUjian.getAppealReviewedBy() : "");
 
             if (hasilUjian.getAppealData() != null && !hasilUjian.getAppealData().isEmpty()) {
                 String appealDataJson = objectMapper.writeValueAsString(hasilUjian.getAppealData());
-                client.insertRecord(table, rowKey, "qa", "appealData", appealDataJson);
+                client.insertRecord(table, rowKey, "security", "appealData", appealDataJson);
             } else {
-                client.insertRecord(table, rowKey, "qa", "appealData", "{}");
+                client.insertRecord(table, rowKey, "security", "appealData", "{}");
             }
 
             if (hasilUjian.getViolationIds() != null) {
@@ -390,23 +448,39 @@ public class HasilUjianRepository {
     }
 
     private void saveRelationships(HBaseCustomClient client, TableName table, String rowKey, HasilUjian hasilUjian) {
+        // Always save at least one column to prevent "No columns to insert" error
+        boolean hasInsertedColumn = false;
+
         // Save Ujian relationship
         if (hasilUjian.getUjian() != null && hasilUjian.getUjian().getIdUjian() != null) {
             client.insertRecord(table, rowKey, "ujian", "idUjian", hasilUjian.getUjian().getIdUjian());
-            client.insertRecord(table, rowKey, "ujian", "namaUjian", hasilUjian.getUjian().getNamaUjian());
+            client.insertRecord(table, rowKey, "ujian", "namaUjian",
+                    hasilUjian.getUjian().getNamaUjian() != null ? hasilUjian.getUjian().getNamaUjian() : "");
+            hasInsertedColumn = true;
         }
 
         // Save Peserta relationship
         if (hasilUjian.getPeserta() != null && hasilUjian.getPeserta().getId() != null) {
             client.insertRecord(table, rowKey, "peserta", "id", hasilUjian.getPeserta().getId());
-            client.insertRecord(table, rowKey, "peserta", "name", hasilUjian.getPeserta().getName());
-            client.insertRecord(table, rowKey, "peserta", "username", hasilUjian.getPeserta().getUsername());
+            client.insertRecord(table, rowKey, "peserta", "name",
+                    hasilUjian.getPeserta().getName() != null ? hasilUjian.getPeserta().getName() : "");
+            client.insertRecord(table, rowKey, "peserta", "username",
+                    hasilUjian.getPeserta().getUsername() != null ? hasilUjian.getPeserta().getUsername() : "");
+            hasInsertedColumn = true;
         }
 
         // Save School relationship
         if (hasilUjian.getSchool() != null && hasilUjian.getSchool().getIdSchool() != null) {
             client.insertRecord(table, rowKey, "school", "idSchool", hasilUjian.getSchool().getIdSchool());
-            client.insertRecord(table, rowKey, "school", "nameSchool", hasilUjian.getSchool().getNameSchool());
+            client.insertRecord(table, rowKey, "school", "nameSchool",
+                    hasilUjian.getSchool().getNameSchool() != null ? hasilUjian.getSchool().getNameSchool() : "");
+            hasInsertedColumn = true;
+        }
+
+        // If no relationships were saved, insert a default column to prevent "No
+        // columns to insert" error
+        if (!hasInsertedColumn) {
+            client.insertRecord(table, rowKey, "detail", "relationships_saved", "false");
         }
     }
 
@@ -522,11 +596,10 @@ public class HasilUjianRepository {
 
         Map<String, String> columnMapping = getStandardColumnMapping();
         Map<String, String> indexedFields = getIndexedFields();
-
         return client.getDataListByColumnIndeks(
                 tableHasilUjian.toString(),
                 columnMapping,
-                "qa",
+                "security",
                 "appealStatus",
                 appealStatus,
                 HasilUjian.class,
@@ -539,7 +612,7 @@ public class HasilUjianRepository {
     private Map<String, String> getStandardColumnMapping() {
         Map<String, String> columnMapping = new HashMap<>();
 
-        // Main fields
+        // Main fields - all stored in main column family
         columnMapping.put("idHasilUjian", "idHasilUjian");
         columnMapping.put("idUjian", "idUjian");
         columnMapping.put("idPeserta", "idPeserta");
@@ -555,7 +628,7 @@ public class HasilUjianRepository {
         columnMapping.put("createdAt", "createdAt");
         columnMapping.put("updatedAt", "updatedAt");
 
-        // Score fields
+        // Score fields - stored in main column family
         columnMapping.put("jawabanPeserta", "jawabanPeserta");
         columnMapping.put("jawabanBenar", "jawabanBenar");
         columnMapping.put("skorPerSoal", "skorPerSoal");
@@ -565,14 +638,14 @@ public class HasilUjianRepository {
         columnMapping.put("nilaiHuruf", "nilaiHuruf");
         columnMapping.put("lulus", "lulus");
 
-        // Analysis fields
+        // Analysis fields - stored in main column family
         columnMapping.put("jumlahBenar", "jumlahBenar");
         columnMapping.put("jumlahSalah", "jumlahSalah");
         columnMapping.put("jumlahKosong", "jumlahKosong");
         columnMapping.put("totalSoal", "totalSoal");
         columnMapping.put("metadata", "metadata");
 
-        // Analytics fields (NEW)
+        // Analytics fields - stored in analytics column family
         columnMapping.put("timeSpentPerQuestion", "timeSpentPerQuestion");
         columnMapping.put("answerTimestamps", "answerTimestamps");
         columnMapping.put("answerHistory", "answerHistory");
@@ -600,7 +673,7 @@ public class HasilUjianRepository {
         columnMapping.put("percentileRank", "percentileRank");
         columnMapping.put("relativePerformance", "relativePerformance");
 
-        // Security fields (NEW)
+        // Security fields - stored in security column family
         columnMapping.put("resultHash", "resultHash");
         columnMapping.put("isVerified", "isVerified");
         columnMapping.put("verifiedBy", "verifiedBy");
@@ -608,7 +681,7 @@ public class HasilUjianRepository {
         columnMapping.put("securityStatus", "securityStatus");
         columnMapping.put("securityFlags", "securityFlags");
 
-        // Quality Assurance fields (NEW)
+        // Quality Assurance fields - stored in security column family
         columnMapping.put("hasAppeal", "hasAppeal");
         columnMapping.put("appealReason", "appealReason");
         columnMapping.put("appealStatus", "appealStatus");
@@ -702,11 +775,10 @@ public class HasilUjianRepository {
             throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
         TableName tableHasilUjian = TableName.valueOf(tableName);
-
-        client.insertRecord(tableHasilUjian, hasilUjianId, "qa", "appealStatus", appealStatus);
+        client.insertRecord(tableHasilUjian, hasilUjianId, "security", "appealStatus", appealStatus);
 
         if (reviewedBy != null) {
-            client.insertRecord(tableHasilUjian, hasilUjianId, "qa", "appealReviewedBy", reviewedBy);
+            client.insertRecord(tableHasilUjian, hasilUjianId, "security", "appealReviewedBy", reviewedBy);
         }
 
         if (reviewNote != null) {
@@ -716,7 +788,7 @@ public class HasilUjianRepository {
                 appealData.put("reviewedAt", Instant.now().toString());
 
                 String appealDataJson = objectMapper.writeValueAsString(appealData);
-                client.insertRecord(tableHasilUjian, hasilUjianId, "qa", "appealData", appealDataJson);
+                client.insertRecord(tableHasilUjian, hasilUjianId, "security", "appealData", appealDataJson);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("Failed to serialize appeal data", e);
             }

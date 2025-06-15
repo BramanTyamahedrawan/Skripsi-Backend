@@ -44,8 +44,9 @@ public class CheatDetectionController {
             @CurrentUser UserPrincipal currentUser) throws IOException {
         try {
             logger.debug("Recording violation: {} for session: {}", request.getTypeViolation(), request.getSessionId());
-
-            // Validate user access to this session
+            logger.debug("Request payload - idPeserta: {}, idUjian: {}, evidence: {}",
+                    request.getIdPeserta(), request.getIdUjian(), request.getEvidence()); // Validate user access to
+                                                                                          // this session
             if (!request.getIdPeserta().equals(currentUser.getId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(new ApiResponse(false, "Akses ditolak - session bukan milik user ini"));
@@ -53,7 +54,13 @@ public class CheatDetectionController {
 
             // Set school ID from current user if not provided
             if (request.getIdSchool() == null) {
-                request.setIdSchool(currentUser.getSchoolId());
+                if (currentUser.getSchoolId() != null) {
+                    request.setIdSchool(currentUser.getSchoolId());
+                } else {
+                    logger.warn("No school ID available for user: {}", currentUser.getId());
+                    return ResponseEntity.badRequest()
+                            .body(new ApiResponse(false, "User tidak memiliki school ID"));
+                }
             }
 
             CheatDetection detection = cheatDetectionService.recordViolation(request);
@@ -78,6 +85,7 @@ public class CheatDetectionController {
             return ResponseEntity.created(location).body(response);
 
         } catch (IllegalArgumentException e) {
+            logger.error("Bad request in recordViolation: {}", e.getMessage());
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
         } catch (Exception e) {
@@ -657,23 +665,30 @@ public class CheatDetectionController {
      * Check if user is admin
      */
     private boolean isAdmin(UserPrincipal currentUser) {
-        return currentUser.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        if (currentUser == null || currentUser.getRoles() == null) {
+            return false;
+        }
+        return currentUser.getRoles().equalsIgnoreCase("1"); // 1 = Administrator
     }
 
     /**
      * Check if user is proctor
      */
     private boolean isProctor(UserPrincipal currentUser) {
-        return currentUser.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_PROCTOR"));
+        if (currentUser == null || currentUser.getRoles() == null) {
+            return false;
+        }
+        // 2 = Operator, 3 = Teacher (keduanya bisa jadi proctor)
+        return currentUser.getRoles().equalsIgnoreCase("2") || currentUser.getRoles().equalsIgnoreCase("3");
     }
 
     /**
      * Check if user is student
      */
     private boolean isStudent(UserPrincipal currentUser) {
-        return currentUser.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_STUDENT"));
+        if (currentUser == null || currentUser.getRoles() == null) {
+            return false;
+        }
+        return currentUser.getRoles().equalsIgnoreCase("5"); // 5 = Student
     }
 }

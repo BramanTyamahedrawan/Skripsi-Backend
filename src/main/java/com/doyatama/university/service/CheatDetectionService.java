@@ -141,6 +141,10 @@ public class CheatDetectionService {
      * VALIDATE SCHOOL - MENGGUNAKAN SchoolRepository
      */
     private School validateSchool(String idSchool) throws IOException {
+        if (idSchool == null || idSchool.trim().isEmpty()) {
+            throw new BadRequestException("School ID wajib diisi");
+        }
+
         School school = schoolRepository.findById(idSchool);
         if (school == null) {
             throw new ResourceNotFoundException("School", "id", idSchool);
@@ -390,109 +394,91 @@ public class CheatDetectionService {
     public CheatDetection recordViolation(CheatDetectionRequest.RecordViolationRequest request) throws IOException {
         logger.debug("Recording violation: {} for session: {}", request.getTypeViolation(), request.getSessionId());
 
-        // Validate request
-        validateRecordViolationRequest(request);
-
-        // ENHANCED validation dengan semua repository
-        UjianSession session = validateActiveSession(request.getSessionId(), request.getIdPeserta(),
-                request.getIdUjian());
-        Ujian ujian = validateUjian(request.getIdUjian());
-        User peserta = validatePeserta(request.getIdPeserta());
-        School school = validateSchool(request.getIdSchool());
-
-        // Check existing violation (spam prevention)
-        CheatDetection existingViolation = findRecentViolation(request.getSessionId(), request.getTypeViolation(), 30);
-
-        if (existingViolation != null) {
-            existingViolation.incrementViolationCount();
-            existingViolation.addEvidence("lastDetection", request.getDetectionTimestamp());
-
-            if (request.getEvidence() != null) {
-                existingViolation.getEvidence().putAll(request.getEvidence());
-            }
-
-            // TAMBAHAN: Sync dengan session
-            existingViolation.syncWithSession(session);
-
-            CheatDetection savedDetection = cheatDetectionRepository.save(existingViolation);
-
-            // TAMBAHAN: Update session dengan violation
-            session.addViolation(savedDetection);
-            ujianSessionRepository.save(session);
-
-            processViolationAction(savedDetection, session);
-            return savedDetection;
-        }
-
-        // PERBAIKAN: Create new violation menggunakan factory method
-        CheatDetection detection = CheatDetection.createFromSession(session, request.getTypeViolation(),
-                request.getSeverity() != null ? request.getSeverity()
-                        : ViolationType.getDefaultSeverity(request.getTypeViolation()),
-                request.getEvidence());
-
-        // Set additional data from request
-        detection.setBrowserInfo(request.getBrowserInfo());
-        detection.setUserAgent(request.getUserAgent());
-        detection.setWindowTitle(request.getWindowTitle());
-        detection.setScreenWidth(request.getScreenWidth());
-        detection.setScreenHeight(request.getScreenHeight());
-        detection.setFullscreenStatus(request.getFullscreenStatus());
-
-        // Set frontend events
-        if (request.getFrontendEvents() != null) {
-            detection.setFrontendEvents(request.getFrontendEvents());
-        }
-
-        // Record answer timing if provided
-        if (request.getQuestionId() != null && request.getDetectionTimestamp() != null) {
-            detection.recordAnswerTime(request.getQuestionId(), request.getDetectionTimestamp());
-        }
-
-        // Save detection
-        CheatDetection savedDetection = cheatDetectionRepository.save(detection);
-
-        // TAMBAHAN: Update session dengan violation
-        session.addViolation(savedDetection);
-        ujianSessionRepository.save(session);
-
-        // TAMBAHAN: Update hasil ujian jika sudah ada
         try {
-            List<HasilUjian> existingResults = hasilUjianRepository.findByUjianAndPeserta(
-                    request.getIdUjian(), request.getIdPeserta());
+            // Validate request
+            validateRecordViolationRequest(request); // ENHANCED validation dengan semua repository
+            UjianSession session = validateActiveSession(request.getSessionId(), request.getIdPeserta(),
+                    request.getIdUjian());
+            // Validate related entities (will throw exception if invalid)
+            validateUjian(request.getIdUjian());
+            validatePeserta(request.getIdPeserta());
+            validateSchool(request.getIdSchool());
 
-            HasilUjian currentResult = existingResults.stream()
-                    .filter(h -> request.getSessionId().equals(h.getSessionId()))
-                    .findFirst()
-                    .orElse(null);
+            // Check existing violation (spam prevention)
+            CheatDetection existingViolation = findRecentViolation(request.getSessionId(), request.getTypeViolation(),
+                    30);
 
-            if (currentResult != null) {
-                savedDetection.updateHasilUjian(currentResult);
-                hasilUjianRepository.save(currentResult);
+            if (existingViolation != null) {
+                logger.debug("Found existing violation, incrementing count");
+                existingViolation.incrementViolationCount();
+                existingViolation.addEvidence("lastDetection", request.getDetectionTimestamp());
+
+                if (request.getEvidence() != null) {
+                    existingViolation.getEvidence().putAll(request.getEvidence());
+                }
+
+                // TAMBAHAN: Sync dengan session
+                existingViolation.syncWithSession(session);
+
+                CheatDetection savedDetection = cheatDetectionRepository.save(existingViolation);
+
+                // TAMBAHAN: Update session dengan violation
+                session.addViolation(savedDetection);
+                ujianSessionRepository.save(session);
+
+                processViolationAction(savedDetection, session);
+                return savedDetection;
             }
-        } catch (Exception e) {
-            logger.warn("Could not update existing HasilUjian with violation: {}", e.getMessage());
-        }
 
-        // Tambahkan ke UjianSession
-        if (session != null) {
-            if (session.getViolationIds() == null)
-                session.setViolationIds(new ArrayList<>());
-            session.getViolationIds().add(detection.getIdDetection());
-            ujianSessionRepository.save(session);
+            logger.debug("Creating new violation for type: {}", request.getTypeViolation());
+
+            // PERBAIKAN: Create new violation menggunakan factory method
+            CheatDetection detection = CheatDetection.createFromSession(session, request.getTypeViolation(),
+                    request.getSeverity() != null ? request.getSeverity()
+                            : ViolationType.getDefaultSeverity(request.getTypeViolation()),
+                    request.getEvidence());
+
+            // Set additional data from request
+            detection.setBrowserInfo(request.getBrowserInfo());
+            detection.setUserAgent(request.getUserAgent());
+            detection.setWindowTitle(request.getWindowTitle());
+            detection.setScreenWidth(request.getScreenWidth());
+            detection.setScreenHeight(request.getScreenHeight());
+            detection.setFullscreenStatus(request.getFullscreenStatus());
+
+            // Set frontend events
+            if (request.getFrontendEvents() != null) {
+                detection.setFrontendEvents(request.getFrontendEvents());
+            }
+
+            // Record answer timing if provided
+            if (request.getQuestionId() != null && request.getDetectionTimestamp() != null) {
+                detection.recordAnswerTime(request.getQuestionId(), request.getDetectionTimestamp());
+            }
+
+            logger.debug("Saving violation to repository");
+
+            // Save detection
+            CheatDetection savedDetection = cheatDetectionRepository.save(detection);
+
+            // Process violation action (including session updates)
+            processViolationAction(savedDetection, session);
+
+            logger.debug("Successfully recorded violation: {} with ID: {}",
+                    savedDetection.getTypeViolation(), savedDetection.getIdDetection());
+
+            return savedDetection;
+
+        } catch (BadRequestException e) {
+            logger.error("Bad request in recordViolation: {}", e.getMessage());
+            throw e;
+        } catch (ResourceNotFoundException e) {
+            logger.error("Resource not found in recordViolation: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error in recordViolation: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to record violation: " + e.getMessage());
         }
-        // Tambahkan ke HasilUjian jika sudah ada
-        List<HasilUjian> hasilList = hasilUjianRepository.findByUjianAndPeserta(request.getIdUjian(), request.getIdPeserta());
-        HasilUjian hasil = hasilList.stream()
-            .filter(h -> request.getSessionId().equals(h.getSessionId()))
-            .findFirst()
-            .orElse(null);
-        if (hasil != null) {
-            if (hasil.getViolationIds() == null)
-                hasil.setViolationIds(new ArrayList<>());
-            hasil.getViolationIds().add(detection.getIdDetection());
-            hasilUjianRepository.save(hasil);
-        }
-        return detection;
     }
 
     /**

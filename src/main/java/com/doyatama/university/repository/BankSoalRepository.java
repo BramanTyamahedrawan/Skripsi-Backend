@@ -14,6 +14,9 @@ import org.apache.hadoop.hbase.TableName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Repository;
+
+@Repository
 
 public class BankSoalRepository {
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -14,6 +15,10 @@ import org.apache.hadoop.hbase.TableName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
 
 public class UjianAnalysisRepository {
 
@@ -162,8 +167,8 @@ public class UjianAnalysisRepository {
 
     private void saveAnalysisData(HBaseCustomClient client, TableName table, String rowKey, UjianAnalysis analysis) {
         try {
-            // Time analysis
-            String timeFamily = "time_analysis";
+            // Time analysis - use 'analysis' family instead of 'time_analysis'
+            String timeFamily = "analysis";
             if (analysis.getAverageCompletionTime() != null) {
                 client.insertRecord(table, rowKey, timeFamily, "averageCompletionTime",
                         analysis.getAverageCompletionTime().toString());
@@ -184,15 +189,15 @@ public class UjianAnalysisRepository {
                 client.insertRecord(table, rowKey, timeFamily, "timePerQuestion", timePerQuestionJson);
             }
 
-            // Item analysis
-            String itemFamily = "item_analysis";
+            // Item analysis - use 'analysis' family
+            String itemFamily = "analysis";
             if (analysis.getItemAnalysis() != null && !analysis.getItemAnalysis().isEmpty()) {
                 String itemAnalysisJson = objectMapper.writeValueAsString(analysis.getItemAnalysis());
                 client.insertRecord(table, rowKey, itemFamily, "itemAnalysis", itemAnalysisJson);
             }
 
-            // Difficulty analysis
-            String difficultyFamily = "difficulty_analysis";
+            // Difficulty analysis - use 'analysis' family
+            String difficultyFamily = "analysis";
             if (analysis.getQuestionDifficulty() != null && !analysis.getQuestionDifficulty().isEmpty()) {
                 String questionDifficultyJson = objectMapper.writeValueAsString(analysis.getQuestionDifficulty());
                 client.insertRecord(table, rowKey, difficultyFamily, "questionDifficulty", questionDifficultyJson);
@@ -221,10 +226,8 @@ public class UjianAnalysisRepository {
                         .writeValueAsString(analysis.getPoorDiscriminatingQuestions());
                 client.insertRecord(table, rowKey, difficultyFamily, "poorDiscriminatingQuestions",
                         poorDiscriminatingJson);
-            }
-
-            // Performance by categories
-            String performanceFamily = "performance";
+            } // Performance by categories - use 'analysis' family
+            String performanceFamily = "analysis";
             if (analysis.getPerformanceByKelas() != null && !analysis.getPerformanceByKelas().isEmpty()) {
                 String performanceByKelasJson = objectMapper.writeValueAsString(analysis.getPerformanceByKelas());
                 client.insertRecord(table, rowKey, performanceFamily, "performanceByKelas", performanceByKelasJson);
@@ -238,10 +241,8 @@ public class UjianAnalysisRepository {
             if (analysis.getPerformanceByJurusan() != null && !analysis.getPerformanceByJurusan().isEmpty()) {
                 String performanceByJurusanJson = objectMapper.writeValueAsString(analysis.getPerformanceByJurusan());
                 client.insertRecord(table, rowKey, performanceFamily, "performanceByJurusan", performanceByJurusanJson);
-            }
-
-            // Cheating analysis
-            String cheatingFamily = "cheating_analysis";
+            } // Cheating analysis - use 'cheating' family
+            String cheatingFamily = "cheating";
             if (analysis.getSuspiciousSubmissions() != null) {
                 client.insertRecord(table, rowKey, cheatingFamily, "suspiciousSubmissions",
                         analysis.getSuspiciousSubmissions().toString());
@@ -255,10 +256,8 @@ public class UjianAnalysisRepository {
             if (analysis.getIntegrityScore() != null) {
                 client.insertRecord(table, rowKey, cheatingFamily, "integrityScore",
                         analysis.getIntegrityScore().toString());
-            }
-
-            // Recommendations
-            String recommendationFamily = "recommendations";
+            } // Recommendations - use 'recommendation' family
+            String recommendationFamily = "recommendation";
             if (analysis.getRecommendations() != null && !analysis.getRecommendations().isEmpty()) {
                 String recommendationsJson = objectMapper.writeValueAsString(analysis.getRecommendations());
                 client.insertRecord(table, rowKey, recommendationFamily, "recommendations", recommendationsJson);
@@ -282,10 +281,8 @@ public class UjianAnalysisRepository {
                 String curriculumSuggestionsJson = objectMapper.writeValueAsString(analysis.getCurriculumSuggestions());
                 client.insertRecord(table, rowKey, recommendationFamily, "curriculumSuggestions",
                         curriculumSuggestionsJson);
-            }
-
-            // Advanced analysis
-            String advancedFamily = "advanced_analysis";
+            } // Advanced analysis - use 'analysis' family
+            String advancedFamily = "analysis";
             if (analysis.getTopicPerformanceAnalysis() != null && !analysis.getTopicPerformanceAnalysis().isEmpty()) {
                 String topicPerformanceJson = objectMapper.writeValueAsString(analysis.getTopicPerformanceAnalysis());
                 client.insertRecord(table, rowKey, advancedFamily, "topicPerformanceAnalysis", topicPerformanceJson);
@@ -306,8 +303,8 @@ public class UjianAnalysisRepository {
                         analysis.getValidityIndex().toString());
             }
 
-            // Comparative analysis
-            String comparativeFamily = "comparative_analysis";
+            // Comparative analysis - use 'analysis' family
+            String comparativeFamily = "analysis";
             if (analysis.getSchoolComparison() != null && !analysis.getSchoolComparison().isEmpty()) {
                 String schoolComparisonJson = objectMapper.writeValueAsString(analysis.getSchoolComparison());
                 client.insertRecord(table, rowKey, comparativeFamily, "schoolComparison", schoolComparisonJson);
@@ -323,8 +320,8 @@ public class UjianAnalysisRepository {
                         analysis.getPercentileRank().toString());
             }
 
-            // Learning analytics
-            String learningFamily = "learning_analytics";
+            // Learning analytics - use 'analysis' family
+            String learningFamily = "analysis";
             if (analysis.getLearningGaps() != null && !analysis.getLearningGaps().isEmpty()) {
                 String learningGapsJson = objectMapper.writeValueAsString(analysis.getLearningGaps());
                 client.insertRecord(table, rowKey, learningFamily, "learningGaps", learningGapsJson);
@@ -354,7 +351,7 @@ public class UjianAnalysisRepository {
             }
         }
 
-        // Save School relationship
+        // Save School relationship - use 'school' family
         if (analysis.getSchool() != null) {
             if (analysis.getSchool().getIdSchool() != null) {
                 client.insertRecord(table, rowKey, "school", "idSchool", analysis.getSchool().getIdSchool());
@@ -362,23 +359,21 @@ public class UjianAnalysisRepository {
             if (analysis.getSchool().getNameSchool() != null) {
                 client.insertRecord(table, rowKey, "school", "nameSchool", analysis.getSchool().getNameSchool());
             }
-        }
-
-        // Save Generated By User relationship
+        } // Save Generated By User relationship - use 'detail' family
         if (analysis.getGeneratedByUser() != null) {
             if (analysis.getGeneratedByUser().getId() != null) {
-                client.insertRecord(table, rowKey, "generatedByUser", "id", analysis.getGeneratedByUser().getId());
+                client.insertRecord(table, rowKey, "detail", "generatedByUser_id",
+                        analysis.getGeneratedByUser().getId());
             }
             if (analysis.getGeneratedByUser().getName() != null) {
-                client.insertRecord(table, rowKey, "generatedByUser", "name", analysis.getGeneratedByUser().getName());
+                client.insertRecord(table, rowKey, "detail", "generatedByUser_name",
+                        analysis.getGeneratedByUser().getName());
             }
             if (analysis.getGeneratedByUser().getUsername() != null) {
-                client.insertRecord(table, rowKey, "generatedByUser", "username",
+                client.insertRecord(table, rowKey, "detail", "generatedByUser_username",
                         analysis.getGeneratedByUser().getUsername());
             }
-        }
-
-        // Save violationIds
+        } // Save violationIds - use 'cheating' family
         if (analysis.getViolationIds() != null && !analysis.getViolationIds().isEmpty()) {
             try {
                 String violationIdsJson = objectMapper.writeValueAsString(analysis.getViolationIds());
@@ -387,7 +382,7 @@ public class UjianAnalysisRepository {
                 throw new RuntimeException("Failed to serialize violationIds", e);
             }
         }
-        // Save cheatDetections
+        // Save cheatDetections - use 'cheating' family
         if (analysis.getCheatDetections() != null && !analysis.getCheatDetections().isEmpty()) {
             try {
                 String cheatDetectionsJson = objectMapper.writeValueAsString(analysis.getCheatDetections());
@@ -400,13 +395,13 @@ public class UjianAnalysisRepository {
 
     private void saveMetadata(HBaseCustomClient client, TableName table, String rowKey, UjianAnalysis analysis) {
         try {
-            // Analysis metadata
+            // Analysis metadata - use 'metadata' family
             if (analysis.getAnalysisMetadata() != null && !analysis.getAnalysisMetadata().isEmpty()) {
                 String analysisMetadataJson = objectMapper.writeValueAsString(analysis.getAnalysisMetadata());
                 client.insertRecord(table, rowKey, "metadata", "analysisMetadata", analysisMetadataJson);
             }
 
-            // Configuration used
+            // Configuration used - use 'metadata' family
             if (analysis.getConfigurationUsed() != null && !analysis.getConfigurationUsed().isEmpty()) {
                 String configurationUsedJson = objectMapper.writeValueAsString(analysis.getConfigurationUsed());
                 client.insertRecord(table, rowKey, "metadata", "configurationUsed", configurationUsedJson);
@@ -452,6 +447,8 @@ public class UjianAnalysisRepository {
         Map<String, String> columnMapping = getStandardColumnMapping();
         Map<String, String> indexedFields = getIndexedFields();
 
+        System.out.println("DEBUG: Finding analysis for ujianId: " + ujianId + " with size: " + size);
+
         List<UjianAnalysis> analysisList = client.getDataListByColumnIndeks(
                 tableAnalysis.toString(),
                 columnMapping,
@@ -462,6 +459,7 @@ public class UjianAnalysisRepository {
                 size,
                 indexedFields);
 
+        System.out.println("DEBUG: Found " + analysisList.size() + " analyses for ujianId: " + ujianId);
         return analysisList;
     }
 
@@ -509,9 +507,8 @@ public class UjianAnalysisRepository {
     public List<UjianAnalysis> findByUjianIdAndAnalysisType(String ujianId, String analysisType) throws IOException {
         // Get all analysis by ujian first, then filter by type
         List<UjianAnalysis> analysisList = findByUjianId(ujianId, 100);
-
         return analysisList.stream()
-                .filter(analysis -> analysisType.equals(analysis.getAnalysisType()))
+                .filter(analysis -> analysisType != null && Objects.equals(analysisType, analysis.getAnalysisType()))
                 .collect(Collectors.toList());
     }
 
@@ -526,12 +523,10 @@ public class UjianAnalysisRepository {
             analysisList = findBySchoolId(schoolId, size * 3); // Get more for filtering
         } else {
             analysisList = findAll(size * 3);
-        }
-
-        // Apply filters
+        } // Apply filters
         return analysisList.stream()
-                .filter(analysis -> analysisType == null || analysisType.equals(analysis.getAnalysisType()))
-                .filter(analysis -> generatedBy == null || generatedBy.equals(analysis.getGeneratedBy()))
+                .filter(analysis -> analysisType == null || Objects.equals(analysisType, analysis.getAnalysisType()))
+                .filter(analysis -> generatedBy == null || Objects.equals(generatedBy, analysis.getGeneratedBy()))
                 .limit(size)
                 .collect(Collectors.toList());
     }
@@ -546,9 +541,8 @@ public class UjianAnalysisRepository {
         } else {
             analysisList = findAll(1000);
         }
-
         return analysisList.stream()
-                .filter(analysis -> analysisType == null || analysisType.equals(analysis.getAnalysisType()))
+                .filter(analysis -> analysisType == null || Objects.equals(analysisType, analysis.getAnalysisType()))
                 .count();
     }
 

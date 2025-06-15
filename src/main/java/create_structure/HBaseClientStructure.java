@@ -169,12 +169,45 @@ public class HBaseClientStructure {
                 TableName tableUjian = TableName.valueOf("ujian");
                 String[] ujianColumns = {
                                 "main", "tahunAjaran", "kelas", "semester", "mapel",
-                                "elemen", "acp", "atp", "taksonomi",
-                                "konsentrasiKeahlianSekolah", "school", "createdBy", "bankSoalList",
+                                "taksonomi", "konsentrasiKeahlianSekolah", "school", "createdBy", "bankSoalList",
                                 "detail"
                 };
                 client.deleteTable(tableUjian);
                 client.createTable(tableUjian, ujianColumns);
+
+                // Create Table HasilUjian
+                TableName tableHasilUjian = TableName.valueOf("hasil_ujian");
+                String[] hasilUjianColumns = {
+                                "main", "peserta", "ujian", "school", "analytics", "security", "detail"
+                };
+                client.deleteTable(tableHasilUjian);
+                client.createTable(tableHasilUjian, hasilUjianColumns);
+
+                // Create Table UjianSession
+                TableName tableUjianSession = TableName.valueOf("ujian_session");
+                String[] ujianSessionColumns = {
+                                "main", "peserta", "ujian", "school", "navigation", "tracking", "security", "detail"
+                };
+                client.deleteTable(tableUjianSession);
+                client.createTable(tableUjianSession, ujianSessionColumns);
+
+                // Create Table CheatDetection
+                TableName tableCheatDetection = TableName.valueOf("cheat_detection");
+                String[] cheatDetectionColumns = {
+                                "main", "peserta", "ujian", "school", "detection", "evidence", "frontend", "timing",
+                                "action", "status", "detail"
+                };
+                client.deleteTable(tableCheatDetection);
+                client.createTable(tableCheatDetection, cheatDetectionColumns);
+
+                // Create Table UjianAnalysis
+                TableName tableUjianAnalysis = TableName.valueOf("ujian_analysis");
+                String[] ujianAnalysisColumns = {
+                                "main", "ujian", "school", "descriptive", "analysis", "cheating", "recommendation",
+                                "metadata", "detail"
+                };
+                client.deleteTable(tableUjianAnalysis);
+                client.createTable(tableUjianAnalysis, ujianAnalysisColumns);
 
                 // // Create Table Jawaban Siswa
                 // TableName tableJawaban = TableName.valueOf("jawabanSiswa");
@@ -228,7 +261,8 @@ public class HBaseClientStructure {
 
                 // Create Tabel Mahasiswa
                 TableName tableStudent = TableName.valueOf("students");
-                String[] students = { "main", "bidangKeahlian", "programKeahlian", "konsentrasiKeahlian", "religion",
+                String[] students = { "main", "bidangKeahlian", "programKeahlian",
+                                "konsentrasiKeahlian", "religion",
                                 "detail" };
                 client.deleteTable(tableStudent);
                 client.createTable(tableStudent, students);
@@ -262,10 +296,10 @@ public class HBaseClientStructure {
                 // client.createTable(tableReference, references);
 
                 // Create Table Media Pembelajaran
-                TableName tableLearningMedia = TableName.valueOf("learning_medias");
-                String[] learningMedias = { "main", "detail" };
-                client.deleteTable(tableLearningMedia);
-                client.createTable(tableLearningMedia, learningMedias);
+                // TableName tableLearningMedia = TableName.valueOf("learning_medias");
+                // String[] learningMedias = { "main", "detail" };
+                // client.deleteTable(tableLearningMedia);
+                // client.createTable(tableLearningMedia, learningMedias);
 
                 // // Create Table Agama
                 // TableName tableReligion = TableName.valueOf("religions");
@@ -316,23 +350,23 @@ public class HBaseClientStructure {
                 // client.deleteTable(tableLearningMethod);
                 // client.createTable(tableLearningMethod, learningMethods);
 
-                // Create Tabel Pertanyaan
-                TableName tableQuestion = TableName.valueOf("questions");
-                String[] questions = { "main", "rps_detail", "detail" };
-                client.deleteTable(tableQuestion);
-                client.createTable(tableQuestion, questions);
+                // // Create Tabel Pertanyaan
+                // TableName tableQuestion = TableName.valueOf("questions");
+                // String[] questions = { "main", "rps_detail", "detail" };
+                // client.deleteTable(tableQuestion);
+                // client.createTable(tableQuestion, questions);
 
-                // Create Tabel Jawaban
-                TableName tableAnswer = TableName.valueOf("answers");
-                String[] answers = { "main", "question", "detail" };
-                client.deleteTable(tableAnswer);
-                client.createTable(tableAnswer, answers);
+                // // Create Tabel Jawaban
+                // TableName tableAnswer = TableName.valueOf("answers");
+                // String[] answers = { "main", "question", "detail" };
+                // client.deleteTable(tableAnswer);
+                // client.createTable(tableAnswer, answers);
 
-                // Create Tabel Ujian
-                TableName tableExam = TableName.valueOf("exams");
-                String[] exams = { "main", "rps", "questions", "detail" };
-                client.deleteTable(tableExam);
-                client.createTable(tableExam, exams);
+                // // Create Tabel Ujian
+                // TableName tableExam = TableName.valueOf("exams");
+                // String[] exams = { "main", "rps", "questions", "detail" };
+                // client.deleteTable(tableExam);
+                // client.createTable(tableExam, exams);
 
                 // // Create Tabel Kuis
                 // TableName tableQuizzes = TableName.valueOf("quizzes");

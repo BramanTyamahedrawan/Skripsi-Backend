@@ -22,6 +22,7 @@ public class Ujian {
     private Double totalBobot;
     private String tipeSoal; // ACAK, BERURUTAN
     private Boolean tampilkanNilai;
+    private Integer jumlahPeserta; // Jumlah peserta yang telah mengikuti ujian
 
     // Menyimpan daftar ID soal untuk referensi cepat
     private List<String> idBankSoalList;
@@ -514,14 +515,7 @@ public class Ujian {
     }
 
     public boolean hasBankSoal(String idBankSoal) {
-        if (this.idBankSoalList != null && this.idBankSoalList.contains(idBankSoal)) {
-            return true;
-        }
-        if (this.bankSoalList != null) {
-            return this.bankSoalList.stream()
-                    .anyMatch(soal -> idBankSoal.equals(soal.getIdBankSoal()));
-        }
-        return false;
+        return this.idBankSoalList != null && this.idBankSoalList.contains(idBankSoal);
     }
 
     // Basic state management methods
@@ -547,6 +541,14 @@ public class Ujian {
         this.isLive = false;
         this.statusUjian = "DIBATALKAN";
         this.updatedAt = Instant.now();
+    }
+
+    public Integer getJumlahPeserta() {
+        return jumlahPeserta;
+    }
+
+    public void setJumlahPeserta(Integer jumlahPeserta) {
+        this.jumlahPeserta = jumlahPeserta;
     }
 
     @Override

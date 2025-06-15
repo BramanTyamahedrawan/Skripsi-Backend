@@ -2,6 +2,7 @@ package com.doyatama.university.helper;
 
 import com.doyatama.university.model.Answer;
 import com.doyatama.university.model.Question;
+import com.doyatama.university.model.BankSoalUjian;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -86,9 +87,9 @@ public class HBaseCustomClient {
         try {
             Table table = connection.getTable(tableName);
             Put p = new Put(Bytes.toBytes(rowKey));
-            if (value != null) {
-                p.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(value));
-            }
+            // Always insert a column, use empty string if value is null
+            String valueToInsert = (value != null) ? value : "";
+            p.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier), Bytes.toBytes(valueToInsert));
             table.put(p);
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -944,17 +945,42 @@ public class HBaseCustomClient {
                             });
                     field.set(object, mapValue);
                 } else if ("LIST".equalsIgnoreCase(fieldType)) {
-                    List<Object> listValue = objectMapper.readValue(value,
-                            new TypeReference<List<Object>>() {
-                            });
-                    field.set(object, listValue);
+                    // Handle special cases for bankSoalList
+                    if (fieldName.equals("bankSoalList")) {
+                        List<BankSoalUjian> listValue = objectMapper.readValue(value,
+                                new TypeReference<List<BankSoalUjian>>() {
+                                });
+                        field.set(object, listValue);
+                    } else {
+                        List<Object> listValue = objectMapper.readValue(value,
+                                new TypeReference<List<Object>>() {
+                                });
+                        field.set(object, listValue);
+                    }
                 } else if ("INTEGER".equalsIgnoreCase(fieldType)) {
                     field.set(object, Integer.parseInt(value));
                 } else {
                     field.set(object, value);
                 }
             } catch (Exception e) {
-                // If parsing fails, keep the default value
+                // If parsing fails, set default value based on field type
+                try {
+                    if ("MAP".equalsIgnoreCase(fieldType)) {
+                        field.set(object, new HashMap<>());
+                    } else if ("LIST".equalsIgnoreCase(fieldType)) {
+                        if (fieldName.equals("bankSoalList")) {
+                            field.set(object, new ArrayList<BankSoalUjian>());
+                        } else {
+                            field.set(object, new ArrayList<>());
+                        }
+                    } else if ("INTEGER".equalsIgnoreCase(fieldType)) {
+                        field.set(object, 0);
+                    } else {
+                        field.set(object, value);
+                    }
+                } catch (Exception fallbackException) {
+                    // Ignore fallback errors
+                }
             }
         } else {
             // Handle regular fields
@@ -1025,13 +1051,32 @@ public class HBaseCustomClient {
         } else if (List.class.isAssignableFrom(fieldType)) {
             // Handling List types
             try {
-                // Untuk field List, gunakan TypeReference untuk parsing yang lebih akurat
-                TypeReference<List<String>> typeRef = new TypeReference<List<String>>() {
-                };
-                List<String> listValue = objectMapper.readValue(value, typeRef);
-                field.set(object, listValue);
+                // Handle special cases for bankSoalList
+                if (field.getName().equals("bankSoalList")) {
+                    // Parse as List<BankSoalUjian>
+                    TypeReference<List<BankSoalUjian>> typeRef = new TypeReference<List<BankSoalUjian>>() {
+                    };
+                    List<BankSoalUjian> listValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, listValue);
+                } else {
+                    // For other List fields, use List<String> as default
+                    TypeReference<List<String>> typeRef = new TypeReference<List<String>>() {
+                    };
+                    List<String> listValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, listValue);
+                }
             } catch (Exception e) {
                 System.out.println("Error parsing List field " + field.getName() + ": " + e.getMessage());
+                // Set empty list as fallback
+                try {
+                    if (field.getName().equals("bankSoalList")) {
+                        field.set(object, new ArrayList<BankSoalUjian>());
+                    } else {
+                        field.set(object, new ArrayList<String>());
+                    }
+                } catch (Exception fallbackException) {
+                    // Ignore fallback errors
+                }
             }
         } else if (Map.class.isAssignableFrom(fieldType)) {
             // Handling Map types
@@ -1045,8 +1090,94 @@ public class HBaseCustomClient {
                 System.out.println("Error parsing Map field " + field.getName() + ": " + e.getMessage());
             }
         } else {
-            // Tipe data yang tidak dikenal, lewati saja
-            System.out.println("Tipe data " + fieldType + " tidak dikenali.");
+            // Handle complex objects that might contain special fields like bankSoalList
+            try {
+                // Try to deserialize as JSON object
+                Object complexObject = objectMapper.readValue(value, fieldType);
+
+                // If the complex object is an Ujian and has bankSoalList, handle it specially
+                if (fieldType.getName().equals("com.doyatama.university.model.Ujian")) {
+                    // Re-deserialize with special handling for bankSoalList
+                    JsonNode jsonNode = objectMapper.readTree(value);
+                    Object ujianObject = fieldType.newInstance();
+
+                    // Set all fields from JSON
+                    Field[] fields = fieldType.getDeclaredFields();
+                    for (Field ujianField : fields) {
+                        ujianField.setAccessible(true);
+                        String fieldName = ujianField.getName();
+
+                        if (jsonNode.has(fieldName)) {
+                            JsonNode fieldNode = jsonNode.get(fieldName);
+                            if (fieldName.equals("bankSoalList") && fieldNode.isArray()) {
+                                // Special handling for bankSoalList
+                                List<BankSoalUjian> bankSoalList = objectMapper.readValue(fieldNode.toString(),
+                                        new TypeReference<List<BankSoalUjian>>() {
+                                        });
+                                ujianField.set(ujianObject, bankSoalList);
+                            } else if (!fieldNode.isNull()) {
+                                // Handle other fields
+                                setFieldFromJsonNode(ujianField, ujianObject, fieldNode);
+                            }
+                        }
+                    }
+                    field.set(object, ujianObject);
+                } else {
+                    // For other complex objects, use regular deserialization
+                    field.set(object, complexObject);
+                }
+            } catch (Exception e) {
+                // Fallback: just set the string value or log the error
+                System.out.println("Error parsing complex object field " + field.getName() + ": " + e.getMessage());
+                // Tipe data yang tidak dikenal, lewati saja
+                System.out.println("Tipe data " + fieldType + " tidak dikenali.");
+            }
+        }
+    }
+
+    private void setFieldFromJsonNode(Field field, Object object, JsonNode jsonNode) throws IllegalAccessException {
+        field.setAccessible(true);
+        Class<?> fieldType = field.getType();
+
+        try {
+            if (fieldType == String.class) {
+                field.set(object, jsonNode.asText());
+            } else if (fieldType == Integer.class || fieldType == int.class) {
+                field.set(object, jsonNode.asInt());
+            } else if (fieldType == Boolean.class || fieldType == boolean.class) {
+                field.set(object, jsonNode.asBoolean());
+            } else if (fieldType == Long.class || fieldType == long.class) {
+                field.set(object, jsonNode.asLong());
+            } else if (fieldType == Double.class || fieldType == double.class) {
+                field.set(object, jsonNode.asDouble());
+            } else if (fieldType == Instant.class) {
+                field.set(object, Instant.parse(jsonNode.asText()));
+            } else if (List.class.isAssignableFrom(fieldType)) {
+                // For lists, use the existing JSON parsing logic
+                String jsonString = jsonNode.toString();
+                if (field.getName().equals("bankSoalList")) {
+                    List<BankSoalUjian> listValue = objectMapper.readValue(jsonString,
+                            new TypeReference<List<BankSoalUjian>>() {
+                            });
+                    field.set(object, listValue);
+                } else {
+                    List<String> listValue = objectMapper.readValue(jsonString,
+                            new TypeReference<List<String>>() {
+                            });
+                    field.set(object, listValue);
+                }
+            } else if (Map.class.isAssignableFrom(fieldType)) {
+                Map<String, Object> mapValue = objectMapper.readValue(jsonNode.toString(),
+                        new TypeReference<Map<String, Object>>() {
+                        });
+                field.set(object, mapValue);
+            } else {
+                // For other complex objects, try JSON deserialization
+                Object value = objectMapper.readValue(jsonNode.toString(), fieldType);
+                field.set(object, value);
+            }
+        } catch (Exception e) {
+            System.out.println("Error setting field " + field.getName() + " from JsonNode: " + e.getMessage());
         }
     }
 }

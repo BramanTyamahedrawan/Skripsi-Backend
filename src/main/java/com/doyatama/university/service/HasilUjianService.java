@@ -7,9 +7,9 @@ import com.doyatama.university.model.Ujian;
 import com.doyatama.university.model.User;
 import com.doyatama.university.model.School;
 import com.doyatama.university.model.UjianSession;
-import com.doyatama.university.model.BankSoal;
 import com.doyatama.university.model.BankSoalUjian;
 import com.doyatama.university.model.CheatDetection;
+import com.doyatama.university.model.UjianAnalysis;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.HasilUjianRepository;
@@ -17,7 +17,6 @@ import com.doyatama.university.repository.UjianRepository;
 import com.doyatama.university.repository.UserRepository;
 import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.UjianSessionRepository;
-import com.doyatama.university.repository.BankSoalRepository;
 import com.doyatama.university.repository.CheatDetectionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,15 +50,13 @@ public class HasilUjianService {
 
     @Autowired
     private SchoolRepository schoolRepository;
-
     @Autowired
     private UjianSessionRepository ujianSessionRepository;
-
-    @Autowired
-    private BankSoalRepository bankSoalRepository;
-
     @Autowired
     private CheatDetectionRepository cheatDetectionRepository;
+
+    @Autowired
+    private UjianAnalysisService ujianAnalysisService;
 
     // ==================== OPERASI CRUD UTAMA ====================
 
@@ -110,13 +107,23 @@ public class HasilUjianService {
     }
 
     /**
-     * Get hasil ujian by ujian dengan PagedResponse - FIXED FORMAT
+     * Get hasil ujian by ujian dengan PagedResponse - FIXED FORMAT WITH SCHOOL
+     * VALIDATION
      */
-    public PagedResponse<HasilUjian> getHasilByUjian(String idUjian, int page, int size, Boolean includeAnalytics)
+    public PagedResponse<HasilUjian> getHasilByUjian(String idUjian, int page, int size, Boolean includeAnalytics,
+            String schoolId)
             throws IOException {
-        logger.debug("Mengambil hasil ujian untuk ujian: {}", idUjian);
+        logger.debug("Mengambil hasil ujian untuk ujian: {} di sekolah: {}", idUjian, schoolId);
+
+        // First, validate that the ujian belongs to the school
+        // TODO: Add ujian validation here to ensure idUjian belongs to schoolId
 
         List<HasilUjian> results = hasilUjianRepository.findByUjian(idUjian);
+
+        // Filter results by school for additional security
+        results = results.stream()
+                .filter(hasil -> schoolId.equals(hasil.getIdSchool()))
+                .collect(Collectors.toList());
 
         if (includeAnalytics != null && includeAnalytics) {
             calculateComparativeAnalytics(results);
@@ -125,24 +132,39 @@ public class HasilUjianService {
         // Enrich data
         for (HasilUjian hasil : results) {
             enrichHasilUjianData(hasil);
-        }
-
-        // Apply pagination
+        } // Apply pagination
         int startIndex = page * size;
         int endIndex = Math.min(startIndex + size, results.size());
 
-        List<HasilUjian> pagedResults = results.subList(startIndex, endIndex);
+        List<HasilUjian> pagedResults = startIndex < results.size()
+                ? results.subList(startIndex, endIndex)
+                : new ArrayList<>();
 
         return new PagedResponse<>(pagedResults, results.size(), "Successfully get data", 200);
     }
 
     /**
-     * Get hasil ujian by peserta dengan PagedResponse - FIXED FORMAT
+     * Get hasil ujian by peserta dengan PagedResponse - FIXED FORMAT WITH SCHOOL
+     * VALIDATION
      */
-    public PagedResponse<HasilUjian> getHasilByPeserta(String idPeserta, int page, int size) throws IOException {
-        logger.debug("Mengambil hasil ujian untuk peserta: {}", idPeserta);
+    public PagedResponse<HasilUjian> getHasilByPeserta(String idPeserta, int page, int size, String schoolId)
+            throws IOException {
+        logger.debug("Mengambil hasil ujian untuk peserta: {} di sekolah: {}", idPeserta, schoolId);
 
         List<HasilUjian> results = hasilUjianRepository.findByPeserta(idPeserta);
+        logger.debug("Found {} raw results for peserta: {}", results.size(), idPeserta);
+
+        // Log each result's school ID for debugging
+        for (HasilUjian hasil : results) {
+            logger.debug("Result: {} belongs to school: {}", hasil.getIdHasilUjian(), hasil.getIdSchool());
+        }
+
+        // Filter by school for additional security
+        results = results.stream()
+                .filter(hasil -> schoolId.equals(hasil.getIdSchool()))
+                .collect(Collectors.toList());
+
+        logger.debug("After school filtering: {} results remain", results.size());
 
         // Sort by created date descending
         List<HasilUjian> sortedResults = results.stream()
@@ -160,6 +182,7 @@ public class HasilUjianService {
 
         List<HasilUjian> pagedResults = sortedResults.subList(startIndex, endIndex);
 
+        logger.debug("Returning {} results (page {}, size {})", pagedResults.size(), page, size);
         return new PagedResponse<>(pagedResults, sortedResults.size(), "Successfully get data", 200);
     }
 
@@ -222,8 +245,35 @@ public class HasilUjianService {
             throw new BadRequestException("Session belum completed");
         }
 
+        // PERBAIKAN: Log session data untuk debugging
+        logger.debug("Session data - idUjian: {}, idPeserta: {}, idSchool: {}",
+                session.getIdUjian(), session.getIdPeserta(), session.getIdSchool());
+
+        // PERBAIKAN: Validasi required fields
+        if (session.getIdUjian() == null || session.getIdUjian().isEmpty()) {
+            throw new BadRequestException("Session missing idUjian");
+        }
+        if (session.getIdPeserta() == null || session.getIdPeserta().isEmpty()) {
+            throw new BadRequestException("Session missing idPeserta");
+        }
+        if (session.getIdSchool() == null || session.getIdSchool().isEmpty()) {
+            logger.warn("Session missing idSchool, using default");
+            session.setIdSchool("UNKNOWN");
+        }
+
         // PERBAIKAN: Gunakan method dari session untuk create hasil ujian
         HasilUjian hasilUjian = session.createHasilUjian();
+
+        // PERBAIKAN: Validate hasil ujian fields
+        if (hasilUjian.getIdHasilUjian() == null) {
+            hasilUjian.setIdHasilUjian(UUID.randomUUID().toString());
+        }
+        if (hasilUjian.getIdSchool() == null || hasilUjian.getIdSchool().isEmpty()) {
+            hasilUjian.setIdSchool(session.getIdSchool() != null ? session.getIdSchool() : "UNKNOWN");
+        }
+        if (hasilUjian.getStatusPengerjaan() == null) {
+            hasilUjian.setStatusPengerjaan(isAutoSubmit ? "TIMEOUT" : "SELESAI");
+        }
 
         // Override answers jika ada final answers
         if (finalAnswers != null && !finalAnswers.isEmpty()) {
@@ -264,8 +314,19 @@ public class HasilUjianService {
             hasilUjian.setMetadata(metadata);
         }
 
+        // PERBAIKAN: Log data before saving
+        logger.debug("Saving HasilUjian - idHasilUjian: {}, idUjian: {}, idPeserta: {}, idSchool: {}",
+                hasilUjian.getIdHasilUjian(), hasilUjian.getIdUjian(), hasilUjian.getIdPeserta(),
+                hasilUjian.getIdSchool());
         HasilUjian savedResult = hasilUjianRepository.save(hasilUjian);
         logger.info("Hasil ujian berhasil dibuat dengan ID: {}", savedResult.getIdHasilUjian());
+
+        // Auto-generate analysis after exam completion
+        try {
+            autoGenerateAnalysisAfterCompletion(savedResult);
+        } catch (Exception e) {
+            logger.warn("Failed to auto-generate analysis for ujian {}: {}", savedResult.getIdUjian(), e.getMessage());
+        }
 
         return savedResult;
     }
@@ -560,6 +621,18 @@ public class HasilUjianService {
         stats.put("passRate", results.size() > 0 ? (double) passedCount / results.size() * 100.0 : 0.0);
 
         return stats;
+    }
+
+    /**
+     * Count unique participants for a specific ujian
+     */
+    public long countParticipantsByUjian(String idUjian) throws IOException {
+        try {
+            return hasilUjianRepository.countByUjian(idUjian);
+        } catch (Exception e) {
+            logger.warn("Failed to count participants for ujian {}: {}", idUjian, e.getMessage());
+            return 0;
+        }
     }
 
     // ==================== METODE ANALYTICS PRIVATE ====================
@@ -1196,6 +1269,41 @@ public class HasilUjianService {
         } catch (Exception e) {
             logger.error("Error evaluating security status for session: {}", hasilUjian.getSessionId(), e);
             hasilUjian.setSecurityStatus("UNKNOWN");
+        }
+    }
+
+    /**
+     * Auto-generate analysis after exam completion
+     */
+    private void autoGenerateAnalysisAfterCompletion(HasilUjian hasilUjian) {
+        try {
+            logger.info("Starting auto-generation analysis for ujian: {} from student: {}",
+                    hasilUjian.getIdUjian(), hasilUjian.getIdPeserta());
+
+            // Always generate analysis when someone completes the exam
+            // Create request for analysis generation
+            com.doyatama.university.payload.UjianAnalysisRequest.GenerateAnalysisRequest request = new com.doyatama.university.payload.UjianAnalysisRequest.GenerateAnalysisRequest();
+            request.setIdUjian(hasilUjian.getIdUjian());
+            request.setIdSchool(hasilUjian.getIdSchool());
+            request.setIncludeDescriptiveStats(true);
+            request.setIncludeItemAnalysis(true);
+            request.setIncludeCheatingAnalysis(true);
+            request.setIncludeLearningAnalytics(true);
+            request.setDetailLevel("DETAILED"); // Add configuration - don't allow duplicate for automatic generation
+            Map<String, Object> configuration = new HashMap<>();
+            configuration.put("allowDuplicate", false);
+            configuration.put("autoGenerated", true);
+            request.setAnalysisConfiguration(configuration);
+
+            // Generate analysis
+            logger.info("Calling ujianAnalysisService.generateAnalysis for ujian: {}", hasilUjian.getIdUjian());
+            UjianAnalysis generatedAnalysis = ujianAnalysisService.generateAnalysis(request);
+            logger.info("Analysis generation completed for ujian: {} with analysis ID: {}",
+                    hasilUjian.getIdUjian(), generatedAnalysis.getIdAnalysis());
+
+        } catch (Exception e) {
+            logger.error("Failed to auto-generate analysis for ujian {}: {}", hasilUjian.getIdUjian(), e.getMessage(),
+                    e);
         }
     }
 }

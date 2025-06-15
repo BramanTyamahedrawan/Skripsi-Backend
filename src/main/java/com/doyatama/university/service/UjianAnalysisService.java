@@ -84,16 +84,20 @@ public class UjianAnalysisService {
      */
     public PagedResponse<UjianAnalysis> getAnalysisByUjian(String ujianId, int page, int size, String schoolID)
             throws IOException {
+        logger.info("Getting analysis for ujian: {} with schoolID: {}", ujianId, schoolID);
         validatePageNumberAndSize(page, size);
 
         List<UjianAnalysis> analysisResponse;
 
         if (schoolID.equalsIgnoreCase("*")) {
+            logger.info("Getting analysis without school filter");
             analysisResponse = ujianAnalysisRepository.findByUjianId(ujianId, size);
         } else {
+            logger.info("Getting analysis with school filter: {}", schoolID);
             analysisResponse = ujianAnalysisRepository.findByUjianIdAndSchoolId(ujianId, schoolID, size);
         }
 
+        logger.info("Found {} analyses for ujian: {}", analysisResponse.size(), ujianId);
         return new PagedResponse<>(analysisResponse, analysisResponse.size(), "Successfully get data", 200);
     }
 
@@ -146,7 +150,7 @@ public class UjianAnalysisService {
      * Generate comprehensive analysis
      */
     public UjianAnalysis generateAnalysis(UjianAnalysisRequest.GenerateAnalysisRequest request) throws IOException {
-        logger.debug("Generating analysis for ujian: {}", request.getIdUjian());
+        logger.info("Generating analysis for ujian: {}", request.getIdUjian());
 
         // Validate request
         validateGenerateAnalysisRequest(request);
@@ -160,20 +164,23 @@ public class UjianAnalysisService {
         // Check if analysis already exists
         List<UjianAnalysis> existingAnalysis = ujianAnalysisRepository.findByUjianIdAndAnalysisType(
                 request.getIdUjian(), request.getAnalysisType());
-
         if (!existingAnalysis.isEmpty()
                 && !request.getAnalysisConfiguration().getOrDefault("allowDuplicate", false).equals(true)) {
-            throw new BadRequestException(
-                    "Analysis sudah ada untuk ujian ini dengan tipe: " + request.getAnalysisType());
-        }
-
-        // Create new analysis object
+            logger.warn("Analysis already exists for ujian: {}, returning latest existing", request.getIdUjian());
+            // Return the latest analysis (sorted by generatedAt descending)
+            return existingAnalysis.stream()
+                    .max(Comparator.comparing(UjianAnalysis::getGeneratedAt))
+                    .orElse(existingAnalysis.get(0));
+        } // Create new analysis object
         UjianAnalysis analysis = new UjianAnalysis();
         analysis.setIdAnalysis(UUID.randomUUID().toString());
         analysis.setIdUjian(request.getIdUjian());
         analysis.setIdSchool(request.getIdSchool());
         analysis.setAnalysisType(request.getAnalysisType() != null ? request.getAnalysisType() : "COMPREHENSIVE");
         analysis.setGeneratedBy(getCurrentUserId());
+        analysis.setGeneratedAt(Instant.now());
+        analysis.setUpdatedAt(Instant.now());
+        analysis.setAnalysisVersion("1.0");
         analysis.setConfigurationUsed(request.getAnalysisConfiguration());
 
         // Set relational data
@@ -186,37 +193,50 @@ public class UjianAnalysisService {
         List<UjianSession> sessionList = ujianSessionRepository.findSessionsByUjian(request.getIdUjian()); // CORRECTED
         List<CheatDetection> cheatDetectionList = cheatDetectionRepository.findByUjianId(request.getIdUjian()); // CORRECTED
 
-        // Generate analysis components based on request
-        if (request.getIncludeDescriptiveStats()) {
+        logger.info("Found {} hasil ujian, {} sessions, {} cheat detections for ujian: {}",
+                hasilUjianList.size(), sessionList.size(), cheatDetectionList.size(), request.getIdUjian()); // Generate
+                                                                                                             // analysis
+                                                                                                             // components
+                                                                                                             // based on
+                                                                                                             // request
+        if (request.getIncludeDescriptiveStats() == null || request.getIncludeDescriptiveStats()) {
             generateDescriptiveStatistics(analysis, hasilUjianList, ujian);
+            logger.debug("Generated descriptive statistics");
         }
 
-        if (request.getIncludeItemAnalysis()) {
+        if (request.getIncludeItemAnalysis() == null || request.getIncludeItemAnalysis()) {
             generateItemAnalysis(analysis, hasilUjianList, ujian);
+            logger.debug("Generated item analysis");
         }
 
-        if (request.getIncludeDifficultyAnalysis()) {
+        if (request.getIncludeDifficultyAnalysis() != null && request.getIncludeDifficultyAnalysis()) {
             generateDifficultyAnalysis(analysis, hasilUjianList, ujian);
+            logger.debug("Generated difficulty analysis");
         }
 
-        if (request.getIncludeTimeAnalysis()) {
+        if (request.getIncludeTimeAnalysis() != null && request.getIncludeTimeAnalysis()) {
             generateTimeAnalysis(analysis, sessionList, hasilUjianList);
+            logger.debug("Generated time analysis");
         }
 
-        if (request.getIncludeCheatingAnalysis()) {
+        if (request.getIncludeCheatingAnalysis() == null || request.getIncludeCheatingAnalysis()) {
             generateCheatingAnalysis(analysis, cheatDetectionList, sessionList);
+            logger.debug("Generated cheating analysis");
         }
 
-        if (request.getIncludeComparativeAnalysis()) {
+        if (request.getIncludeComparativeAnalysis() != null && request.getIncludeComparativeAnalysis()) {
             generateComparativeAnalysis(analysis, request.getIdSchool());
+            logger.debug("Generated comparative analysis");
         }
 
-        if (request.getIncludeLearningAnalytics()) {
+        if (request.getIncludeLearningAnalytics() == null || request.getIncludeLearningAnalytics()) {
             generateLearningAnalytics(analysis, hasilUjianList, ujian);
+            logger.debug("Generated learning analytics");
         }
 
-        if (request.getIncludeRecommendations()) {
+        if (request.getIncludeRecommendations() == null || request.getIncludeRecommendations()) {
             generateRecommendations(analysis, ujian);
+            logger.debug("Generated recommendations");
         }
 
         // Calculate performance by categories
@@ -233,7 +253,11 @@ public class UjianAnalysisService {
         analysis.setCheatDetections(new ArrayList<>(cheatDetectionList));
 
         // Save analysis
-        return ujianAnalysisRepository.save(analysis);
+        UjianAnalysis savedAnalysis = ujianAnalysisRepository.save(analysis);
+        logger.info("Analysis saved successfully with ID: {} for ujian: {}", savedAnalysis.getIdAnalysis(),
+                request.getIdUjian());
+
+        return savedAnalysis;
     }
 
     /**
@@ -310,15 +334,30 @@ public class UjianAnalysisService {
         long completedCount = hasilUjianList.stream()
                 .filter(hasil -> hasil.getStatusPengerjaan() != null && hasil.getStatusPengerjaan().equals("SELESAI"))
                 .count();
-
         analysis.setCompletedParticipants((int) completedCount);
         analysis.setIncompleteParticipants(analysis.getTotalParticipants() - analysis.getCompletedParticipants());
-
-        // FIXED: Use correct field name getTotalSkor instead of getTotalScore
+        // Use percentage scores for analysis consistency with pass/fail logic
         List<Double> scores = hasilUjianList.stream()
-                .filter(hasil -> hasil.getTotalSkor() != null)
-                .map(HasilUjian::getTotalSkor)
+                .filter(hasil -> hasil.getPersentase() != null)
+                .map(HasilUjian::getPersentase)
                 .collect(Collectors.toList());
+
+        // Fallback: if no percentage scores, use totalSkor
+        if (scores.isEmpty()) {
+            scores = hasilUjianList.stream()
+                    .filter(hasil -> hasil.getTotalSkor() != null)
+                    .map(HasilUjian::getTotalSkor)
+                    .collect(Collectors.toList());
+            logger.warn("No percentage scores found, using totalSkor for analysis");
+        }
+
+        // Debug logging
+        logger.debug("Found {} hasil ujian for analysis", hasilUjianList.size());
+        for (HasilUjian hasil : hasilUjianList) {
+            logger.debug("Hasil ujian {}: totalSkor={}, persentase={}, lulus={}",
+                    hasil.getIdHasilUjian(), hasil.getTotalSkor(), hasil.getPersentase(), hasil.getLulus());
+        }
+        logger.debug("Filtered scores for analysis: {}", scores);
 
         if (!scores.isEmpty()) {
             analysis.setAverageScore(scores.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
@@ -580,13 +619,11 @@ public class UjianAnalysisService {
                     learningGaps.computeIfAbsent(topic, k -> new ArrayList<>()).add(itemData.getPertanyaan());
                 }
             }
-        }
-
-        // FIXED: Use correct field name getTotalSkor instead of getTotalScore
+        } // Use percentage scores for consistency
         for (HasilUjian hasil : hasilUjianList) {
-            if (hasil.getTotalSkor() != null && hasil.getTotalSkor() < 70.0) {
+            if (hasil.getPersentase() != null && hasil.getPersentase() < 70.0) {
                 studyRecommendations.put(hasil.getIdPeserta(),
-                        generateStudyRecommendation(hasil.getTotalSkor(), learningGaps));
+                        generateStudyRecommendation(hasil.getPersentase(), learningGaps));
             }
         }
 
@@ -802,8 +839,12 @@ public class UjianAnalysisService {
             throw new ResourceNotFoundException("Ujian", "id", ujianId);
         }
 
-        if (!ujian.isSelesai()) {
-            throw new BadRequestException("Analisis hanya dapat dilakukan pada ujian yang sudah selesai");
+        // Allow analysis generation for active exams or completed exams
+        // Analysis can be generated when students complete their exam, even if exam is
+        // still ongoing
+        if (ujian.getStatusUjian() == null ||
+                (!ujian.getStatusUjian().equals("AKTIF") && !ujian.getStatusUjian().equals("SELESAI"))) {
+            throw new BadRequestException("Analisis hanya dapat dilakukan pada ujian yang aktif atau sudah selesai");
         }
 
         return ujian;
@@ -987,5 +1028,79 @@ public class UjianAnalysisService {
         stats.put("overallPassRate", avgPassRate.orElse(0.0));
 
         return stats;
+    }
+
+    /**
+     * Clean up duplicate analysis records for a specific ujian and analysis type
+     * Keeps the latest analysis and removes duplicates
+     */
+    public int cleanupDuplicateAnalysis(String idUjian, String analysisType) throws IOException {
+        logger.info("Cleaning up duplicate analysis for ujian: {}, type: {}", idUjian, analysisType);
+
+        List<UjianAnalysis> existingAnalysis = ujianAnalysisRepository.findByUjianIdAndAnalysisType(idUjian,
+                analysisType);
+
+        if (existingAnalysis.size() <= 1) {
+            logger.info("No duplicates found for ujian: {}, type: {}", idUjian, analysisType);
+            return 0;
+        }
+
+        // Sort by generatedAt descending to keep the latest
+        existingAnalysis.sort(Comparator.comparing(UjianAnalysis::getGeneratedAt).reversed());
+
+        // Keep the first (latest) analysis, remove the rest
+        List<UjianAnalysis> toDelete = existingAnalysis.subList(1, existingAnalysis.size());
+        int deletedCount = 0;
+        for (UjianAnalysis analysis : toDelete) {
+            try {
+                ujianAnalysisRepository.deleteById(analysis.getIdAnalysis());
+                deletedCount++;
+                logger.info("Deleted duplicate analysis: {} for ujian: {}", analysis.getIdAnalysis(), idUjian);
+            } catch (Exception e) {
+                logger.error("Failed to delete duplicate analysis: {} for ujian: {}", analysis.getIdAnalysis(), idUjian,
+                        e);
+            }
+        }
+
+        logger.info("Cleaned up {} duplicate analysis records for ujian: {}, type: {}", deletedCount, idUjian,
+                analysisType);
+        return deletedCount;
+    }
+
+    /**
+     * Clean up all duplicate analysis records in the system
+     * Groups by ujian ID and analysis type, keeps latest of each group
+     */
+    public Map<String, Integer> cleanupAllDuplicateAnalysis() throws IOException {
+        logger.info("Starting cleanup of all duplicate analysis records");
+
+        List<UjianAnalysis> allAnalyses = ujianAnalysisRepository.findAll(1000); // Get up to 1000 records
+        Map<String, Integer> cleanupStats = new HashMap<>();
+        int totalCleaned = 0;
+
+        // Group analyses by ujian ID and analysis type
+        Map<String, List<UjianAnalysis>> groupedAnalyses = allAnalyses.stream()
+                .collect(Collectors.groupingBy(analysis -> analysis.getIdUjian() + "_"
+                        + (analysis.getAnalysisType() != null ? analysis.getAnalysisType() : "COMPREHENSIVE")));
+
+        for (Map.Entry<String, List<UjianAnalysis>> entry : groupedAnalyses.entrySet()) {
+            List<UjianAnalysis> analyses = entry.getValue();
+            if (analyses.size() > 1) {
+                String[] parts = entry.getKey().split("_");
+                String idUjian = parts[0];
+                String analysisType = parts.length > 1 ? parts[1] : "COMPREHENSIVE";
+
+                int cleaned = cleanupDuplicateAnalysis(idUjian, analysisType);
+                totalCleaned += cleaned;
+
+                if (cleaned > 0) {
+                    cleanupStats.put(entry.getKey(), cleaned);
+                }
+            }
+        }
+
+        cleanupStats.put("TOTAL_CLEANED", totalCleaned);
+        logger.info("Completed cleanup of all duplicate analysis records. Total cleaned: {}", totalCleaned);
+        return cleanupStats;
     }
 }

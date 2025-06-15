@@ -904,17 +904,34 @@ public class HasilUjian {
     }
 
     public void performCompleteAnalysis() {
+        // Initialize default values for all analytics fields to prevent NPE
+        if (this.totalAnswerChanges == null)
+            this.totalAnswerChanges = 0;
+        if (this.answerChangeSuccessRate == null)
+            this.answerChangeSuccessRate = 0.0;
+        if (this.workingPattern == null)
+            this.workingPattern = "UNKNOWN";
+        if (this.hasSignsOfGuessing == null)
+            this.hasSignsOfGuessing = false;
+        if (this.hasSignsOfAnxiety == null)
+            this.hasSignsOfAnxiety = false;
+        if (this.consistencyScore == null)
+            this.consistencyScore = 0.0;
+
         analyzeAnswerPatterns();
         analyzeWorkingPatterns();
         analyzeGuessingSigns();
         analyzeAnxietySigns();
         analyzeConsistency();
-    }
+    }// Analytics Helper Methods
 
-    // Analytics Helper Methods
     private void analyzeAnswerPatterns() {
-        if (answerHistory == null || answerHistory.isEmpty())
+        if (answerHistory == null || answerHistory.isEmpty()) {
+            // Initialize with default values if answerHistory is empty
+            this.totalAnswerChanges = 0;
+            this.answerChangeSuccessRate = 0.0;
             return;
+        }
 
         int totalChanges = 0;
         int beneficialChanges = 0;
@@ -1004,7 +1021,8 @@ public class HasilUjian {
 
         int anxietyIndicators = 0;
 
-        if (this.totalAnswerChanges > this.totalSoal * 0.4) {
+        // Check if totalAnswerChanges is null before using it
+        if (this.totalAnswerChanges != null && this.totalAnswerChanges > this.totalSoal * 0.4) {
             anxietyIndicators++;
         }
 

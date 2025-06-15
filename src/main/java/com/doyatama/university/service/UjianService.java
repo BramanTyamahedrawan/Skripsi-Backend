@@ -12,6 +12,7 @@ import com.doyatama.university.model.Semester;
 import com.doyatama.university.model.TahunAjaran;
 import com.doyatama.university.model.Ujian;
 import com.doyatama.university.model.User;
+import com.doyatama.university.model.UjianAnalysis;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.payload.UjianRequest;
@@ -26,6 +27,11 @@ import com.doyatama.university.repository.UjianRepository;
 import com.doyatama.university.repository.UserRepository;
 import com.doyatama.university.util.AppConstants;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
@@ -34,7 +40,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 public class UjianService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UjianService.class);
 
     private UjianRepository ujianRepository = new UjianRepository();
     private BankSoalRepository bankSoalRepository = new BankSoalRepository();
@@ -45,6 +54,11 @@ public class UjianService {
     private KonsentrasiKeahlianSekolahRepository konsentrasiKeahlianSekolahRepository = new KonsentrasiKeahlianSekolahRepository();
     private SchoolRepository schoolRepository = new SchoolRepository();
     private UserRepository userRepository = new UserRepository();
+    @Autowired
+    private UjianAnalysisService ujianAnalysisService;
+
+    @Autowired
+    private HasilUjianService hasilUjianService;
 
     public PagedResponse<Ujian> getAllUjian(int page, int size, String userID, String schoolID) throws IOException {
         validatePageNumberAndSize(page, size);
@@ -55,6 +69,15 @@ public class UjianService {
             ujianResponse = ujianRepository.findAll(size);
         } else {
             ujianResponse = ujianRepository.findUjianBySekolah(schoolID, size);
+        }
+
+        // Enrich ujian data with participant counts
+        for (Ujian ujian : ujianResponse) {
+            try {
+                enrichUjianWithParticipantData(ujian);
+            } catch (Exception e) {
+                logger.warn("Failed to enrich ujian {} with participant data: {}", ujian.getIdUjian(), e.getMessage());
+            }
         }
 
         return new PagedResponse<>(ujianResponse, ujianResponse.size(), "Successfully get data", 200);
@@ -390,9 +413,19 @@ public class UjianService {
             throw new BadRequestException("Hanya ujian dengan status DRAFT yang dapat diaktifkan");
         }
 
-        // Validate ujian has required data
+        // Validasi wajib
         if (ujian.getIdBankSoalList() == null || ujian.getIdBankSoalList().isEmpty()) {
             throw new BadRequestException("Ujian harus memiliki bank soal sebelum dapat diaktifkan");
+        }
+
+        // **Tambahkan validasi dan pengambilan ulang bankSoalList jika null/empty**
+        if (ujian.getBankSoalList() == null || ujian.getBankSoalList().isEmpty()) {
+            // Ambil ulang dari repository jika perlu
+            List<BankSoal> fullBankSoalList = bankSoalRepository.findAllById(ujian.getIdBankSoalList());
+            List<BankSoalUjian> simpleBankSoalList = fullBankSoalList.stream()
+                    .map(BankSoalUjian::new)
+                    .collect(Collectors.toList());
+            ujian.setBankSoalList(simpleBankSoalList);
         }
 
         if (ujian.getWaktuMulaiDijadwalkan() == null) {
@@ -432,7 +465,17 @@ public class UjianService {
         }
 
         ujian.endUjian();
-        return ujianRepository.save(ujian);
+        Ujian savedUjian = ujianRepository.save(ujian);
+
+        // Generate final analysis when exam ends
+        try {
+            logger.info("Generating final analysis for ended ujian: {}", ujianId);
+            generateFinalAnalysisForUjian(savedUjian);
+        } catch (Exception e) {
+            logger.warn("Failed to generate final analysis for ujian {}: {}", ujianId, e.getMessage());
+        }
+
+        return savedUjian;
     }
 
     public Ujian cancelUjian(String ujianId) throws IOException {
@@ -526,5 +569,61 @@ public class UjianService {
         stats.put("liveCount", liveCount);
 
         return stats;
+    }
+
+    // ==================== ANALYSIS GENERATION HELPERS ====================
+
+    /**
+     * Generate final comprehensive analysis when exam ends
+     */
+    private void generateFinalAnalysisForUjian(Ujian ujian) {
+        try {
+            logger.info("Starting final analysis generation for ended ujian: {}", ujian.getIdUjian());
+
+            // Create request for comprehensive analysis generation
+            com.doyatama.university.payload.UjianAnalysisRequest.GenerateAnalysisRequest request = new com.doyatama.university.payload.UjianAnalysisRequest.GenerateAnalysisRequest();
+            request.setIdUjian(ujian.getIdUjian());
+            request.setIdSchool(ujian.getSchool() != null ? ujian.getSchool().getIdSchool() : "");
+            request.setAnalysisType("COMPREHENSIVE");
+            request.setIncludeDescriptiveStats(true);
+            request.setIncludeItemAnalysis(true);
+            request.setIncludeDifficultyAnalysis(true);
+            request.setIncludeTimeAnalysis(true);
+            request.setIncludeCheatingAnalysis(true);
+            request.setIncludeComparativeAnalysis(true);
+            request.setIncludeLearningAnalytics(true);
+            request.setIncludeRecommendations(true);
+            request.setDetailLevel("DETAILED"); // Add configuration - allow one final analysis when exam ends
+            Map<String, Object> configuration = new HashMap<>();
+            configuration.put("allowDuplicate", false);
+            configuration.put("finalAnalysis", true);
+            configuration.put("autoGenerated", true);
+            request.setAnalysisConfiguration(configuration);
+
+            // Generate analysis
+            UjianAnalysis generatedAnalysis = ujianAnalysisService.generateAnalysis(request);
+            logger.info("Final analysis generated successfully for ujian: {} with analysis ID: {}",
+                    ujian.getIdUjian(), generatedAnalysis.getIdAnalysis());
+
+        } catch (Exception e) {
+            logger.error("Failed to generate final analysis for ujian {}: {}", ujian.getIdUjian(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Enrich ujian with participant count and other metadata
+     */
+    private void enrichUjianWithParticipantData(Ujian ujian) {
+        try {
+            // Count participants from hasil_ujian table
+            long participantCount = hasilUjianService.countParticipantsByUjian(ujian.getIdUjian());
+            ujian.setJumlahPeserta((int) participantCount);
+
+            // You can add more enrichment here like active sessions, etc.
+
+        } catch (Exception e) {
+            logger.warn("Failed to get participant count for ujian {}: {}", ujian.getIdUjian(), e.getMessage());
+            ujian.setJumlahPeserta(0);
+        }
     }
 }

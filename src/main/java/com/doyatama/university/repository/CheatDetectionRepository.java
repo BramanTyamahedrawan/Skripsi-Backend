@@ -16,7 +16,9 @@ import org.apache.hadoop.hbase.TableName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class CheatDetectionRepository {
 
     Configuration conf = HBaseConfiguration.create();
@@ -61,15 +63,23 @@ public class CheatDetectionRepository {
     }
 
     private void saveMainInfo(HBaseCustomClient client, TableName table, String rowKey, CheatDetection cheatDetection) {
-        client.insertRecord(table, rowKey, "main", "idDetection", cheatDetection.getIdDetection());
-        client.insertRecord(table, rowKey, "main", "sessionId", cheatDetection.getSessionId());
-        client.insertRecord(table, rowKey, "main", "idPeserta", cheatDetection.getIdPeserta());
-        client.insertRecord(table, rowKey, "main", "idUjian", cheatDetection.getIdUjian());
-        client.insertRecord(table, rowKey, "main", "idSchool", cheatDetection.getIdSchool());
+        // Ensure required fields are saved
+        client.insertRecord(table, rowKey, "main", "idDetection",
+                cheatDetection.getIdDetection() != null ? cheatDetection.getIdDetection() : "");
+        client.insertRecord(table, rowKey, "main", "sessionId",
+                cheatDetection.getSessionId() != null ? cheatDetection.getSessionId() : "");
+        client.insertRecord(table, rowKey, "main", "idPeserta",
+                cheatDetection.getIdPeserta() != null ? cheatDetection.getIdPeserta() : "");
+        client.insertRecord(table, rowKey, "main", "idUjian",
+                cheatDetection.getIdUjian() != null ? cheatDetection.getIdUjian() : "");
+        client.insertRecord(table, rowKey, "main", "idSchool",
+                cheatDetection.getIdSchool() != null ? cheatDetection.getIdSchool() : "");
 
         // Detection details
-        client.insertRecord(table, rowKey, "main", "typeViolation", cheatDetection.getTypeViolation());
-        client.insertRecord(table, rowKey, "main", "severity", cheatDetection.getSeverity());
+        client.insertRecord(table, rowKey, "main", "typeViolation",
+                cheatDetection.getTypeViolation() != null ? cheatDetection.getTypeViolation() : "");
+        client.insertRecord(table, rowKey, "main", "severity",
+                cheatDetection.getSeverity() != null ? cheatDetection.getSeverity() : "LOW");
 
         if (cheatDetection.getViolationCount() != null) {
             client.insertRecord(table, rowKey, "main", "violationCount", cheatDetection.getViolationCount().toString());
@@ -127,37 +137,50 @@ public class CheatDetectionRepository {
         if (cheatDetection.getResolutionNotes() != null) {
             client.insertRecord(table, rowKey, "main", "resolutionNotes", cheatDetection.getResolutionNotes());
         }
-
-        client.insertRecord(table, rowKey, "main", "createdAt", cheatDetection.getCreatedAt().toString());
-        client.insertRecord(table, rowKey, "main", "updatedAt", cheatDetection.getUpdatedAt().toString());
+        client.insertRecord(table, rowKey, "main", "createdAt",
+                cheatDetection.getCreatedAt() != null ? cheatDetection.getCreatedAt().toString()
+                        : java.time.Instant.now().toString());
+        client.insertRecord(table, rowKey, "main", "updatedAt",
+                cheatDetection.getUpdatedAt() != null ? cheatDetection.getUpdatedAt().toString()
+                        : java.time.Instant.now().toString());
     }
 
     private void saveRelationships(HBaseCustomClient client, TableName table, String rowKey,
             CheatDetection cheatDetection) {
-        // Save UjianSession relationship
+        // Always save at least one column to prevent "No columns to insert" error
+        client.insertRecord(table, rowKey, "status", "relationshipsStatus", "SAVING");
+
+        // Save UjianSession relationship - using 'main' column family
         if (cheatDetection.getUjianSession() != null && cheatDetection.getUjianSession().getIdSession() != null) {
-            client.insertRecord(table, rowKey, "ujianSession", "idSession",
+            client.insertRecord(table, rowKey, "main", "ujianSessionId",
                     cheatDetection.getUjianSession().getIdSession());
-            client.insertRecord(table, rowKey, "ujianSession", "status", cheatDetection.getUjianSession().getStatus());
+
+            if (cheatDetection.getUjianSession().getStatus() != null) {
+                client.insertRecord(table, rowKey, "main", "ujianSessionStatus",
+                        cheatDetection.getUjianSession().getStatus());
+            }
 
             if (cheatDetection.getUjianSession().getStartTime() != null) {
-                client.insertRecord(table, rowKey, "ujianSession", "startTime",
+                client.insertRecord(table, rowKey, "main", "ujianSessionStartTime",
                         cheatDetection.getUjianSession().getStartTime().toString());
             }
         }
 
-        // Save Peserta relationship
+        // Save Peserta relationship - use peserta column family
         if (cheatDetection.getPeserta() != null && cheatDetection.getPeserta().getId() != null) {
-            client.insertRecord(table, rowKey, "peserta", "id", cheatDetection.getPeserta().getId());
-            client.insertRecord(table, rowKey, "peserta", "name", cheatDetection.getPeserta().getName());
-            client.insertRecord(table, rowKey, "peserta", "username", cheatDetection.getPeserta().getUsername());
+            client.insertRecord(table, rowKey, "peserta", "id",
+                    cheatDetection.getPeserta().getId() != null ? cheatDetection.getPeserta().getId() : "");
+            client.insertRecord(table, rowKey, "peserta", "name",
+                    cheatDetection.getPeserta().getName() != null ? cheatDetection.getPeserta().getName() : "");
+            client.insertRecord(table, rowKey, "peserta", "username",
+                    cheatDetection.getPeserta().getUsername() != null ? cheatDetection.getPeserta().getUsername() : "");
         }
 
-        // Save Ujian relationship
+        // Save Ujian relationship - use ujian column family
         if (cheatDetection.getUjian() != null && cheatDetection.getUjian().getIdUjian() != null) {
             client.insertRecord(table, rowKey, "ujian", "idUjian", cheatDetection.getUjian().getIdUjian());
-            client.insertRecord(table, rowKey, "ujian", "namaUjian", cheatDetection.getUjian().getNamaUjian());
-            client.insertRecord(table, rowKey, "ujian", "statusUjian", cheatDetection.getUjian().getStatusUjian());
+            client.insertRecord(table, rowKey, "ujian", "namaUjian",
+                    cheatDetection.getUjian().getNamaUjian() != null ? cheatDetection.getUjian().getNamaUjian() : "");
 
             if (cheatDetection.getUjian().getDurasiMenit() != null) {
                 client.insertRecord(table, rowKey, "ujian", "durasiMenit",
@@ -165,16 +188,24 @@ public class CheatDetectionRepository {
             }
         }
 
-        // Save School relationship
+        // Save School relationship - use school column family
         if (cheatDetection.getSchool() != null && cheatDetection.getSchool().getIdSchool() != null) {
             client.insertRecord(table, rowKey, "school", "idSchool", cheatDetection.getSchool().getIdSchool());
-            client.insertRecord(table, rowKey, "school", "nameSchool", cheatDetection.getSchool().getNameSchool());
+            client.insertRecord(table, rowKey, "school", "nameSchool",
+                    cheatDetection.getSchool().getNameSchool() != null ? cheatDetection.getSchool().getNameSchool()
+                            : "");
         }
+
+        // Update status to completed
+        client.insertRecord(table, rowKey, "status", "relationshipsStatus", "COMPLETED");
     }
 
     private void saveDetectionData(HBaseCustomClient client, TableName table, String rowKey,
             CheatDetection cheatDetection) {
-        // Save action data
+        // Always save detection status to ensure at least one record exists
+        client.insertRecord(table, rowKey, "detection", "status", "RECORDED");
+
+        // Save action data using action column family
         if (cheatDetection.getActionTaken() != null) {
             client.insertRecord(table, rowKey, "action", "actionTaken", cheatDetection.getActionTaken());
         }
@@ -195,20 +226,20 @@ public class CheatDetectionRepository {
     private void saveEvidenceData(HBaseCustomClient client, TableName table, String rowKey,
             CheatDetection cheatDetection) {
         try {
-            // Save evidence
+            // Save evidence using evidence column family
             if (cheatDetection.getEvidence() != null && !cheatDetection.getEvidence().isEmpty()) {
                 String evidenceJson = objectMapper.writeValueAsString(cheatDetection.getEvidence());
-                client.insertRecord(table, rowKey, "main", "evidence", evidenceJson);
+                client.insertRecord(table, rowKey, "evidence", "data", evidenceJson);
             } else {
-                client.insertRecord(table, rowKey, "main", "evidence", "{}");
+                client.insertRecord(table, rowKey, "evidence", "data", "{}");
             }
 
-            // Save frontend events
+            // Save frontend events using frontend column family
             if (cheatDetection.getFrontendEvents() != null && !cheatDetection.getFrontendEvents().isEmpty()) {
                 String frontendEventsJson = objectMapper.writeValueAsString(cheatDetection.getFrontendEvents());
-                client.insertRecord(table, rowKey, "main", "frontendEvents", frontendEventsJson);
+                client.insertRecord(table, rowKey, "frontend", "events", frontendEventsJson);
             } else {
-                client.insertRecord(table, rowKey, "main", "frontendEvents", "{}");
+                client.insertRecord(table, rowKey, "frontend", "events", "{}");
             }
 
         } catch (JsonProcessingException e) {
@@ -219,7 +250,10 @@ public class CheatDetectionRepository {
     private void saveTimingData(HBaseCustomClient client, TableName table, String rowKey,
             CheatDetection cheatDetection) {
         try {
-            // Save timing analysis
+            // Always save timing status
+            client.insertRecord(table, rowKey, "timing", "status", "RECORDED");
+
+            // Save timing analysis using timing column family
             if (cheatDetection.getTimeBetweenAnswers() != null) {
                 client.insertRecord(table, rowKey, "timing", "timeBetweenAnswers",
                         cheatDetection.getTimeBetweenAnswers().toString());
@@ -449,56 +483,64 @@ public class CheatDetectionRepository {
     private Map<String, String> getStandardColumnMapping() {
         Map<String, String> columnMapping = new HashMap<>();
 
-        // Main detection fields
-        columnMapping.put("idDetection", "idDetection");
-        columnMapping.put("sessionId", "sessionId");
-        columnMapping.put("idPeserta", "idPeserta");
-        columnMapping.put("idUjian", "idUjian");
-        columnMapping.put("idSchool", "idSchool");
-        columnMapping.put("typeViolation", "typeViolation");
-        columnMapping.put("severity", "severity");
-        columnMapping.put("violationCount", "violationCount");
-        columnMapping.put("detectedAt", "detectedAt");
-        columnMapping.put("firstDetectedAt", "firstDetectedAt");
+        // Main detection fields - main column family
+        columnMapping.put("main:idDetection", "idDetection");
+        columnMapping.put("main:sessionId", "sessionId");
+        columnMapping.put("main:idPeserta", "idPeserta");
+        columnMapping.put("main:idUjian", "idUjian");
+        columnMapping.put("main:idSchool", "idSchool");
+        columnMapping.put("main:typeViolation", "typeViolation");
+        columnMapping.put("main:severity", "severity");
+        columnMapping.put("main:violationCount", "violationCount");
+        columnMapping.put("main:detectedAt", "detectedAt");
+        columnMapping.put("main:firstDetectedAt", "firstDetectedAt");
 
-        // Browser and system info
-        columnMapping.put("browserInfo", "browserInfo");
-        columnMapping.put("userAgent", "userAgent");
-        columnMapping.put("windowTitle", "windowTitle");
-        columnMapping.put("screenWidth", "screenWidth");
-        columnMapping.put("screenHeight", "screenHeight");
-        columnMapping.put("fullscreenStatus", "fullscreenStatus");
+        // Browser and system info - main column family
+        columnMapping.put("main:browserInfo", "browserInfo");
+        columnMapping.put("main:userAgent", "userAgent");
+        columnMapping.put("main:windowTitle", "windowTitle");
+        columnMapping.put("main:screenWidth", "screenWidth");
+        columnMapping.put("main:screenHeight", "screenHeight");
+        columnMapping.put("main:fullscreenStatus", "fullscreenStatus");
 
-        // Evidence and events
-        columnMapping.put("evidence", "evidence");
-        columnMapping.put("frontendEvents", "frontendEvents");
+        // Evidence and events - specific column families
+        columnMapping.put("evidence:data", "evidence");
+        columnMapping.put("frontend:events", "frontendEvents");
 
-        // Timing data
-        columnMapping.put("timeBetweenAnswers", "timeBetweenAnswers");
-        columnMapping.put("answerPattern", "answerPattern");
-        columnMapping.put("answerTimestamps", "answerTimestamps");
+        // Timing data - timing column family
+        columnMapping.put("timing:timeBetweenAnswers", "timeBetweenAnswers");
+        columnMapping.put("timing:answerPattern", "answerPattern");
+        columnMapping.put("timing:answerTimestamps", "answerTimestamps");
 
-        // Action data
-        columnMapping.put("actionTaken", "actionTaken");
-        columnMapping.put("actionBy", "actionBy");
-        columnMapping.put("actionAt", "actionAt");
-        columnMapping.put("actionReason", "actionReason");
+        // Action data - action column family
+        columnMapping.put("action:actionTaken", "actionTaken");
+        columnMapping.put("action:actionBy", "actionBy");
+        columnMapping.put("action:actionAt", "actionAt");
+        columnMapping.put("action:actionReason", "actionReason");
 
-        // Status fields
-        columnMapping.put("resolved", "resolved");
-        columnMapping.put("resolvedBy", "resolvedBy");
-        columnMapping.put("resolvedAt", "resolvedAt");
-        columnMapping.put("resolutionNotes", "resolutionNotes");
+        // Status fields - main column family
+        columnMapping.put("main:resolved", "resolved");
+        columnMapping.put("main:resolvedBy", "resolvedBy");
+        columnMapping.put("main:resolvedAt", "resolvedAt");
+        columnMapping.put("main:resolutionNotes", "resolutionNotes");
 
-        // Timestamps
-        columnMapping.put("createdAt", "createdAt");
-        columnMapping.put("updatedAt", "updatedAt");
+        // Timestamps - main column family
+        columnMapping.put("main:createdAt", "createdAt");
+        columnMapping.put("main:updatedAt", "updatedAt");
 
-        // Relationships
-        columnMapping.put("ujianSession", "ujianSession");
-        columnMapping.put("peserta", "peserta");
-        columnMapping.put("ujian", "ujian");
-        columnMapping.put("school", "school");
+        // UjianSession fields - main column family
+        columnMapping.put("main:ujianSessionId", "ujianSessionId");
+        columnMapping.put("main:ujianSessionStatus", "ujianSessionStatus");
+        columnMapping.put("main:ujianSessionStartTime", "ujianSessionStartTime");
+
+        // Relationship fields
+        columnMapping.put("peserta:id", "pesertaId");
+        columnMapping.put("peserta:name", "pesertaName");
+        columnMapping.put("peserta:username", "pesertaUsername");
+        columnMapping.put("ujian:idUjian", "ujianId");
+        columnMapping.put("ujian:namaUjian", "ujianNama");
+        columnMapping.put("school:idSchool", "schoolId");
+        columnMapping.put("school:nameSchool", "schoolName");
 
         return columnMapping;
     }

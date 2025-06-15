@@ -140,13 +140,15 @@ public class UjianSessionService {
      */
     public UjianSession saveJawaban(UjianSessionRequest.SaveJawabanRequest request) throws IOException {
         // Validasi request
-        validateSaveJawabanRequest(request);
-
-        // Ambil session aktif berdasarkan sessionId (bukan hanya idUjian & idPeserta)
+        validateSaveJawabanRequest(request); // Ambil session aktif berdasarkan sessionId (bukan hanya idUjian &
+                                             // idPeserta)
         UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
         if (session == null || !session.isActive()) {
             throw new BadRequestException("Session tidak ditemukan atau tidak aktif");
         }
+
+        System.out.println("Session found: " + session.getIdSession());
+        System.out.println("Session ujian: " + (session.getUjian() != null ? session.getUjian().getIdUjian() : "null"));
 
         // Validasi idBankSoal
         validateSoalInUjian(session.getUjian(), request.getIdBankSoal());
@@ -173,7 +175,11 @@ public class UjianSessionService {
         // Validasi request
         validateAutoSaveRequest(request);
 
+        System.out.println("AutoSave - Looking for session: " + request.getSessionId());
         UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
+        System.out.println("AutoSave - Found session: " + (session != null ? session.getIdSession() : "null"));
+        System.out.println("AutoSave - Session active: " + (session != null ? session.isActive() : "N/A"));
+
         if (session == null || !session.isActive()) {
             throw new BadRequestException("Session tidak ditemukan atau tidak aktif");
         }
@@ -202,35 +208,59 @@ public class UjianSessionService {
      * Submit ujian - delegasi ke HasilUjianService untuk create hasil
      */
     public HasilUjian submitUjian(UjianSessionRequest.SubmitUjianRequest request, String schoolId) throws IOException {
-        validateSubmitRequest(request);
+        logger.debug("Submitting ujian for session: {}, ujian: {}, peserta: {}",
+                request.getSessionId(), request.getIdUjian(), request.getIdPeserta());
 
-        UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
-        if (session == null || !session.isActive()) {
-            throw new BadRequestException("Session tidak ditemukan atau tidak aktif");
+        try {
+            validateSubmitRequest(request);
+
+            UjianSession session = ujianSessionRepository.findBySessionId(request.getSessionId());
+            if (session == null) {
+                logger.warn("Session not found: {}", request.getSessionId());
+                throw new BadRequestException("Session tidak ditemukan");
+            }
+
+            if (!session.isActive()) {
+                logger.warn("Session not active: {}, status: {}", request.getSessionId(), session.getStatus());
+                throw new BadRequestException("Session tidak aktif");
+            }
+
+            logger.debug("Session found and active, proceeding with submit");
+
+            // Update answers terakhir
+            if (request.getAnswers() != null) {
+                session.setAnswers(request.getAnswers());
+                logger.debug("Updated session answers: {} questions answered", request.getAnswers().size());
+            }
+
+            // Update waktu tersisa terakhir
+            if (request.getFinalTimeRemaining() != null) {
+                session.setTimeRemaining(request.getFinalTimeRemaining());
+            }
+
+            // Finalisasi session
+            session.finalizeSession(Boolean.TRUE.equals(request.getIsAutoSubmit()));
+
+            ujianSessionRepository.save(session);
+            logger.debug("Session finalized and saved");
+
+            // Buat hasil ujian
+            HasilUjian hasilUjian = hasilUjianService.createHasilUjianFromSession(
+                    session.getSessionId(),
+                    session.getAnswers(),
+                    Boolean.TRUE.equals(request.getIsAutoSubmit()),
+                    null);
+
+            logger.debug("HasilUjian created successfully with ID: {}", hasilUjian.getIdHasilUjian());
+            return hasilUjian;
+
+        } catch (BadRequestException e) {
+            logger.error("Bad request in submitUjian: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error in submitUjian: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to submit ujian: " + e.getMessage());
         }
-
-        // Update answers terakhir
-        if (request.getAnswers() != null) {
-            session.setAnswers(request.getAnswers());
-        }
-
-        // Update waktu tersisa terakhir
-        if (request.getFinalTimeRemaining() != null) {
-            session.setTimeRemaining(request.getFinalTimeRemaining());
-        }
-
-        // Finalisasi session
-        session.finalizeSession(Boolean.TRUE.equals(request.getIsAutoSubmit()));
-
-        ujianSessionRepository.save(session);
-
-        // Buat hasil ujian
-        return hasilUjianService.createHasilUjianFromSession(
-                session.getSessionId(),
-                session.getAnswers(),
-                Boolean.TRUE.equals(request.getIsAutoSubmit()),
-                null
-        );
     }
 
     // ==================== SESSION MONITORING ====================
@@ -783,6 +813,9 @@ public class UjianSessionService {
     }
 
     private void validateSubmitRequest(UjianSessionRequest.SubmitUjianRequest request) {
+        if (request.getSessionId() == null || request.getSessionId().trim().isEmpty()) {
+            throw new BadRequestException("Session ID wajib diisi");
+        }
         if (request.getIdUjian() == null || request.getIdUjian().trim().isEmpty()) {
             throw new BadRequestException("ID ujian wajib diisi");
         }
@@ -816,11 +849,44 @@ public class UjianSessionService {
         }
     }
 
-    private void validateSoalInUjian(Ujian ujian, String idBankSoal) {
+    private void validateSoalInUjian(Ujian ujian, String idBankSoal) throws IOException {
+        System.out.println("Validating soal: " + idBankSoal);
+        System.out.println("Ujian ID: " + (ujian != null ? ujian.getIdUjian() : "null"));
+        System.out.println("BankSoalList size: "
+                + (ujian != null && ujian.getBankSoalList() != null ? ujian.getBankSoalList().size()
+                        : "null or empty"));
+
+        // If bankSoalList is empty, try to reload ujian data from repository
+        if (ujian == null || ujian.getBankSoalList() == null || ujian.getBankSoalList().isEmpty()) {
+            System.out.println("Ujian or bankSoalList is null/empty, attempting to reload ujian data");
+
+            if (ujian != null && ujian.getIdUjian() != null) {
+                try {
+                    Ujian reloadedUjian = ujianRepository.findById(ujian.getIdUjian());
+                    if (reloadedUjian != null && reloadedUjian.getBankSoalList() != null
+                            && !reloadedUjian.getBankSoalList().isEmpty()) {
+                        System.out.println("Successfully reloaded ujian data with "
+                                + reloadedUjian.getBankSoalList().size() + " soal");
+                        // Update the original ujian object
+                        ujian.setBankSoalList(reloadedUjian.getBankSoalList());
+                    } else {
+                        throw new BadRequestException("Data ujian tidak lengkap - bankSoalList kosong setelah reload");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Failed to reload ujian data: " + e.getMessage());
+                    throw new BadRequestException("Gagal memuat data ujian");
+                }
+            } else {
+                throw new BadRequestException("Data ujian tidak lengkap - ID ujian null");
+            }
+        }
+
         boolean soalExists = ujian.getBankSoalList().stream()
                 .anyMatch(soal -> idBankSoal.equals(soal.getIdBankSoal()));
 
         if (!soalExists) {
+            System.out.println("Available soal IDs in ujian:");
+            ujian.getBankSoalList().forEach(soal -> System.out.println("- " + soal.getIdBankSoal()));
             throw new BadRequestException("Soal tidak ditemukan dalam ujian");
         }
     }
