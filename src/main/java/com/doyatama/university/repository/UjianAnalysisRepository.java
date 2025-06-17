@@ -16,6 +16,7 @@ import org.apache.hadoop.hbase.TableName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -24,7 +25,9 @@ public class UjianAnalysisRepository {
 
     Configuration conf = HBaseConfiguration.create();
     String tableName = "ujian_analysis";
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper; // Use the configured ObjectMapper with JSR310 support
 
     public List<UjianAnalysis> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);

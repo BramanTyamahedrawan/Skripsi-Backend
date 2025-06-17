@@ -223,30 +223,40 @@ public class UjianSessionRepository {
     }
 
     public UjianSession findActiveSessionByUjianAndPeserta(String idUjian, String idPeserta) throws IOException {
+        // Validate input parameters
+        if (idUjian == null || idPeserta == null) {
+            throw new IllegalArgumentException("idUjian and idPeserta cannot be null");
+        }
+
         TableName tableUjianSession = TableName.valueOf(tableName);
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
         Map<String, String> columnMapping = getStandardColumnMapping();
         Map<String, String> indexedFields = getIndexedFields();
 
-        // Find sessions by ujian first
-        List<UjianSession> sessions = client.getDataListByColumnIndeks(
-                tableUjianSession.toString(),
-                columnMapping,
-                "main",
-                "idUjian",
-                idUjian,
-                UjianSession.class,
-                100, // Get more for filtering
-                indexedFields);
+        try {
+            // Find sessions by ujian first
+            List<UjianSession> sessions = client.getDataListByColumnIndeks(
+                    tableUjianSession.toString(),
+                    columnMapping,
+                    "main",
+                    "idUjian",
+                    idUjian,
+                    UjianSession.class,
+                    100, // Get more for filtering
+                    indexedFields);
 
-        // Filter by peserta and active status
-        return sessions.stream()
-                .filter(session -> idPeserta.equals(session.getIdPeserta()))
-                .filter(session -> "ACTIVE".equals(session.getStatus()))
-                .filter(session -> session.getIsSubmitted() == null || !session.getIsSubmitted())
-                .findFirst()
-                .orElse(null);
+            // Filter by peserta and active status
+            return sessions.stream()
+                    .filter(session -> idPeserta.equals(session.getIdPeserta()))
+                    .filter(session -> "ACTIVE".equals(session.getStatus()))
+                    .filter(session -> session.getIsSubmitted() == null || !session.getIsSubmitted())
+                    .findFirst()
+                    .orElse(null);
+        } catch (Exception e) {
+            throw new IOException("Failed to find active session for ujian: " + idUjian + " and peserta: " + idPeserta,
+                    e);
+        }
     }
 
     public List<UjianSession> findSessionsByUjian(String idUjian) throws IOException {

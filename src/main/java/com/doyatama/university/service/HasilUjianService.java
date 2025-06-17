@@ -27,6 +27,10 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.io.ByteArrayOutputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1211,7 +1215,9 @@ public class HasilUjianService {
         Set<String> studentAnswers = new HashSet<>();
 
         if (jawabanPeserta instanceof List) {
-            studentAnswers.addAll((List<String>) jawabanPeserta);
+            @SuppressWarnings("unchecked")
+            List<String> answers = (List<String>) jawabanPeserta;
+            studentAnswers.addAll(answers);
         } else {
             String[] answers = jawabanPeserta.toString().split(",");
             for (String answer : answers) {
@@ -1229,6 +1235,7 @@ public class HasilUjianService {
         Set<String> studentPairs = new HashSet<>();
 
         if (jawabanPeserta instanceof Map) {
+            @SuppressWarnings("unchecked")
             Map<String, String> studentMap = (Map<String, String>) jawabanPeserta;
             studentMap.forEach((key, value) -> studentPairs.add(key + "=" + value));
         }
@@ -1244,6 +1251,7 @@ public class HasilUjianService {
             // Cek pelanggaran keamanan dari session (sudah diproses di
             // createHasilUjianFromSession)
             Map<String, Object> metadata = hasilUjian.getMetadata();
+            @SuppressWarnings("unchecked")
             List<Map<String, Object>> violations = (List<Map<String, Object>>) metadata.get("violations");
 
             if (violations != null && !violations.isEmpty()) {
@@ -1253,12 +1261,14 @@ public class HasilUjianService {
                 Map<String, Object> securityFlags = hasilUjian.getSecurityFlags();
                 securityFlags.put("hasViolations", true);
                 securityFlags.put("violationCount", violations.size());
-                securityFlags.put("evaluatedAt", Instant.now().toString());
-
-                // Count by severity
+                securityFlags.put("evaluatedAt", Instant.now().toString()); // Count by severity with null safety
                 Map<String, Long> severityCounts = violations.stream()
+                        .filter(Objects::nonNull) // Filter out null violations
                         .collect(Collectors.groupingBy(
-                                v -> (String) v.get("severity"),
+                                v -> {
+                                    String severity = (String) v.get("severity");
+                                    return (severity != null) ? severity : "UNKNOWN";
+                                },
                                 Collectors.counting()));
                 securityFlags.put("severityCounts", severityCounts);
 
@@ -1304,6 +1314,441 @@ public class HasilUjianService {
         } catch (Exception e) {
             logger.error("Failed to auto-generate analysis for ujian {}: {}", hasilUjian.getIdUjian(), e.getMessage(),
                     e);
+        }
+    }
+
+    // ==================== REPORT GENERATION METHODS ====================
+
+    /**
+     * Generate participant report data for operators/teachers
+     */
+    public Map<String, Object> generateParticipantReport(String idPeserta, String idUjian, String schoolId,
+            Map<String, Object> options) throws IOException {
+        logger.info("Generating participant report for peserta: {}, ujian: {}", idPeserta, idUjian);
+
+        // Get hasil ujian
+        HasilUjian hasilUjian = getHasilByPesertaAndUjianDirect(idUjian, idPeserta, null, true, true);
+        if (hasilUjian == null) {
+            throw new ResourceNotFoundException("HasilUjian", "id", idPeserta + "-" + idUjian);
+        }
+
+        // Get participant info
+        User participant = userRepository.findById(idPeserta);
+        if (participant == null) {
+            throw new ResourceNotFoundException("Peserta", "id", idPeserta);
+        }
+
+        // Get ujian info
+        Ujian ujian = ujianRepository.findById(idUjian);
+        if (ujian == null) {
+            throw new ResourceNotFoundException("Ujian", "id", idUjian);
+        }
+
+        // Get violations for this participant
+        // Get violations by filtering ujian violations with peserta id
+        List<CheatDetection> ujianViolations = cheatDetectionRepository.findByUjianId(idUjian);
+        List<CheatDetection> violations = ujianViolations.stream()
+                .filter(v -> idPeserta.equals(v.getIdPeserta()))
+                .collect(Collectors.toList());
+
+        // Compile report data
+        Map<String, Object> reportData = new HashMap<>();
+
+        // Basic info
+        reportData.put("participantInfo", createParticipantInfo(participant));
+        reportData.put("ujianInfo", createUjianInfo(ujian));
+        reportData.put("hasilUjian", hasilUjian);
+
+        // Performance metrics
+        reportData.put("performanceMetrics", createPerformanceMetrics(hasilUjian));
+
+        // Violations
+        reportData.put("violations", createViolationSummary(violations));
+
+        // Behavioral analysis
+        reportData.put("behavioralAnalysis", createBehavioralAnalysis(hasilUjian, violations));
+
+        // Generated timestamp
+        reportData.put("generatedAt", Instant.now());
+        reportData.put("generatedBy", schoolId);
+
+        logger.info("Report generated successfully for peserta: {}", idPeserta);
+        return reportData;
+    }
+
+    /**
+     * Download participant report as Excel
+     */
+    public byte[] downloadParticipantReportExcel(String idPeserta, String idUjian, String schoolId) throws IOException {
+        logger.info("Generating Excel report for peserta: {}, ujian: {}", idPeserta, idUjian);
+
+        // Generate report data
+        Map<String, Object> reportData = generateParticipantReport(idPeserta, idUjian, schoolId, new HashMap<>());
+
+        // Create Excel file
+        return createExcelReport(reportData);
+    }
+
+    /**
+     * Get participant reports list with pagination
+     */
+    public Map<String, Object> getParticipantReportsList(int page, int size, String ujianId, String search,
+            String schoolId) throws IOException {
+        logger.info("Getting participant reports list - ujianId: {}, search: {}", ujianId, search);
+
+        List<HasilUjian> hasilUjianList;
+
+        if (ujianId != null && !ujianId.trim().isEmpty()) {
+            hasilUjianList = hasilUjianRepository.findByUjian(ujianId);
+        } else {
+            hasilUjianList = hasilUjianRepository.findBySchool(schoolId);
+        }
+
+        // Filter by search if provided
+        if (search != null && !search.trim().isEmpty()) {
+            String searchLower = search.toLowerCase();
+            hasilUjianList = hasilUjianList.stream()
+                    .filter(hasil -> {
+                        try {
+                            User participant = userRepository.findById(hasil.getIdPeserta());
+                            String participantName = participant != null ? participant.getName() : "";
+                            Ujian ujian = ujianRepository.findById(hasil.getIdUjian());
+                            String ujianName = ujian != null ? ujian.getNamaUjian() : "";
+
+                            return participantName.toLowerCase().contains(searchLower) ||
+                                    ujianName.toLowerCase().contains(searchLower);
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        // Enrich with additional data
+        List<Map<String, Object>> enrichedData = hasilUjianList.stream()
+                .map(this::enrichParticipantReportData)
+                .collect(Collectors.toList());
+
+        // Apply pagination
+        int totalElements = enrichedData.size();
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, totalElements);
+
+        List<Map<String, Object>> pagedData = enrichedData.subList(fromIndex, toIndex);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", pagedData);
+        response.put("totalElements", totalElements);
+        response.put("totalPages", (int) Math.ceil((double) totalElements / size));
+        response.put("currentPage", page);
+        response.put("size", size);
+        response.put("hasNext", toIndex < totalElements);
+        response.put("hasPrevious", page > 0);
+
+        return response;
+    }
+
+    /**
+     * Get participant name by ID
+     */
+    public String getParticipantName(String idPeserta) throws IOException {
+        User participant = userRepository.findById(idPeserta);
+        return participant != null ? participant.getName() : "Unknown";
+    }
+
+    /**
+     * Get ujian name by ID
+     */
+    public String getUjianName(String idUjian) throws IOException {
+        Ujian ujian = ujianRepository.findById(idUjian);
+        return ujian != null ? ujian.getNamaUjian() : "Unknown";
+    }
+
+    // ==================== HELPER METHODS FOR REPORT GENERATION
+    // ====================
+
+    private Map<String, Object> createParticipantInfo(User participant) {
+        Map<String, Object> info = new HashMap<>();
+        info.put("id", participant.getId());
+        info.put("name", participant.getName());
+        info.put("username", participant.getUsername());
+        info.put("email", participant.getEmail());
+        return info;
+    }
+
+    private Map<String, Object> createUjianInfo(Ujian ujian) {
+        Map<String, Object> info = new HashMap<>();
+        info.put("id", ujian.getIdUjian());
+        info.put("name", ujian.getNamaUjian());
+        info.put("description", ujian.getDeskripsi());
+        info.put("duration", ujian.getDurasiMenit());
+        info.put("totalQuestions", ujian.getJumlahSoal());
+        info.put("maxScore", ujian.getTotalBobot());
+        return info;
+    }
+
+    private Map<String, Object> createPerformanceMetrics(HasilUjian hasilUjian) {
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("totalScore", hasilUjian.getTotalSkor());
+        metrics.put("maxScore", hasilUjian.getSkorMaksimal());
+        metrics.put("percentage", hasilUjian.getPersentase());
+        metrics.put("grade", hasilUjian.getNilaiHuruf());
+        metrics.put("passed", hasilUjian.getLulus());
+        metrics.put("correctAnswers", hasilUjian.getJumlahBenar());
+        metrics.put("wrongAnswers", hasilUjian.getJumlahSalah());
+        metrics.put("emptyAnswers", hasilUjian.getJumlahKosong());
+        metrics.put("duration", hasilUjian.getDurasiPengerjaan());
+        return metrics;
+    }
+
+    private Map<String, Object> createViolationSummary(List<CheatDetection> violations) {
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("totalViolations", violations.size());
+        Map<String, Long> violationsByType = violations.stream()
+                .filter(Objects::nonNull) // Filter out null violations
+                .collect(Collectors.groupingBy(v -> v.getTypeViolation() != null ? v.getTypeViolation() : "UNKNOWN",
+                        Collectors.counting()));
+        summary.put("violationsByType", violationsByType);
+        Map<String, Long> violationsBySeverity = violations.stream()
+                .filter(Objects::nonNull) // Filter out null violations
+                .collect(Collectors.groupingBy(v -> v.getSeverity() != null ? v.getSeverity() : "UNKNOWN",
+                        Collectors.counting()));
+        summary.put("violationsBySeverity", violationsBySeverity);
+
+        summary.put("violations", violations);
+        return summary;
+    }
+
+    private Map<String, Object> createBehavioralAnalysis(HasilUjian hasilUjian, List<CheatDetection> violations) {
+        Map<String, Object> analysis = new HashMap<>();
+
+        // Risk level based on violations
+        int totalViolations = violations.size();
+        String riskLevel = "LOW";
+        if (totalViolations > 10)
+            riskLevel = "HIGH";
+        else if (totalViolations > 5)
+            riskLevel = "MEDIUM";
+
+        analysis.put("riskLevel", riskLevel);
+        analysis.put("integrityScore", Math.max(0, 100 - totalViolations * 10));
+        analysis.put("behaviorScore", Math.max(0, 100 - violations.size() * 5));
+
+        // Working pattern
+        String workingPattern = "Normal";
+        if (totalViolations > 10)
+            workingPattern = "High Risk";
+        else if (totalViolations > 5)
+            workingPattern = "Suspicious";
+
+        analysis.put("workingPattern", workingPattern);
+        analysis.put("needsReview",
+                totalViolations > 3 || (hasilUjian.getPersentase() != null && hasilUjian.getPersentase() < 50));
+
+        return analysis;
+    }
+
+    private Map<String, Object> enrichParticipantReportData(HasilUjian hasilUjian) {
+        Map<String, Object> data = new HashMap<>();
+
+        try {
+            // Validate input
+            if (hasilUjian == null) {
+                logger.warn("HasilUjian is null in enrichParticipantReportData");
+                return data;
+            }
+
+            // Basic hasil ujian data
+            data.put("idHasilUjian", hasilUjian.getIdHasilUjian());
+            data.put("idPeserta", hasilUjian.getIdPeserta());
+            data.put("idUjian", hasilUjian.getIdUjian()); // Get participant information
+            User participant = null;
+            try {
+                participant = userRepository.findById(hasilUjian.getIdPeserta());
+            } catch (Exception e) {
+                logger.warn("Error fetching participant {}: {}", hasilUjian.getIdPeserta(), e.getMessage());
+            }
+            data.put("participantName", participant != null ? participant.getName() : "Unknown");
+            data.put("participantUsername", participant != null ? participant.getUsername() : "");
+
+            // Get ujian information with class
+            Ujian ujian = null;
+            try {
+                ujian = ujianRepository.findById(hasilUjian.getIdUjian());
+            } catch (Exception e) {
+                logger.warn("Error fetching ujian {}: {}", hasilUjian.getIdUjian(), e.getMessage());
+            }
+            data.put("ujianName", ujian != null ? ujian.getNamaUjian() : "Unknown");
+            if (ujian != null && ujian.getKelas() != null) {
+                data.put("kelas", ujian.getKelas().getNamaKelas());
+            } else {
+                data.put("kelas", "Tidak Diketahui");
+            } // Performance data with null checks
+            data.put("totalSkor", hasilUjian.getTotalSkor() != null ? hasilUjian.getTotalSkor() : 0);
+            data.put("skorMaksimal", hasilUjian.getSkorMaksimal() != null ? hasilUjian.getSkorMaksimal() : 100);
+            data.put("persentase", hasilUjian.getPersentase() != null ? hasilUjian.getPersentase() : 0.0);
+            data.put("nilaiHuruf", hasilUjian.getNilaiHuruf() != null ? hasilUjian.getNilaiHuruf() : "E");
+            data.put("lulus", hasilUjian.getLulus() != null ? hasilUjian.getLulus() : false);
+
+            // Question breakdown with null checks
+            data.put("totalSoal", hasilUjian.getTotalSoal() != null ? hasilUjian.getTotalSoal() : 0);
+            data.put("jumlahBenar", hasilUjian.getJumlahBenar() != null ? hasilUjian.getJumlahBenar() : 0);
+            data.put("jumlahSalah", hasilUjian.getJumlahSalah() != null ? hasilUjian.getJumlahSalah() : 0);
+            data.put("jumlahKosong", hasilUjian.getJumlahKosong() != null ? hasilUjian.getJumlahKosong() : 0);
+
+            // Time information with null checks
+            data.put("waktuMulai", hasilUjian.getWaktuMulai());
+            data.put("waktuSelesai", hasilUjian.getWaktuSelesai());
+            data.put("durasi", hasilUjian.getDurasiPengerjaan() != null ? hasilUjian.getDurasiPengerjaan() : 0);
+            data.put("statusPengerjaan",
+                    hasilUjian.getStatusPengerjaan() != null ? hasilUjian.getStatusPengerjaan() : "BELUM_SELESAI"); // Get
+                                                                                                                    // violations
+                                                                                                                    // count
+                                                                                                                    // with
+                                                                                                                    // null
+                                                                                                                    // check
+            int totalViolations = 0;
+            try {
+                List<CheatDetection> ujianViolations = cheatDetectionRepository.findByUjianId(hasilUjian.getIdUjian());
+                if (ujianViolations != null) {
+                    List<CheatDetection> violations = ujianViolations.stream()
+                            .filter(v -> v != null && hasilUjian.getIdPeserta().equals(v.getIdPeserta()))
+                            .collect(Collectors.toList());
+                    totalViolations = violations.size();
+                }
+            } catch (Exception e) {
+                logger.warn("Error fetching violations for ujian {}: {}", hasilUjian.getIdUjian(), e.getMessage());
+            }
+            data.put("violationCount", totalViolations); // Risk assessment
+            double score = hasilUjian.getPersentase() != null ? hasilUjian.getPersentase() : 0.0;
+            String riskLevel = "LOW";
+            if (totalViolations > 2 || score < 40) {
+                riskLevel = "HIGH";
+            } else if (totalViolations > 0 || score < 60) {
+                riskLevel = "MEDIUM";
+            }
+            data.put("riskLevel", riskLevel);
+
+            // School information
+            if (hasilUjian.getSchool() != null) {
+                data.put("school", hasilUjian.getSchool().getNameSchool());
+            } else {
+                data.put("school", "Tidak Diketahui");
+            }
+        } catch (Exception e) {
+            logger.error("Error enriching participant report data for hasil ujian: {}",
+                    hasilUjian != null ? hasilUjian.getIdHasilUjian() : "null", e);
+
+            // Return basic data structure even on error
+            if (hasilUjian != null) {
+                data.put("idHasilUjian", hasilUjian.getIdHasilUjian());
+                data.put("idPeserta", hasilUjian.getIdPeserta());
+                data.put("idUjian", hasilUjian.getIdUjian());
+                data.put("participantName", "Error loading data");
+                data.put("ujianName", "Error loading data");
+                data.put("persentase", 0.0);
+                data.put("violationCount", 0);
+                data.put("riskLevel", "UNKNOWN");
+                data.put("kelas", "Tidak Diketahui");
+                data.put("school", "Tidak Diketahui");
+            }
+        }
+
+        return data;
+    }
+
+    /**
+     * Create Excel report from report data
+     */
+    private byte[] createExcelReport(Map<String, Object> reportData) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Laporan Peserta");
+
+            int rowNum = 0;
+
+            // Header
+            Row headerRow = sheet.createRow(rowNum++);
+            Cell titleCell = headerRow.createCell(0);
+            titleCell.setCellValue("LAPORAN PESERTA UJIAN");
+
+            // Style for header
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setFontHeightInPoints((short) 16);
+            headerStyle.setFont(headerFont);
+            titleCell.setCellStyle(headerStyle);
+
+            rowNum++; // Empty row
+
+            // Participant info
+            @SuppressWarnings("unchecked")
+            Map<String, Object> participantInfo = (Map<String, Object>) reportData.get("participantInfo");
+            addInfoSection(sheet, rowNum, "INFORMASI PESERTA", participantInfo, workbook);
+            rowNum += participantInfo.size() + 2;
+
+            // Ujian info
+            @SuppressWarnings("unchecked")
+            Map<String, Object> ujianInfo = (Map<String, Object>) reportData.get("ujianInfo");
+            addInfoSection(sheet, rowNum, "INFORMASI UJIAN", ujianInfo, workbook);
+            rowNum += ujianInfo.size() + 2;
+
+            // Hasil ujian
+            HasilUjian hasilUjian = (HasilUjian) reportData.get("hasilUjian");
+            Map<String, Object> hasilData = new HashMap<>();
+            hasilData.put("Total Skor", hasilUjian.getTotalSkor());
+            hasilData.put("Persentase", hasilUjian.getPersentase() + "%");
+            hasilData.put("Grade", hasilUjian.getNilaiHuruf());
+            hasilData.put("Status", hasilUjian.getLulus() != null && hasilUjian.getLulus() ? "LULUS" : "TIDAK LULUS");
+            addInfoSection(sheet, rowNum, "HASIL UJIAN", hasilData, workbook);
+            rowNum += hasilData.size() + 2;
+
+            // Performance metrics
+            @SuppressWarnings("unchecked")
+            Map<String, Object> metrics = (Map<String, Object>) reportData.get("performanceMetrics");
+            if (metrics != null) {
+                addInfoSection(sheet, rowNum, "METRIK PERFORMANSI", metrics, workbook);
+                rowNum += metrics.size() + 2;
+            }
+
+            // Violations
+            @SuppressWarnings("unchecked")
+            Map<String, Object> violations = (Map<String, Object>) reportData.get("violations");
+            if (violations != null) {
+                addInfoSection(sheet, rowNum, "RINGKASAN PELANGGARAN", violations, workbook);
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < 3; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Convert to byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+
+    private void addInfoSection(Sheet sheet, int startRow, String sectionTitle, Map<String, Object> data,
+            Workbook workbook) {
+        // Section title
+        Row titleRow = sheet.createRow(startRow);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue(sectionTitle);
+
+        CellStyle sectionStyle = workbook.createCellStyle();
+        Font sectionFont = workbook.createFont();
+        sectionFont.setBold(true);
+        sectionFont.setFontHeightInPoints((short) 12);
+        sectionStyle.setFont(sectionFont);
+        titleCell.setCellStyle(sectionStyle);
+        // Data rows
+        int rowNum = startRow + 1;
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            Row dataRow = sheet.createRow(rowNum++);
+            dataRow.createCell(0).setCellValue(entry.getKey());
+            dataRow.createCell(1).setCellValue(entry.getValue() != null ? entry.getValue().toString() : "");
         }
     }
 }

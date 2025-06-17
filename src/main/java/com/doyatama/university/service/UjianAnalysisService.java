@@ -139,9 +139,225 @@ public class UjianAnalysisService {
         if (analysis == null) {
             throw new ResourceNotFoundException("UjianAnalysis", "id", analysisId);
         }
-
         ujianAnalysisRepository.deleteById(analysisId);
         logger.info("Analysis deleted: {}", analysisId);
+    }
+
+    /**
+     * Get participant-based analysis data
+     * This method returns hasil ujian data enriched with violation and behavioral
+     * analysis
+     */
+    public Map<String, Object> getParticipantBasedAnalysis(int page, int size, String ujianId,
+            String search, String status, String schoolID) throws IOException {
+        logger.info(
+                "Getting participant-based analysis with filters - ujianId: {}, search: {}, status: {}, schoolID: {}",
+                ujianId, search, status, schoolID);
+
+        try {
+            // Get hasil ujian data based on filters
+            List<HasilUjian> hasilUjianList;
+            if (ujianId != null && !ujianId.trim().isEmpty()) {
+                hasilUjianList = hasilUjianRepository.findByUjian(ujianId);
+            } else {
+                hasilUjianList = hasilUjianRepository.findBySchool(schoolID); // Get results for school
+            }
+
+            // Filter by search if provided
+            if (search != null && !search.trim().isEmpty()) {
+                String searchLower = search.toLowerCase();
+                hasilUjianList = hasilUjianList.stream()
+                        .filter(hasil -> {
+                            // Search in participant ID or name
+                            if (hasil.getIdPeserta().toLowerCase().contains(searchLower)) {
+                                return true;
+                            }
+                            // Try to get user name and search in it
+                            try {
+                                User user = userRepository.findById(hasil.getIdPeserta());
+                                if (user != null && user.getName() != null) {
+                                    return user.getName().toLowerCase().contains(searchLower);
+                                }
+                            } catch (Exception e) {
+                                // Ignore errors in user lookup
+                            }
+                            return false;
+                        })
+                        .collect(Collectors.toList());
+            }
+
+            // Enrich each hasil ujian with violation and behavioral data
+            List<Map<String, Object>> enrichedParticipants = new ArrayList<>();
+
+            for (HasilUjian hasil : hasilUjianList) {
+                try {
+                    Map<String, Object> participantData = new HashMap<>();
+
+                    // Basic participant info
+                    participantData.put("idHasilUjian", hasil.getIdHasilUjian());
+                    participantData.put("idPeserta", hasil.getIdPeserta());
+                    participantData.put("idUjian", hasil.getIdUjian());
+                    participantData.put("totalSkor", hasil.getTotalSkor());
+                    participantData.put("persentase", hasil.getPersentase());
+                    participantData.put("lulus", hasil.getLulus());
+                    participantData.put("statusPengerjaan", hasil.getStatusPengerjaan());
+                    participantData.put("waktuMulai", hasil.getWaktuMulai());
+                    participantData.put("waktuSelesai", hasil.getWaktuSelesai());
+                    participantData.put("durasiPengerjaan", hasil.getDurasiPengerjaan());
+                    participantData.put("jumlahBenar", hasil.getJumlahBenar());
+                    participantData.put("jumlahSalah", hasil.getJumlahSalah());
+                    participantData.put("jumlahKosong", hasil.getJumlahKosong());
+                    participantData.put("totalSoal", hasil.getTotalSoal());
+
+                    // Get participant name
+                    try {
+                        User participant = userRepository.findById(hasil.getIdPeserta());
+                        if (participant != null) {
+                            Map<String, Object> pesertaInfo = new HashMap<>();
+                            pesertaInfo.put("name", participant.getName());
+                            pesertaInfo.put("username", participant.getUsername());
+                            participantData.put("peserta", pesertaInfo);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Failed to get participant info for {}: {}", hasil.getIdPeserta(), e.getMessage());
+                    }
+
+                    // Get ujian info
+                    try {
+                        Ujian ujian = ujianRepository.findById(hasil.getIdUjian());
+                        if (ujian != null) {
+                            Map<String, Object> ujianInfo = new HashMap<>();
+                            ujianInfo.put("namaUjian", ujian.getNamaUjian());
+                            participantData.put("ujian", ujianInfo);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Failed to get ujian info for {}: {}", hasil.getIdUjian(), e.getMessage());
+                    }
+                    // Get violations for this participant (filter from ujian violations)
+                    List<CheatDetection> allUjianViolations = cheatDetectionRepository
+                            .findByUjianId(hasil.getIdUjian());
+                    List<CheatDetection> violations = allUjianViolations.stream()
+                            .filter(v -> hasil.getIdPeserta().equals(v.getIdPeserta()))
+                            .collect(Collectors.toList());
+
+                    // Calculate behavioral metrics
+                    int totalViolations = violations.size();
+                    int severityScore = violations.stream()
+                            .mapToInt(v -> {
+                                String severity = v.getSeverity(); // Use getSeverity() instead of getSeverityLevel()
+                                if ("HIGH".equals(severity))
+                                    return 3;
+                                if ("MEDIUM".equals(severity))
+                                    return 2;
+                                return 1;
+                            })
+                            .sum();
+
+                    // Determine risk level
+                    String riskLevel = "LOW";
+                    if (totalViolations > 10)
+                        riskLevel = "HIGH";
+                    else if (totalViolations > 5)
+                        riskLevel = "MEDIUM";
+
+                    // Calculate behavior score (100 = perfect, decreases with violations)
+                    int behaviorScore = Math.max(0, 100 - (severityScore * 5));
+
+                    // Determine working pattern
+                    String workingPattern = "Normal";
+                    if (totalViolations > 10)
+                        workingPattern = "High Risk";
+                    else if (totalViolations > 5)
+                        workingPattern = "Suspicious";
+
+                    // Determine learning style based on response patterns
+                    String learningStyle = "Mixed";
+                    if (hasil.getDurasiPengerjaan() != null && hasil.getTotalSoal() != null
+                            && hasil.getTotalSoal() > 0) {
+                        double avgTimePerQuestion = hasil.getDurasiPengerjaan() / (double) hasil.getTotalSoal();
+                        if (avgTimePerQuestion < 30)
+                            learningStyle = "Quick";
+                        else if (avgTimePerQuestion > 120)
+                            learningStyle = "Careful";
+                    }
+
+                    // Add behavioral analysis
+                    participantData.put("violationCount", totalViolations);
+                    participantData.put("severityScore", severityScore);
+                    participantData.put("riskLevel", riskLevel);
+                    participantData.put("behaviorScore", behaviorScore);
+                    participantData.put("workingPattern", workingPattern);
+                    participantData.put("learningStyle", learningStyle);
+                    participantData.put("needsReview",
+                            totalViolations > 3 || (hasil.getPersentase() != null && hasil.getPersentase() < 50));
+                    participantData.put("integrityScore", Math.max(0, 100 - (totalViolations * 10)));
+
+                    // Filter by status if provided
+                    if (status != null && !status.trim().isEmpty()) {
+                        boolean includeRecord = false;
+                        switch (status.toLowerCase()) {
+                            case "normal":
+                                includeRecord = !((Boolean) participantData.get("needsReview"));
+                                break;
+                            case "perlu review":
+                                includeRecord = (Boolean) participantData.get("needsReview");
+                                break;
+                            case "high":
+                                includeRecord = "HIGH".equals(riskLevel);
+                                break;
+                            case "medium":
+                                includeRecord = "MEDIUM".equals(riskLevel);
+                                break;
+                            case "low":
+                                includeRecord = "LOW".equals(riskLevel);
+                                break;
+                            default:
+                                includeRecord = true;
+                        }
+
+                        if (!includeRecord) {
+                            continue;
+                        }
+                    }
+
+                    enrichedParticipants.add(participantData);
+
+                } catch (Exception e) {
+                    logger.error("Error processing participant {}: {}", hasil.getIdPeserta(), e.getMessage());
+                    // Continue with next participant
+                }
+            }
+
+            // Apply pagination
+            int totalElements = enrichedParticipants.size();
+            int startIndex = page * size;
+            int endIndex = Math.min(startIndex + size, totalElements);
+
+            List<Map<String, Object>> paginatedResults = new ArrayList<>();
+            if (startIndex < totalElements) {
+                paginatedResults = enrichedParticipants.subList(startIndex, endIndex);
+            }
+
+            // Build response
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", paginatedResults);
+            response.put("totalElements", totalElements);
+            response.put("totalPages", (int) Math.ceil((double) totalElements / size));
+            response.put("size", size);
+            response.put("number", page);
+            response.put("numberOfElements", paginatedResults.size());
+            response.put("first", page == 0);
+            response.put("last", endIndex >= totalElements);
+
+            logger.info("Returning {} participants out of {} total for participant-based analysis",
+                    paginatedResults.size(), totalElements);
+
+            return response;
+
+        } catch (Exception e) {
+            logger.error("Error in getParticipantBasedAnalysis: {}", e.getMessage(), e);
+            throw new IOException("Failed to get participant-based analysis: " + e.getMessage(), e);
+        }
     }
 
     // ==================== ANALYSIS GENERATION ====================
@@ -240,17 +456,41 @@ public class UjianAnalysisService {
         }
 
         // Calculate performance by categories
-        generateCategoryPerformance(analysis, hasilUjianList, ujian);
-
-        // Ambil dan set violationIds serta cheatDetections ke analysis
+        generateCategoryPerformance(analysis, hasilUjianList, ujian); // Ambil dan set violationIds serta
+                                                                      // cheatDetections ke analysis
         List<String> allViolationIds = cheatDetectionList.stream()
                 .map(CheatDetection::getIdDetection)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         analysis.setViolationIds(allViolationIds);
+
+        // Filter cheat detections to ensure they have proper timestamps for
+        // serialization
+        List<CheatDetection> validCheatDetections = cheatDetectionList.stream()
+                .filter(cd -> {
+                    // Ensure timestamps are not null to prevent serialization errors
+                    if (cd.getDetectedAt() == null) {
+                        logger.warn("CheatDetection {} has null detectedAt, setting to createdAt or current time",
+                                cd.getIdDetection());
+                        if (cd.getCreatedAt() != null) {
+                            cd.setDetectedAt(cd.getCreatedAt());
+                        } else {
+                            cd.setDetectedAt(Instant.now());
+                            cd.setCreatedAt(Instant.now());
+                        }
+                    }
+                    if (cd.getCreatedAt() == null) {
+                        logger.warn("CheatDetection {} has null createdAt, setting to current time",
+                                cd.getIdDetection());
+                        cd.setCreatedAt(Instant.now());
+                    }
+                    return true; // Include all after fixing timestamps
+                })
+                .collect(Collectors.toList());
+
         // Cast ke Object agar kompatibel dengan List<Object> (atau ganti tipe jika
         // sudah pasti)
-        analysis.setCheatDetections(new ArrayList<>(cheatDetectionList));
+        analysis.setCheatDetections(new ArrayList<>(validCheatDetections));
 
         // Save analysis
         UjianAnalysis savedAnalysis = ujianAnalysisRepository.save(analysis);

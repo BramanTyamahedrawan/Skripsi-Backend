@@ -192,6 +192,36 @@ public class UjianAnalysisController {
         }
     }
 
+    /**
+     * Get participant-based analysis data
+     * This endpoint returns hasil ujian data enriched with violation and behavioral
+     * analysis
+     */
+    @GetMapping("/participants")
+    public ResponseEntity<Map<String, Object>> getParticipantAnalysis(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "ujianId", required = false) String ujianId,
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "status", required = false) String status,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        try {
+            String schoolID = currentUser.getSchoolId();
+
+            // This will fetch hasil ujian data which represents participants
+            Map<String, Object> response = ujianAnalysisService.getParticipantBasedAnalysis(
+                    page, size, ujianId, search, status, schoolID);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error fetching participant analysis", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Terjadi kesalahan sistem: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
     // ==================== ANALYSIS COMPARISON ====================
 
     /**

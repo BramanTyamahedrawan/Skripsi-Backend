@@ -16,6 +16,7 @@ import org.apache.hadoop.hbase.TableName;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,7 +24,9 @@ public class CheatDetectionRepository {
 
     Configuration conf = HBaseConfiguration.create();
     String tableName = "cheat_detection";
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper; // Use the configured ObjectMapper with JSR310 support
 
     public List<CheatDetection> findAll(int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
@@ -39,6 +42,23 @@ public class CheatDetectionRepository {
     }
 
     public CheatDetection save(CheatDetection cheatDetection) throws IOException {
+        // Ensure timestamps are not null before saving
+        if (cheatDetection.getDetectedAt() == null) {
+            if (cheatDetection.getCreatedAt() != null) {
+                cheatDetection.setDetectedAt(cheatDetection.getCreatedAt());
+            } else {
+                cheatDetection.setDetectedAt(Instant.now());
+            }
+        }
+
+        if (cheatDetection.getCreatedAt() == null) {
+            cheatDetection.setCreatedAt(Instant.now());
+        }
+
+        if (cheatDetection.getUpdatedAt() == null) {
+            cheatDetection.setUpdatedAt(Instant.now());
+        }
+
         HBaseCustomClient client = new HBaseCustomClient(conf);
         String rowKey = cheatDetection.getIdDetection();
         TableName tableCheatDetection = TableName.valueOf(tableName);

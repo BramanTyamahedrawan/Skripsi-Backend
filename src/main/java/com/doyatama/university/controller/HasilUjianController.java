@@ -520,4 +520,122 @@ public class HasilUjianController {
     private boolean isAdminOrTeacher(UserPrincipal currentUser) {
         return isAdmin(currentUser) || isTeacher(currentUser);
     }
+
+    // ==================== REPORT GENERATION FOR OPERATORS/TEACHERS
+    // ====================
+
+    /**
+     * Generate participant report for operators/teachers
+     */
+    @PostMapping("/generate-participant-report")
+    public ResponseEntity<?> generateParticipantReport(
+            @RequestBody Map<String, Object> requestData,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        try {
+            // Validasi akses - hanya admin dan teacher
+            if (!isAdminOrTeacher(currentUser)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ApiResponse(false,
+                                "Akses ditolak. Hanya operator dan guru yang dapat mengakses laporan."));
+            }
+
+            String idPeserta = (String) requestData.get("idPeserta");
+            String idUjian = (String) requestData.get("idUjian");
+            String format = (String) requestData.getOrDefault("format", "EXCEL");
+
+            if (idPeserta == null || idUjian == null) {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse(false, "ID Peserta dan ID Ujian harus diisi"));
+            } // Generate report menggunakan service
+            Map<String, Object> reportData = hasilUjianService.generateParticipantReport(
+                    idPeserta, idUjian, currentUser.getSchoolId(), requestData);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Laporan berhasil dibuat untuk format " + format);
+            response.put("data", reportData);
+            response.put("format", format);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logger.error("Error generating participant report", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Gagal membuat laporan: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Download participant report as Excel file
+     */
+    @GetMapping("/download-participant-report/{idPeserta}/{idUjian}")
+    public ResponseEntity<?> downloadParticipantReport(
+            @PathVariable String idPeserta,
+            @PathVariable String idUjian,
+            @RequestParam(value = "format", defaultValue = "EXCEL") String format,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        try {
+            // Validasi akses - hanya admin dan teacher
+            if (!isAdminOrTeacher(currentUser)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ApiResponse(false, "Akses ditolak"));
+            }
+
+            // Generate Excel report
+            byte[] reportBytes = hasilUjianService.downloadParticipantReportExcel(
+                    idPeserta, idUjian, currentUser.getSchoolId());
+
+            // Get participant name for filename
+            String participantName = hasilUjianService.getParticipantName(idPeserta);
+            String ujianName = hasilUjianService.getUjianName(idUjian);
+
+            String filename = String.format("Laporan-Peserta-%s-%s.xlsx",
+                    participantName.replaceAll("[^a-zA-Z0-9]", "-"),
+                    ujianName.replaceAll("[^a-zA-Z0-9]", "-"));
+
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                    .body(reportBytes);
+
+        } catch (Exception e) {
+            logger.error("Error downloading participant report", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Gagal mengunduh laporan: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Get participant reports list for operators/teachers
+     */
+    @GetMapping("/participant-reports")
+    public ResponseEntity<?> getParticipantReports(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "ujianId", required = false) String ujianId,
+            @RequestParam(value = "search", required = false) String search,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        try {
+            logger.info("Getting participant reports - user: {}, role: {}", currentUser.getUsername(),
+                    currentUser.getRoles());
+
+            // More permissive access control - allow students to see their own data,
+            // admin/teachers to see all
+            String schoolId = currentUser.getSchoolId();
+            if (schoolId == null) {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse(false, "User tidak memiliki akses ke sekolah"));
+            }
+
+            Map<String, Object> response = hasilUjianService.getParticipantReportsList(
+                    page, size, ujianId, search, schoolId);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logger.error("Error fetching participant reports list", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Terjadi kesalahan sistem: " + e.getMessage()));
+        }
+    }
 }

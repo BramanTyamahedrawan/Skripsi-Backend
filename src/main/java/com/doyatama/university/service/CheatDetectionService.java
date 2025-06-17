@@ -1108,6 +1108,19 @@ public class CheatDetectionService {
             return true;
         }
 
+        // Check if detectedAt is null, if so, exclude from filter or use createdAt as
+        // fallback
+        Instant violationTime = violation.getDetectedAt();
+        if (violationTime == null) {
+            violationTime = violation.getCreatedAt();
+            if (violationTime == null) {
+                // If both detectedAt and createdAt are null, exclude from results
+                logger.warn("CheatDetection {} has null detectedAt and createdAt, excluding from time filter",
+                        violation.getIdDetection());
+                return false;
+            }
+        }
+
         Instant now = Instant.now();
         Instant threshold;
 
@@ -1125,7 +1138,7 @@ public class CheatDetectionService {
                 return true;
         }
 
-        return violation.getDetectedAt().isAfter(threshold);
+        return violationTime.isAfter(threshold);
     }
 
     private List<CheatDetection> applySorting(List<CheatDetection> violations,
@@ -1141,7 +1154,18 @@ public class CheatDetectionService {
                 break;
             case "TIMESTAMP":
             default:
-                comparator = Comparator.comparing(CheatDetection::getDetectedAt);
+                // Handle null detectedAt by using createdAt as fallback
+                comparator = Comparator.comparing(v -> {
+                    Instant time = v.getDetectedAt();
+                    if (time == null) {
+                        time = v.getCreatedAt();
+                        if (time == null) {
+                            // If both are null, use current time to put at end
+                            return Instant.now();
+                        }
+                    }
+                    return time;
+                });
                 break;
         }
 

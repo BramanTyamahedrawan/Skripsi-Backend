@@ -883,21 +883,37 @@ public class HBaseCustomClient {
                         }
                     }
 
-                    // Process each cell in the result
-                    for (Cell cell : result.listCells()) {
-                        String family = Bytes.toString(CellUtil.cloneFamily(cell));
-                        String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));
-                        String value = Bytes.toString(CellUtil.cloneValue(cell));
+                    // Process each cell in the result with null safety
+                    if (result.listCells() != null) {
+                        for (Cell cell : result.listCells()) {
+                            try {
+                                String family = Bytes.toString(CellUtil.cloneFamily(cell));
+                                String qualifier = Bytes.toString(CellUtil.cloneQualifier(cell));
+                                String value = Bytes.toString(CellUtil.cloneValue(cell));
 
-                        // Check if this is a nested field (family exists in columnMapping)
-                        if (columnMapping.containsKey(family)) {
-                            // Handle nested object (e.g., user.id, taksonomi.namaTaksonomi)
-                            handleNestedField(object, family, qualifier, value);
-                        } else {
-                            // Handle regular field
-                            String fieldName = columnMapping.get(qualifier);
-                            if (fieldName != null) {
-                                handleRegularField(object, fieldName, value, indexedFields);
+                                // Add null safety checks
+                                if (family == null || qualifier == null) {
+                                    continue; // Skip null family/qualifier
+                                }
+
+                                // Ensure value is not null (empty string is acceptable)
+                                value = (value != null) ? value : "";
+
+                                // Check if this is a nested field (family exists in columnMapping)
+                                if (columnMapping.containsKey(family)) {
+                                    // Handle nested object (e.g., user.id, taksonomi.namaTaksonomi)
+                                    handleNestedField(object, family, qualifier, value);
+                                } else {
+                                    // Handle regular field
+                                    String fieldName = columnMapping.get(qualifier);
+                                    if (fieldName != null) {
+                                        handleRegularField(object, fieldName, value, indexedFields);
+                                    }
+                                }
+                            } catch (Exception cellException) {
+                                // Log and continue processing other cells
+                                System.err.println("Error processing cell: " + cellException.getMessage());
+                                continue;
                             }
                         }
                     }
@@ -1081,13 +1097,67 @@ public class HBaseCustomClient {
         } else if (Map.class.isAssignableFrom(fieldType)) {
             // Handling Map types
             try {
-                // Untuk field Map, gunakan TypeReference untuk parsing yang lebih akurat
-                TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
-                };
-                Map<String, String> mapValue = objectMapper.readValue(value, typeRef);
-                field.set(object, mapValue);
+                // Handle specific Map types based on field name
+                if (field.getName().equals("skorPerSoal")) {
+                    // skorPerSoal is Map<String, Double>
+                    TypeReference<Map<String, Double>> typeRef = new TypeReference<Map<String, Double>>() {
+                    };
+                    Map<String, Double> mapValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, mapValue);
+                } else if (field.getName().equals("metadata") || field.getName().equals("securityFlags")
+                        || field.getName().equals("appealData") || field.getName().equals("pengaturan")
+                        || field.getName().equals("catSettings") || field.getName().equals("topicPerformance")
+                        || field.getName().equals("conceptMastery") || field.getName().equals("changePatterns")
+                        || field.getName().equals("learningInsights")) {
+                    // These fields are Map<String, Object>
+                    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+                    };
+                    Map<String, Object> mapValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, mapValue);
+                } else if (field.getName().equals("jawabanPeserta") || field.getName().equals("timeSpentPerQuestion")
+                        || field.getName().equals("attemptCountPerQuestion")) {
+                    // These fields have mixed types, handle as Map<String, Object> then convert if
+                    // needed
+                    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+                    };
+                    Map<String, Object> mapValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, mapValue);
+                } else if (field.getName().equals("jawabanBenar")) {
+                    // jawabanBenar is Map<String, Boolean>
+                    TypeReference<Map<String, Boolean>> typeRef = new TypeReference<Map<String, Boolean>>() {
+                    };
+                    Map<String, Boolean> mapValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, mapValue);
+                } else if (field.getName().equals("answerTimestamps")) {
+                    // answerTimestamps is Map<String, Instant> but we'll handle as Map<String,
+                    // String> first
+                    TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+                    };
+                    Map<String, String> tempMap = objectMapper.readValue(value, typeRef);
+                    Map<String, Instant> mapValue = new HashMap<>();
+                    for (Map.Entry<String, String> entry : tempMap.entrySet()) {
+                        try {
+                            mapValue.put(entry.getKey(), Instant.parse(entry.getValue()));
+                        } catch (Exception e) {
+                            System.out.println("Error parsing Instant for answerTimestamps: " + e.getMessage());
+                        }
+                    }
+                    field.set(object, mapValue);
+                } else {
+                    // Default to Map<String, Object> for other Map fields
+                    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+                    };
+                    Map<String, Object> mapValue = objectMapper.readValue(value, typeRef);
+                    field.set(object, mapValue);
+                }
             } catch (Exception e) {
                 System.out.println("Error parsing Map field " + field.getName() + ": " + e.getMessage());
+                // Set empty map as fallback
+                try {
+                    field.set(object, new HashMap<>());
+                } catch (Exception fallbackException) {
+                    // Ignore fallback errors
+                }
             }
         } else {
             // Handle complex objects that might contain special fields like bankSoalList
@@ -1167,10 +1237,26 @@ public class HBaseCustomClient {
                     field.set(object, listValue);
                 }
             } else if (Map.class.isAssignableFrom(fieldType)) {
-                Map<String, Object> mapValue = objectMapper.readValue(jsonNode.toString(),
-                        new TypeReference<Map<String, Object>>() {
-                        });
-                field.set(object, mapValue);
+                // Handle specific Map types based on field name
+                if (field.getName().equals("skorPerSoal")) {
+                    // skorPerSoal is Map<String, Double>
+                    Map<String, Double> mapValue = objectMapper.readValue(jsonNode.toString(),
+                            new TypeReference<Map<String, Double>>() {
+                            });
+                    field.set(object, mapValue);
+                } else if (field.getName().equals("jawabanBenar")) {
+                    // jawabanBenar is Map<String, Boolean>
+                    Map<String, Boolean> mapValue = objectMapper.readValue(jsonNode.toString(),
+                            new TypeReference<Map<String, Boolean>>() {
+                            });
+                    field.set(object, mapValue);
+                } else {
+                    // Default to Map<String, Object> for other Map fields
+                    Map<String, Object> mapValue = objectMapper.readValue(jsonNode.toString(),
+                            new TypeReference<Map<String, Object>>() {
+                            });
+                    field.set(object, mapValue);
+                }
             } else {
                 // For other complex objects, try JSON deserialization
                 Object value = objectMapper.readValue(jsonNode.toString(), fieldType);

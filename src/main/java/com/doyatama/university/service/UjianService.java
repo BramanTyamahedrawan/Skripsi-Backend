@@ -615,9 +615,15 @@ public class UjianService {
      */
     private void enrichUjianWithParticipantData(Ujian ujian) {
         try {
-            // Count participants from hasil_ujian table
-            long participantCount = hasilUjianService.countParticipantsByUjian(ujian.getIdUjian());
-            ujian.setJumlahPeserta((int) participantCount);
+            // Add null check for hasilUjianService
+            if (hasilUjianService != null) {
+                // Count participants from hasil_ujian table
+                long participantCount = hasilUjianService.countParticipantsByUjian(ujian.getIdUjian());
+                ujian.setJumlahPeserta((int) participantCount);
+            } else {
+                logger.warn("HasilUjianService is null, cannot get participant count for ujian {}", ujian.getIdUjian());
+                ujian.setJumlahPeserta(0);
+            }
 
             // You can add more enrichment here like active sessions, etc.
 

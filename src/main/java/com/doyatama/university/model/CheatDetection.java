@@ -64,9 +64,8 @@ public class CheatDetection {
     private UjianSession ujianSession;
     private User peserta;
     private Ujian ujian;
-    private School school;
+    private School school; // Constructors
 
-    // Constructors
     public CheatDetection() {
         this.evidence = new HashMap<>();
         this.frontendEvents = new HashMap<>();
@@ -76,6 +75,8 @@ public class CheatDetection {
         this.fullscreenStatus = true; // Default assume fullscreen
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
+        this.detectedAt = Instant.now(); // Ensure detectedAt is never null
+        this.firstDetectedAt = Instant.now(); // Ensure firstDetectedAt is never null
     }
 
     public CheatDetection(String sessionId, String idPeserta, String idUjian, String idSchool,
