@@ -385,6 +385,10 @@ public class UjianService {
         if (ujianResponse == null) {
             throw new ResourceNotFoundException("Ujian", "id", ujianId);
         }
+
+        // Enrich ujian with relational data
+        enrichUjianWithRelationalData(ujianResponse);
+
         return new DefaultResponse<>(ujianResponse, 1, "Successfully get data");
     }
 
@@ -630,6 +634,74 @@ public class UjianService {
         } catch (Exception e) {
             logger.warn("Failed to get participant count for ujian {}: {}", ujian.getIdUjian(), e.getMessage());
             ujian.setJumlahPeserta(0);
+        }
+    }
+
+    /**
+     * Enrich ujian with complete relational data (kelas, mapel, semester, etc.)
+     */
+    public void enrichUjianWithRelationalData(Ujian ujian) {
+        try {
+            // Enrich tahun ajaran
+            if (ujian.getTahunAjaran() != null && ujian.getTahunAjaran().getIdTahun() != null) {
+                TahunAjaran tahunAjaran = tahunAjaranRepository.findById(ujian.getTahunAjaran().getIdTahun());
+                if (tahunAjaran != null) {
+                    ujian.setTahunAjaran(tahunAjaran);
+                }
+            }
+
+            // Enrich kelas
+            if (ujian.getKelas() != null && ujian.getKelas().getIdKelas() != null) {
+                Kelas kelas = kelasRepository.findById(ujian.getKelas().getIdKelas());
+                if (kelas != null) {
+                    ujian.setKelas(kelas);
+                }
+            }
+
+            // Enrich semester
+            if (ujian.getSemester() != null && ujian.getSemester().getIdSemester() != null) {
+                Semester semester = semesterRepository.findById(ujian.getSemester().getIdSemester());
+                if (semester != null) {
+                    ujian.setSemester(semester);
+                }
+            }
+
+            // Enrich mapel
+            if (ujian.getMapel() != null && ujian.getMapel().getIdMapel() != null) {
+                Mapel mapel = mapelRepository.findById(ujian.getMapel().getIdMapel());
+                if (mapel != null) {
+                    ujian.setMapel(mapel);
+                }
+            }
+
+            // Enrich konsentrasi keahlian sekolah
+            if (ujian.getKonsentrasiKeahlianSekolah() != null
+                    && ujian.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah() != null) {
+                KonsentrasiKeahlianSekolah konsentrasi = konsentrasiKeahlianSekolahRepository
+                        .findById(ujian.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+                if (konsentrasi != null) {
+                    ujian.setKonsentrasiKeahlianSekolah(konsentrasi);
+                }
+            }
+
+            // Enrich school
+            if (ujian.getSchool() != null && ujian.getSchool().getIdSchool() != null) {
+                School school = schoolRepository.findById(ujian.getSchool().getIdSchool());
+                if (school != null) {
+                    ujian.setSchool(school);
+                }
+            }
+
+            // Enrich created by
+            if (ujian.getCreatedBy() != null && ujian.getCreatedBy().getId() != null) {
+                User createdBy = userRepository.findById(ujian.getCreatedBy().getId());
+                if (createdBy != null) {
+                    ujian.setCreatedBy(createdBy);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.warn("Failed to enrich ujian {} with relational data: {}", ujian.getIdUjian(), e.getMessage());
         }
     }
 }

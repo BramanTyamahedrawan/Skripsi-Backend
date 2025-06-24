@@ -20,6 +20,7 @@ import com.doyatama.university.repository.UjianSessionRepository;
 import com.doyatama.university.repository.CheatDetectionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -57,10 +58,12 @@ public class HasilUjianService {
     @Autowired
     private UjianSessionRepository ujianSessionRepository;
     @Autowired
-    private CheatDetectionRepository cheatDetectionRepository;
+    private CheatDetectionRepository cheatDetectionRepository;    @Autowired
+    private UjianAnalysisService ujianAnalysisService;
 
     @Autowired
-    private UjianAnalysisService ujianAnalysisService;
+    @Lazy
+    private UjianService ujianService;
 
     // ==================== OPERASI CRUD UTAMA ====================
 
@@ -911,18 +914,20 @@ public class HasilUjianService {
 
         recommendations.put("studyRecommendations", recommendationsList);
         recommendations.put("recommendedStudyTime", calculateRecommendedStudyTime(result));
-        recommendations.put("priorityAreas", result.getRecommendedStudyAreas());
-
-        return recommendations;
+        recommendations.put("priorityAreas", result.getRecommendedStudyAreas());        return recommendations;
     }
 
     // ==================== METODE UTILITY ====================
-
+    
     private void enrichHasilUjianData(HasilUjian hasil) throws IOException {
         // Muat entitas terkait jika belum dimuat
         if (hasil.getUjian() == null && hasil.getIdUjian() != null) {
             Ujian ujian = ujianRepository.findById(hasil.getIdUjian());
-            hasil.setUjian(ujian);
+            if (ujian != null) {
+                // Enrich ujian with complete relational data (kelas, mapel, etc.)
+                ujianService.enrichUjianWithRelationalData(ujian);
+                hasil.setUjian(ujian);
+            }
         }
 
         if (hasil.getPeserta() == null && hasil.getIdPeserta() != null) {
