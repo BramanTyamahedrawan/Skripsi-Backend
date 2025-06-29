@@ -37,6 +37,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL001", "main", "idAtp", "ATPACPELEDKVBIKLSFGL001");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL001", "main", "namaAtp",
                                 "B1. Menemukan Tema dan pesan dalam cerpen yang menginspirasi penggubahan puisi Menganalisis unsur-unsur pembangun puisi");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL001", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL001", "acp", "idAcp", "ACPELEDKVBIKLSFGL002");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL001", "acp", "namaAcp",
                                 "Peserta didik mampu mengevaluasi gagasan dan pandangan berdasarkan kaidah logika berpikir dari membaca berbagai tipe teks (nonfiksi dan fiksi) di media cetak dan elektronik. Peserta didik mampu mengapresiasi teks fiksi dan nonfiksi ");
@@ -65,6 +66,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL002", "main", "idAtp", "ATPACPELEDKVBIKLSFGL002");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL002", "main", "namaAtp",
                                 "Mengidentifikasi perbedaan antara drama, puisi dan prosa");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL002", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL002", "acp", "idAcp", "ACPELEDKVBIKLSFGL002");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL002", "acp", "namaAcp",
                                 "Peserta didik mampu mengevaluasi gagasan dan pandangan berdasarkan kaidah logika berpikir dari membaca berbagai tipe teks (nonfiksi dan fiksi) di media cetak dan elektronik. Peserta didik mampu mengapresiasi teks fiksi dan nonfiksi ");
@@ -93,6 +95,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL003", "main", "idAtp", "ATPACPELEDKVBIKLSFGL003");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL003", "main", "namaAtp",
                                 "Mengidentifikasi unsur unsur pembangun pertunjukan drama");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL003", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL003", "acp", "idAcp", "ACPELEDKVBIKLSFGL002");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL003", "acp", "namaAcp",
                                 "Peserta didik mampu mengevaluasi gagasan dan pandangan berdasarkan kaidah logika berpikir dari membaca berbagai tipe teks (nonfiksi dan fiksi) di media cetak dan elektronik. Peserta didik mampu mengapresiasi teks fiksi dan nonfiksi ");
@@ -121,6 +124,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL004", "main", "idAtp", "ATPACPELEDKVBIKLSFGL004");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL004", "main", "namaAtp",
                                 "Menulis puisi berdasarkan cerpen");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL004", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL004", "acp", "idAcp", "ACPELEDKVBIKLSFGL004");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL004", "acp", "namaAcp",
                                 "Peserta didik mampu menulis gagasan,pikiran, pandangan, pengetahuan metakognisi untuk berbagai tujuan secara logis, kritis, dan kreatif. Peserta didik mampu menulis berbagai jenis karya sastra. Peserta didik mampu menulis teks refleksi diri. Peserta didik mampu menulis hasil penelitian, teks fungsional dunia kerja, dan pengembangan studi lanjut. Peserta didik mampu memodifikasi/mendekonstruksikan karya sastra untuk tujuan ekonomi kreatif. Peserta didik mampu menerbitkan tulisan hasil karyanya di media cetak maupun digital.");
@@ -149,6 +153,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL005", "main", "idAtp", "ATPACPELEDKVBIKLSFGL005");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL005", "main", "namaAtp",
                                 "D2 Menulis naskah drama berdasarkan cerpen ");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL005", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL005", "acp", "idAcp", "ACPELEDKVBIKLSFGL004");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL005", "acp", "namaAcp",
                                 "Peserta didik mampu menulis gagasan,pikiran, pandangan, pengetahuan metakognisi untuk berbagai tujuan secara logis, kritis, dan kreatif. Peserta didik mampu menulis berbagai jenis karya sastra. Peserta didik mampu menulis teks refleksi diri. Peserta didik mampu menulis hasil penelitian, teks fungsional dunia kerja, dan pengembangan studi lanjut. Peserta didik mampu memodifikasi/mendekonstruksikan karya sastra untuk tujuan ekonomi kreatif. Peserta didik mampu menerbitkan tulisan hasil karyanya di media cetak maupun digital.");
@@ -175,8 +180,10 @@ public class SeederDataATP {
 
                 // ATP 6
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL006", "main", "idAtp", "ATPACPELEDKVBIKLSFGL006");
-                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL006", "main", "namaAtp",
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL006", "main",
+                                "namaAtp",
                                 "Menulis karya ilmiah");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL006", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL006", "acp", "idAcp", "ACPELEDKVBIKLSFGL004");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL006", "acp", "namaAcp",
                                 "Peserta didik mampu menulis gagasan,pikiran, pandangan, pengetahuan metakognisi untuk berbagai tujuan secara logis, kritis, dan kreatif. Peserta didik mampu menulis berbagai jenis karya sastra. Peserta didik mampu menulis teks refleksi diri. Peserta didik mampu menulis hasil penelitian, teks fungsional dunia kerja, dan pengembangan studi lanjut. Peserta didik mampu memodifikasi/mendekonstruksikan karya sastra untuk tujuan ekonomi kreatif. Peserta didik mampu menerbitkan tulisan hasil karyanya di media cetak maupun digital.");
@@ -205,6 +212,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL007", "main", "idAtp", "ATPACPELEDKVBIKLSFGL007");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL007", "main", "namaAtp",
                                 "Menampilkan musikalisasi puisi");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL007", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL007", "acp", "idAcp", "ACPELEDKVBIKLSFGL003");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL007", "acp", "namaAcp",
                                 "Peserta didik mampu menyajikan gagasan, pikiran, dan kreativitas dalam berbahasa dalam bentuk monolog, dialog, dan gelar wicara secara logis, sistematis, kritis, dan kreatif; mampu menyajikan karya sastra secara kreatif dan menarik. Peserta didik mampu mengkreasi teks sesuai dengan norma kesopanan dan budaya Indonesia. Peserta didik mampu menyajikan dan mempertahankan hasil penelitian, serta menyimpulkan masukan dari mitra diskusi.");
@@ -234,6 +242,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL008", "main", "idAtp", "ATPACPELEDKVBIKLSFGL008");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL008", "main", "namaAtp",
                                 "C1 Menyajikan pertujukan drama");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL008", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL008", "acp", "idAcp", "ACPELEDKVBIKLSFGL003");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL008", "acp", "namaAcp",
                                 "Peserta didik mampu menyajikan gagasan, pikiran, dan kreativitas dalam berbahasa dalam bentuk monolog, dialog, dan gelar wicara secara logis, sistematis, kritis, dan kreatif; mampu menyajikan karya sastra secara kreatif dan menarik. Peserta didik mampu mengkreasi teks sesuai dengan norma kesopanan dan budaya Indonesia. Peserta didik mampu menyajikan dan mempertahankan hasil penelitian, serta menyimpulkan masukan dari mitra diskusi.");
@@ -263,6 +272,7 @@ public class SeederDataATP {
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL009", "main", "idAtp", "ATPACPELEDKVBIKLSFGL009");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL009", "main", "namaAtp",
                                 "Menyajikan karya Ilmiah");
+                client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL009", "main", "jumlahJpl", "4");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL009", "acp", "idAcp", "ACPELEDKVBIKLSFGL003");
                 client.insertRecord(tableAtp, "ATPACPELEDKVBIKLSFGL009", "acp", "namaAcp",
                                 "Peserta didik mampu menyajikan gagasan, pikiran, dan kreativitas dalam berbahasa dalam bentuk monolog, dialog, dan gelar wicara secara logis, sistematis, kritis, dan kreatif; mampu menyajikan karya sastra secara kreatif dan menarik. Peserta didik mampu mengkreasi teks sesuai dengan norma kesopanan dan budaya Indonesia. Peserta didik mampu menyajikan dan mempertahankan hasil penelitian, serta menyimpulkan masukan dari mitra diskusi.");
