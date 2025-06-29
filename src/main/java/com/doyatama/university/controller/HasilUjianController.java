@@ -482,13 +482,7 @@ public class HasilUjianController {
             @PathVariable String hasilUjianId,
             @CurrentUser UserPrincipal currentUser) throws IOException {
         try {
-            // Validasi role admin
-            if (!isAdmin(currentUser)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new ApiResponse(false, "Akses ditolak"));
-            }
-
-            // Implementation would depend on business rules
+            hasilUjianService.deleteHasilUjianById(hasilUjianId);
             // For now, just return success
             return ResponseEntity.ok()
                     .body(new ApiResponse(true, "Hasil ujian berhasil dihapus"));

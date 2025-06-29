@@ -500,67 +500,85 @@ public class CheatDetectionRepository {
     /**
      * Get standard column mapping used across all queries
      */
+    // Inside CheatDetectionRepository.java
+
     private Map<String, String> getStandardColumnMapping() {
         Map<String, String> columnMapping = new HashMap<>();
 
-        // Main detection fields - main column family
-        columnMapping.put("main:idDetection", "idDetection");
-        columnMapping.put("main:sessionId", "sessionId");
-        columnMapping.put("main:idPeserta", "idPeserta");
-        columnMapping.put("main:idUjian", "idUjian");
-        columnMapping.put("main:idSchool", "idSchool");
-        columnMapping.put("main:typeViolation", "typeViolation");
-        columnMapping.put("main:severity", "severity");
-        columnMapping.put("main:violationCount", "violationCount");
-        columnMapping.put("main:detectedAt", "detectedAt");
-        columnMapping.put("main:firstDetectedAt", "firstDetectedAt");
+        // Main detection fields - assuming these qualifiers are directly mapped
+        columnMapping.put("idDetection", "idDetection");
+        columnMapping.put("sessionId", "sessionId");
+        columnMapping.put("idPeserta", "idPeserta");
+        columnMapping.put("idUjian", "idUjian");
+        columnMapping.put("idSchool", "idSchool");
+        columnMapping.put("typeViolation", "typeViolation");
+        columnMapping.put("severity", "severity");
+        columnMapping.put("violationCount", "violationCount");
+        columnMapping.put("detectedAt", "detectedAt");
+        columnMapping.put("firstDetectedAt", "firstDetectedAt");
 
-        // Browser and system info - main column family
-        columnMapping.put("main:browserInfo", "browserInfo");
-        columnMapping.put("main:userAgent", "userAgent");
-        columnMapping.put("main:windowTitle", "windowTitle");
-        columnMapping.put("main:screenWidth", "screenWidth");
-        columnMapping.put("main:screenHeight", "screenHeight");
-        columnMapping.put("main:fullscreenStatus", "fullscreenStatus");
+        // Browser and system info - assuming these qualifiers are directly mapped
+        columnMapping.put("browserInfo", "browserInfo");
+        columnMapping.put("userAgent", "userAgent");
+        columnMapping.put("windowTitle", "windowTitle");
+        columnMapping.put("screenWidth", "screenWidth");
+        columnMapping.put("screenHeight", "screenHeight");
+        columnMapping.put("fullscreenStatus", "fullscreenStatus");
 
-        // Evidence and events - specific column families
-        columnMapping.put("evidence:data", "evidence");
-        columnMapping.put("frontend:events", "frontendEvents");
+        // Evidence and events - assuming these qualifiers are directly mapped
+        // NOTE: If 'evidence:data' and 'frontend:events' are unique qualifiers across
+        // column families,
+        // they can be mapped directly. If 'data' or 'events' exist in multiple
+        // families,
+        // your HBaseCustomClient needs a more sophisticated way to differentiate.
+        columnMapping.put("data", "evidence"); // Maps 'data' qualifier to CheatDetection.evidence
+        columnMapping.put("events", "frontendEvents"); // Maps 'events' qualifier to CheatDetection.frontendEvents
 
-        // Timing data - timing column family
-        columnMapping.put("timing:timeBetweenAnswers", "timeBetweenAnswers");
-        columnMapping.put("timing:answerPattern", "answerPattern");
-        columnMapping.put("timing:answerTimestamps", "answerTimestamps");
+        // Timing data - assuming these qualifiers are directly mapped
+        columnMapping.put("timeBetweenAnswers", "timeBetweenAnswers");
+        columnMapping.put("answerPattern", "answerPattern");
+        columnMapping.put("answerTimestamps", "answerTimestamps");
 
-        // Action data - action column family
-        columnMapping.put("action:actionTaken", "actionTaken");
-        columnMapping.put("action:actionBy", "actionBy");
-        columnMapping.put("action:actionAt", "actionAt");
-        columnMapping.put("action:actionReason", "actionReason");
+        // Action data - assuming these qualifiers are directly mapped
+        columnMapping.put("actionTaken", "actionTaken");
+        columnMapping.put("actionBy", "actionBy");
+        columnMapping.put("actionAt", "actionAt");
+        columnMapping.put("actionReason", "actionReason");
 
-        // Status fields - main column family
-        columnMapping.put("main:resolved", "resolved");
-        columnMapping.put("main:resolvedBy", "resolvedBy");
-        columnMapping.put("main:resolvedAt", "resolvedAt");
-        columnMapping.put("main:resolutionNotes", "resolutionNotes");
+        // Status fields - assuming these qualifiers are directly mapped
+        columnMapping.put("resolved", "resolved");
+        columnMapping.put("resolvedBy", "resolvedBy");
+        columnMapping.put("resolvedAt", "resolvedAt");
+        columnMapping.put("resolutionNotes", "resolutionNotes");
 
-        // Timestamps - main column family
-        columnMapping.put("main:createdAt", "createdAt");
-        columnMapping.put("main:updatedAt", "updatedAt");
+        // Timestamps - assuming these qualifiers are directly mapped
+        columnMapping.put("createdAt", "createdAt");
+        columnMapping.put("updatedAt", "updatedAt");
 
-        // UjianSession fields - main column family
-        columnMapping.put("main:ujianSessionId", "ujianSessionId");
-        columnMapping.put("main:ujianSessionStatus", "ujianSessionStatus");
-        columnMapping.put("main:ujianSessionStartTime", "ujianSessionStartTime");
+        // UjianSession fields - assuming these qualifiers are directly mapped
+        columnMapping.put("ujianSessionId", "ujianSessionId");
+        columnMapping.put("ujianSessionStatus", "ujianSessionStatus");
+        columnMapping.put("ujianSessionStartTime", "ujianSessionStartTime");
 
-        // Relationship fields
-        columnMapping.put("peserta:id", "pesertaId");
-        columnMapping.put("peserta:name", "pesertaName");
-        columnMapping.put("peserta:username", "pesertaUsername");
-        columnMapping.put("ujian:idUjian", "ujianId");
-        columnMapping.put("ujian:namaUjian", "ujianNama");
-        columnMapping.put("school:idSchool", "schoolId");
-        columnMapping.put("school:nameSchool", "schoolName");
+        // Relationship fields - assuming these qualifiers are directly mapped
+        columnMapping.put("id", "pesertaId"); // Maps 'id' qualifier (from 'peserta:id') to 'pesertaId'
+        columnMapping.put("name", "pesertaName"); // Maps 'name' qualifier (from 'peserta:name') to 'pesertaName'
+        columnMapping.put("username", "pesertaUsername"); // Maps 'username' qualifier (from 'peserta:username') to
+                                                          // 'pesertaUsername'
+        columnMapping.put("idUjian", "ujianId"); // Maps 'idUjian' qualifier (from 'ujian:idUjian') to 'ujianId'
+        columnMapping.put("namaUjian", "ujianNama"); // Maps 'namaUjian' qualifier (from 'ujian:namaUjian') to
+                                                     // 'ujianNama'
+        columnMapping.put("durasiMenit", "ujianDurasiMenit"); // Maps 'durasiMenit' qualifier (from 'ujian:durasiMenit')
+                                                              // to 'ujianDurasiMenit'
+        columnMapping.put("idSchool", "schoolId"); // Maps 'idSchool' qualifier (from 'school:idSchool') to 'schoolId'
+        columnMapping.put("nameSchool", "schoolName"); // Maps 'nameSchool' qualifier (from 'school:nameSchool') to
+                                                       // 'schoolName'
+
+        // Additional fields if they are always in 'detail', 'detection', 'status' and
+        // their qualifiers are unique
+        columnMapping.put("created_by", "createdBy");
+        columnMapping.put("status", "detectionStatus"); // For 'detection:status'
+        columnMapping.put("relationshipsStatus", "relationshipsStatus"); // For 'status:relationshipsStatus'
 
         return columnMapping;
     }

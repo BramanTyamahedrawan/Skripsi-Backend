@@ -58,7 +58,8 @@ public class HasilUjianService {
     @Autowired
     private UjianSessionRepository ujianSessionRepository;
     @Autowired
-    private CheatDetectionRepository cheatDetectionRepository;    @Autowired
+    private CheatDetectionRepository cheatDetectionRepository;
+    @Autowired
     private UjianAnalysisService ujianAnalysisService;
 
     @Autowired
@@ -914,11 +915,12 @@ public class HasilUjianService {
 
         recommendations.put("studyRecommendations", recommendationsList);
         recommendations.put("recommendedStudyTime", calculateRecommendedStudyTime(result));
-        recommendations.put("priorityAreas", result.getRecommendedStudyAreas());        return recommendations;
+        recommendations.put("priorityAreas", result.getRecommendedStudyAreas());
+        return recommendations;
     }
 
     // ==================== METODE UTILITY ====================
-    
+
     private void enrichHasilUjianData(HasilUjian hasil) throws IOException {
         // Muat entitas terkait jika belum dimuat
         if (hasil.getUjian() == null && hasil.getIdUjian() != null) {
@@ -1754,6 +1756,16 @@ public class HasilUjianService {
             Row dataRow = sheet.createRow(rowNum++);
             dataRow.createCell(0).setCellValue(entry.getKey());
             dataRow.createCell(1).setCellValue(entry.getValue() != null ? entry.getValue().toString() : "");
+        }
+    }
+
+    public void deleteHasilUjianById(String hasilUjianId) throws IOException {
+        HasilUjian hasilUjian = hasilUjianRepository.findById(hasilUjianId);
+        if (hasilUjian != null) {
+            hasilUjianRepository.deleteById(hasilUjianId);
+        } else {
+            throw new ResourceNotFoundException("Hasil Ujian", "id", hasilUjianId);
+
         }
     }
 }
