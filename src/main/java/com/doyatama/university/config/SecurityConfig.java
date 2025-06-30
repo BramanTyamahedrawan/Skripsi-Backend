@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,9 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @Configuration
 @EnableWebSecurity
@@ -44,18 +42,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder());
     }
 
-    // FIX 1: Remove BeanIds.AUTHENTICATION_MANAGER (deprecated in Spring Boot 2.5+)
-    @Bean
+    @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
-        firewall.setAllowUrlEncodedDoubleSlash(true);
-        web.httpFirewall(firewall);
     }
 
     @Bean
@@ -63,11 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    // FIX 2: Add explicit BCryptPasswordEncoder bean for UserService
-    @Bean
-    public BCryptPasswordEncoder bcryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // Metode 'bcryptPasswordEncoder()' yang datang dari GitHub (FIX 2) tidak ada di
+    // sini
+    // karena Anda memilih versi server.
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -102,8 +90,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated();
 
-        // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
     }
 }
