@@ -66,27 +66,26 @@ public class BankSoalController {
         return bankSoalService.getBankSoalById(bankSoalId);
     }
 
-    // @PutMapping("/{bankSoalId}")
-    // public ResponseEntity<?> updateBankSoal(@PathVariable String bankSoalId,
-    // @Valid @RequestBody BankSoalRequest bankSoalRequest) throws IOException {
-    // try {
-    // BankSoal bankSoal = bankSoalService.updateBankSoal(bankSoalId,
-    // bankSoalRequest);
+    @PutMapping("/{bankSoalId}")
+    public ResponseEntity<?> updateBankSoal(@PathVariable String bankSoalId,
+            @Valid @RequestBody BankSoalRequest bankSoalRequest) throws IOException {
+        try {
+            BankSoal bankSoal = bankSoalService.updateBankSoal(bankSoalId, bankSoalRequest);
 
-    // URI location = ServletUriComponentsBuilder
-    // .fromCurrentRequest().path("/{bankSoalId}")
-    // .buildAndExpand(bankSoal.getIdBankSoal()).toUri();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{bankSoalId}")
+                    .buildAndExpand(bankSoal.getIdBankSoal()).toUri();
 
-    // return ResponseEntity.created(location)
-    // .body(new ApiResponse(true, "Soal Ujian Updated Successfully"));
-    // } catch (IllegalArgumentException e) {
-    // return ResponseEntity.badRequest()
-    // .body(new ApiResponse(false, e.getMessage()));
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    // .body(new ApiResponse(false, "An unexpected error occurred."));
-    // }
-    // }
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(true, "Bank Soal Updated Successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "An unexpected error occurred."));
+        }
+    }
 
     @DeleteMapping("/{bankSoalId}")
     public ResponseEntity<?> deleteBankSoal(@PathVariable String bankSoalId) throws IOException {

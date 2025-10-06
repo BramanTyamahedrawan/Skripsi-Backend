@@ -254,6 +254,110 @@ public class BankSoalService {
                 "Successfully get data");
     }
 
+    public BankSoal updateBankSoal(String bankSoalId, BankSoalRequest bankSoalRequest) throws IOException {
+        // Check if bank soal exists
+        BankSoal existingBankSoal = bankSoalRepository.findById(bankSoalId);
+        if (existingBankSoal == null || !existingBankSoal.isValid()) {
+            throw new ResourceNotFoundException("Bank Soal", "id", bankSoalId);
+        }
+
+        // Get related entities
+        TahunAjaran tahunAjaranResponse = tahunAjaranRepository.findById(bankSoalRequest.getIdTahun());
+        Kelas kelasResponse = kelasRepository.findById(bankSoalRequest.getIdKelas());
+        Semester semesterResponse = semesterRepository.findById(bankSoalRequest.getIdSemester());
+        Mapel mapelResponse = mapelRepository.findById(bankSoalRequest.getIdMapel());
+        Elemen elemenResponse = elemenRepository.findById(bankSoalRequest.getIdElemen());
+        Acp acpResponse = acpRepository.findById(bankSoalRequest.getIdAcp());
+        Atp atpResponse = atpRepository.findById(bankSoalRequest.getIdAtp());
+        SoalUjian soalUjianResponse = soalUjianRepository.findById(bankSoalRequest.getIdSoalUjian());
+        Taksonomi taksonomiResponse = taksonomiRepository.findById(bankSoalRequest.getIdTaksonomi());
+        KonsentrasiKeahlianSekolah konsentrasiKeahlianSekolahResponse = konsentrasiKeahlianSekolahRepository
+                .findById(bankSoalRequest.getIdKonsentrasiSekolah());
+        School schoolResponse = schoolRepository.findById(bankSoalRequest.getIdSchool());
+
+        // Build updated BankSoal object
+        BankSoal updatedBankSoal = new BankSoal();
+        updatedBankSoal.setIdBankSoal(bankSoalId); // Keep the same ID
+        updatedBankSoal.setIdSoalUjian(bankSoalRequest.getIdSoalUjian());
+        updatedBankSoal.setNamaUjian(bankSoalRequest.getNamaUjian());
+        updatedBankSoal.setPertanyaan(bankSoalRequest.getPertanyaan());
+        updatedBankSoal.setBobot(bankSoalRequest.getBobot());
+        updatedBankSoal.setJenisSoal(bankSoalRequest.getJenisSoal());
+
+        updatedBankSoal.setCreatedAt(existingBankSoal.getCreatedAt()); // Keep original creation date
+        updatedBankSoal.setSoalUjian(soalUjianResponse);
+        updatedBankSoal.setTaksonomi(taksonomiResponse);
+        updatedBankSoal.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
+        updatedBankSoal.setTahunAjaran(tahunAjaranResponse);
+        updatedBankSoal.setSemester(semesterResponse);
+        updatedBankSoal.setKelas(kelasResponse);
+        updatedBankSoal.setMapel(mapelResponse);
+        updatedBankSoal.setElemen(elemenResponse);
+        updatedBankSoal.setAcp(acpResponse);
+        updatedBankSoal.setAtp(atpResponse);
+        updatedBankSoal.setSchool(schoolResponse);
+
+        // Handle different question types
+        switch (bankSoalRequest.getJenisSoal().toUpperCase()) {
+            case "PG":
+                validatePertanyaanPG(bankSoalRequest);
+                updatedBankSoal.setOpsi(bankSoalRequest.getOpsi());
+                updatedBankSoal.setJawabanBenar(bankSoalRequest.getJawabanBenar());
+                break;
+
+            case "MULTI":
+                validatePertanyaanMulti(bankSoalRequest);
+                updatedBankSoal.setOpsi(bankSoalRequest.getOpsi());
+                updatedBankSoal.setJawabanBenar(bankSoalRequest.getJawabanBenar());
+                break;
+
+            case "COCOK":
+                validatePertanyaanCocok(bankSoalRequest);
+                updatedBankSoal.setPasangan(bankSoalRequest.getPasangan());
+                updatedBankSoal.setJawabanBenar(bankSoalRequest.getJawabanBenar());
+                break;
+
+            case "ISIAN":
+                validatePertanyaanIsian(bankSoalRequest);
+                updatedBankSoal.setJawabanBenar(bankSoalRequest.getJawabanBenar());
+                updatedBankSoal.setToleransiTypo(bankSoalRequest.getToleransiTypo());
+                break;
+
+            default:
+                throw new IllegalArgumentException("Jenis bankSoal tidak dikenali: " + bankSoalRequest.getJenisSoal());
+        }
+
+        // Save updated bank soal
+        BankSoal savedBankSoal = bankSoalRepository.save(updatedBankSoal);
+
+        // Handle cascade updates to SoalUjian if BankSoal fields changed
+        try {
+            if (soalUjianResponse != null) {
+                // Check if key fields changed and cascade to SoalUjian
+                boolean shouldCascade = !existingBankSoal.getNamaUjian().equals(bankSoalRequest.getNamaUjian()) ||
+                        !existingBankSoal.getPertanyaan().equals(bankSoalRequest.getPertanyaan()) ||
+                        !existingBankSoal.getBobot().equals(bankSoalRequest.getBobot()) ||
+                        !existingBankSoal.getJenisSoal().equals(bankSoalRequest.getJenisSoal());
+
+                if (shouldCascade) {
+                    System.out.println("Cascading BankSoal update to SoalUjian: " + soalUjianResponse.getIdSoalUjian());
+                    soalUjianRepository.updateBankSoalInfoByBankSoalId(
+                            bankSoalId,
+                            bankSoalRequest.getNamaUjian(),
+                            bankSoalRequest.getPertanyaan(),
+                            bankSoalRequest.getBobot(),
+                            bankSoalRequest.getJenisSoal());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error during cascade update to SoalUjian: " + e.getMessage());
+            e.printStackTrace();
+            // Continue execution - cascade failure shouldn't fail the main update
+        }
+
+        return savedBankSoal;
+    }
+
     public void deleteBankSoalById(String bankSoalId) throws IOException {
         BankSoal bankSoalResponse = bankSoalRepository.findById(bankSoalId);
         if (bankSoalResponse.isValid()) {

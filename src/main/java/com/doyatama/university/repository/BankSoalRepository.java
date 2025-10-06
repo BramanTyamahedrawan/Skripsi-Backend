@@ -528,4 +528,83 @@ public class BankSoalRepository {
         }
     }
 
+    public List<BankSoal> findBankSoalBySoalUjian(String soalUjianId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idBankSoal", "idBankSoal");
+        columnMapping.put("idSoalUjian", "idSoalUjian");
+        columnMapping.put("namaUjian", "namaUjian");
+        columnMapping.put("pertanyaan", "pertanyaan");
+        columnMapping.put("bobot", "bobot");
+        columnMapping.put("jenisSoal", "jenisSoal");
+        columnMapping.put("opsi", "opsi");
+        columnMapping.put("pasangan", "pasangan");
+        columnMapping.put("jawabanBenar", "jawabanBenar");
+        columnMapping.put("toleransiTypo", "toleransiTypo");
+        columnMapping.put("createdAt", "createdAt");
+        columnMapping.put("soalUjian", "soalUjian");
+        columnMapping.put("taksonomi", "taksonomi");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
+
+        List<BankSoal> bankSoalList = client.getDataListByColumn(tableBankSoal.toString(), columnMapping, "soalUjian",
+                "idSoalUjian",
+                soalUjianId, BankSoal.class, size);
+        return bankSoalList;
+    }
+
+    public void updateSoalUjianInfoBySoalUjianId(String soalUjianId, String namaUjian, String pertanyaan, String bobot,
+            String jenisSoal, String toleransiTypo) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+
+        // Get all BankSoal records that reference this SoalUjian
+        List<BankSoal> bankSoalList = findBankSoalBySoalUjian(soalUjianId, 1000); // Use large size to get all records
+
+        // Update SoalUjian info for each BankSoal record
+        for (BankSoal bankSoal : bankSoalList) {
+            if (bankSoal.getIdBankSoal() != null) {
+                // Update fields that are stored directly in BankSoal
+                if (namaUjian != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "namaUjian", namaUjian);
+                }
+                if (pertanyaan != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "pertanyaan", pertanyaan);
+                }
+                if (bobot != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "bobot", bobot);
+                }
+                if (jenisSoal != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "jenisSoal", jenisSoal);
+                }
+
+                // Update in soalUjian nested object as well
+                if (namaUjian != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "namaUjian", namaUjian);
+                }
+                if (pertanyaan != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "pertanyaan", pertanyaan);
+                }
+                if (bobot != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "bobot", bobot);
+                }
+                if (jenisSoal != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "jenisSoal", jenisSoal);
+                }
+
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "detail", "updated_by",
+                        "System_Cascade_Update");
+            }
+        }
+    }
+
 }
