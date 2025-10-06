@@ -286,4 +286,82 @@ public class AtpRepository {
         return atp.getIdAtp() != null;
     }
 
+    public List<Atp> findAtpByElemen(String elemenId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
+
+        List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "elemen", "idElemen",
+                elemenId, Atp.class, size);
+        return atpList;
+    }
+
+    public void updateNamaElemenByElemenId(String elemenId, String newNamaElemen) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableAtp = TableName.valueOf(tableName);
+
+        // Get all ATP records that reference this elemen
+        List<Atp> atpList = findAtpByElemen(elemenId, 1000); // Use large size to get all records
+
+        // Update nama elemen for each ATP record
+        for (Atp atp : atpList) {
+            if (atp.getIdAtp() != null) {
+                client.insertRecord(tableAtp, atp.getIdAtp(), "elemen", "namaElemen", newNamaElemen);
+                client.insertRecord(tableAtp, atp.getIdAtp(), "detail", "updated_by", "System_Cascade_Update");
+            }
+        }
+    }
+
+    public List<Atp> findAtpByAcp(String acpId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAtp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idAtp", "idAtp");
+        columnMapping.put("namaAtp", "namaAtp");
+        columnMapping.put("jumlahJpl", "jumlahJpl");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("school", "school");
+
+        List<Atp> atpList = client.getDataListByColumn(tableAtp.toString(), columnMapping, "acp", "idAcp",
+                acpId, Atp.class, size);
+        return atpList;
+    }
+
+    public void updateNamaAcpByAcpId(String acpId, String newNamaAcp) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableAtp = TableName.valueOf(tableName);
+
+        // Get all ATP records that reference this ACP
+        List<Atp> atpList = findAtpByAcp(acpId, 1000); // Use large size to get all records
+
+        // Update nama ACP for each ATP record
+        for (Atp atp : atpList) {
+            if (atp.getIdAtp() != null) {
+                client.insertRecord(tableAtp, atp.getIdAtp(), "acp", "namaAcp", newNamaAcp);
+                client.insertRecord(tableAtp, atp.getIdAtp(), "detail", "updated_by", "System_Cascade_Update");
+            }
+        }
+    }
+
 }

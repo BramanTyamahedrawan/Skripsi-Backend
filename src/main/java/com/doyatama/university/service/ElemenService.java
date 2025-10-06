@@ -19,6 +19,9 @@ import com.doyatama.university.repository.MapelRepository;
 import com.doyatama.university.repository.SchoolRepository;
 import com.doyatama.university.repository.SemesterRepository;
 import com.doyatama.university.repository.TahunAjaranRepository;
+import com.doyatama.university.repository.AcpRepository;
+import com.doyatama.university.repository.AtpRepository;
+import com.doyatama.university.repository.BankSoalRepository;
 import com.doyatama.university.util.AppConstants;
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +36,9 @@ public class ElemenService {
     private MapelRepository mapelRepository = new MapelRepository();
     private KonsentrasiKeahlianSekolahRepository konsentrasiKeahlianSekolahRepository = new KonsentrasiKeahlianSekolahRepository();
     private SchoolRepository schoolRepository = new SchoolRepository();
+    private AcpRepository acpRepository = new AcpRepository();
+    private AtpRepository atpRepository = new AtpRepository();
+    private BankSoalRepository bankSoalRepository = new BankSoalRepository();
 
     public PagedResponse<Elemen> getAllElemen(int page, int size, String mapelID, String tahunAjaranID,
             String semesterID, String kelasID, String konsentrasiKeahlianSekolahID, String schoolID)
@@ -109,6 +115,11 @@ public class ElemenService {
         School schoolResponse = schoolRepository.findById(elemenRequest.getIdSekolah());
 
         if (schoolResponse.getIdSchool() != null) {
+            // Get current elemen data to check if nama changed
+            Elemen currentElemen = elemenRepository.findElemenById(elemenId);
+            String oldNamaElemen = currentElemen.getNamaElemen();
+            String newNamaElemen = elemenRequest.getNamaElemen();
+
             elemen.setNamaElemen(elemenRequest.getNamaElemen());
             elemen.setTahunAjaran(tahunAjaranResponse);
             elemen.setKelas(kelasResponse);
@@ -117,7 +128,29 @@ public class ElemenService {
             elemen.setKonsentrasiKeahlianSekolah(konsentrasiKeahlianSekolahResponse);
             elemen.setSchool(schoolResponse);
 
-            return elemenRepository.update(elemenId, elemen);
+            Elemen updatedElemen = elemenRepository.update(elemenId, elemen);
+
+            // Cascade update if nama elemen changed
+            if (updatedElemen != null && !oldNamaElemen.equals(newNamaElemen)) {
+                try {
+                    // Update nama elemen in ACP records
+                    acpRepository.updateNamaElemenByElemenId(elemenId, newNamaElemen);
+
+                    // Update nama elemen in ATP records
+                    atpRepository.updateNamaElemenByElemenId(elemenId, newNamaElemen);
+
+                    // Update nama elemen in BankSoal records
+                    bankSoalRepository.updateNamaElemenByElemenId(elemenId, newNamaElemen);
+
+                    System.out.println("Cascade update completed for elemen: " + elemenId +
+                            ", new nama: " + newNamaElemen);
+                } catch (Exception e) {
+                    System.err.println("Error during cascade update for elemen " + elemenId + ": " + e.getMessage());
+                    // Continue execution even if cascade update fails
+                }
+            }
+
+            return updatedElemen;
         } else {
             return null;
         }

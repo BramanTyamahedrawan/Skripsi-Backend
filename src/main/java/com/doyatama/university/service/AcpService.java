@@ -14,6 +14,8 @@ import com.doyatama.university.payload.AcpRequest;
 import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.AcpRepository;
+import com.doyatama.university.repository.AtpRepository;
+import com.doyatama.university.repository.BankSoalRepository;
 import com.doyatama.university.repository.ElemenRepository;
 import com.doyatama.university.repository.KelasRepository;
 import com.doyatama.university.repository.KonsentrasiKeahlianSekolahRepository;
@@ -29,6 +31,8 @@ import java.util.UUID;
 public class AcpService {
 
     private AcpRepository acpRepository = new AcpRepository();
+    private AtpRepository atpRepository = new AtpRepository();
+    private BankSoalRepository bankSoalRepository = new BankSoalRepository();
     private ElemenRepository elemenRepository = new ElemenRepository();
     private TahunAjaranRepository tahunAjaranRepository = new TahunAjaranRepository();
     private KelasRepository kelasRepository = new KelasRepository();
@@ -114,7 +118,12 @@ public class AcpService {
         Elemen elemenResponse = elemenRepository.findById(acpRequest.getIdElemen());
         School schoolResponse = schoolRepository.findById(acpRequest.getIdSchool());
 
-        if (acp.getIdAcp() != null && schoolResponse.getIdSchool() != null) {
+        if (schoolResponse.getIdSchool() != null) {
+            // Get current ACP data to check if nama changed
+            Acp currentAcp = acpRepository.findAcpById(acpId);
+            String oldNamaAcp = currentAcp.getNamaAcp();
+            String newNamaAcp = acpRequest.getNamaAcp();
+
             acp.setNamaAcp(acpRequest.getNamaAcp());
             acp.setTahunAjaran(tahunAjaranResponse);
             acp.setKelas(kelasResponse);
@@ -124,7 +133,26 @@ public class AcpService {
             acp.setElemen(elemenResponse);
             acp.setSchool(schoolResponse);
 
-            return acpRepository.update(acpId, acp);
+            Acp updatedAcp = acpRepository.update(acpId, acp);
+
+            // Cascade update if nama ACP changed
+            if (updatedAcp != null && !oldNamaAcp.equals(newNamaAcp)) {
+                try {
+                    // Update nama ACP in ATP records
+                    atpRepository.updateNamaAcpByAcpId(acpId, newNamaAcp);
+
+                    // Update nama ACP in BankSoal records
+                    bankSoalRepository.updateNamaAcpByAcpId(acpId, newNamaAcp);
+
+                    System.out.println("Cascade update completed for ACP: " + acpId +
+                            ", new nama: " + newNamaAcp);
+                } catch (Exception e) {
+                    System.err.println("Error during cascade update for ACP " + acpId + ": " + e.getMessage());
+                    // Continue execution even if cascade update fails
+                }
+            }
+
+            return updatedAcp;
         } else {
             return null;
         }

@@ -228,4 +228,41 @@ public class AcpRepository {
         Acp acp = client.getDataByColumn(tableAcp.toString(), columnMapping, "main", "idAcp", acpId, Acp.class);
         return acp.getIdAcp() != null;
     }
+
+    public List<Acp> findAcpByElemen(String elemenId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+
+        TableName tableAcp = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idAcp", "idAcp");
+        columnMapping.put("namaAcp", "namaAcp");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("school", "school");
+
+        List<Acp> acpList = client.getDataListByColumn(tableAcp.toString(), columnMapping, "elemen", "idElemen",
+                elemenId, Acp.class, size);
+        return acpList;
+    }
+
+    public void updateNamaElemenByElemenId(String elemenId, String newNamaElemen) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableAcp = TableName.valueOf(tableName);
+
+        // Get all ACP records that reference this elemen
+        List<Acp> acpList = findAcpByElemen(elemenId, 1000); // Use large size to get all records
+
+        // Update nama elemen for each ACP record
+        for (Acp acp : acpList) {
+            if (acp.getIdAcp() != null) {
+                client.insertRecord(tableAcp, acp.getIdAcp(), "elemen", "namaElemen", newNamaElemen);
+                client.insertRecord(tableAcp, acp.getIdAcp(), "detail", "updated_by", "System_Cascade_Update");
+            }
+        }
+    }
 }

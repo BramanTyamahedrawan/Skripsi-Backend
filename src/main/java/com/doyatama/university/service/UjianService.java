@@ -145,6 +145,7 @@ public class UjianService {
         ujian.setDeskripsi(ujianRequest.getDeskripsi());
         ujian.setDurasiMenit(ujianRequest.getDurasiMenit());
         ujian.setWaktuMulaiDijadwalkan(ujianRequest.getWaktuMulaiDijadwalkan());
+        ujian.setWaktuSelesaiOtomatis(ujianRequest.getWaktuSelesaiOtomatis());
         ujian.setStatusUjian(ujianRequest.getStatusUjian() != null ? ujianRequest.getStatusUjian() : "DRAFT");
         ujian.setIsLive(ujianRequest.getIsLive() != null ? ujianRequest.getIsLive() : false);
         ujian.setTipeSoal(ujianRequest.getTipeSoal() != null ? ujianRequest.getTipeSoal() : "ACAK");

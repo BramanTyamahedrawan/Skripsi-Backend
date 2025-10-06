@@ -16,6 +16,7 @@ import com.doyatama.university.payload.DefaultResponse;
 import com.doyatama.university.payload.PagedResponse;
 import com.doyatama.university.repository.AtpRepository;
 import com.doyatama.university.repository.AcpRepository;
+import com.doyatama.university.repository.BankSoalRepository;
 import com.doyatama.university.repository.ElemenRepository;
 import com.doyatama.university.repository.KelasRepository;
 import com.doyatama.university.repository.KonsentrasiKeahlianSekolahRepository;
@@ -32,6 +33,7 @@ public class AtpService {
 
     private AtpRepository atpRepository = new AtpRepository();
     private AcpRepository acpRepository = new AcpRepository();
+    private BankSoalRepository bankSoalRepository = new BankSoalRepository();
     private ElemenRepository elemenRepository = new ElemenRepository();
     private TahunAjaranRepository tahunAjaranRepository = new TahunAjaranRepository();
     private KelasRepository kelasRepository = new KelasRepository();
@@ -125,6 +127,11 @@ public class AtpService {
         School schoolResponse = schoolRepository.findById(atpRequest.getIdSekolah());
 
         if (schoolResponse.getIdSchool() != null) {
+            // Get current ATP data to check if nama changed
+            Atp currentAtp = atpRepository.findAtpById(atpId);
+            String oldNamaAtp = currentAtp.getNamaAtp();
+            String newNamaAtp = atpRequest.getNamaAtp();
+
             atp.setNamaAtp(atpRequest.getNamaAtp());
             atp.setJumlahJpl(atpRequest.getJumlahJpl());
             atp.setTahunAjaran(tahunAjaranResponse);
@@ -136,7 +143,23 @@ public class AtpService {
             atp.setAcp(acpResponse);
             atp.setSchool(schoolResponse);
 
-            return atpRepository.update(atpId, atp);
+            Atp updatedAtp = atpRepository.update(atpId, atp);
+
+            // Cascade update if nama ATP changed
+            if (updatedAtp != null && !oldNamaAtp.equals(newNamaAtp)) {
+                try {
+                    // Update nama ATP in BankSoal records
+                    bankSoalRepository.updateNamaAtpByAtpId(atpId, newNamaAtp);
+
+                    System.out.println("Cascade update completed for ATP: " + atpId +
+                            ", new nama: " + newNamaAtp);
+                } catch (Exception e) {
+                    System.err.println("Error during cascade update for ATP " + atpId + ": " + e.getMessage());
+                    // Continue execution even if cascade update fails
+                }
+            }
+
+            return updatedAtp;
         } else {
             return null;
         }

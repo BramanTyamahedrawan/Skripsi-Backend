@@ -375,4 +375,157 @@ public class BankSoalRepository {
         return bankSoal.getIdBankSoal() != null;
     }
 
+    public List<BankSoal> findBankSoalByElemen(String elemenId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idBankSoal", "idBankSoal");
+        columnMapping.put("idSoalUjian", "idSoalUjian");
+        columnMapping.put("namaUjian", "namaUjian");
+        columnMapping.put("pertanyaan", "pertanyaan");
+        columnMapping.put("bobot", "bobot");
+        columnMapping.put("jenisSoal", "jenisSoal");
+        columnMapping.put("opsi", "opsi");
+        columnMapping.put("pasangan", "pasangan");
+        columnMapping.put("jawabanBenar", "jawabanBenar");
+        columnMapping.put("toleransiTypo", "toleransiTypo");
+        columnMapping.put("createdAt", "createdAt");
+        columnMapping.put("soalUjian", "soalUjian");
+        columnMapping.put("taksonomi", "taksonomi");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
+
+        List<BankSoal> bankSoalList = client.getDataListByColumn(tableBankSoal.toString(), columnMapping, "elemen",
+                "idElemen",
+                elemenId, BankSoal.class, size);
+        return bankSoalList;
+    }
+
+    public List<BankSoal> findBankSoalByAcp(String acpId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idBankSoal", "idBankSoal");
+        columnMapping.put("idSoalUjian", "idSoalUjian");
+        columnMapping.put("namaUjian", "namaUjian");
+        columnMapping.put("pertanyaan", "pertanyaan");
+        columnMapping.put("bobot", "bobot");
+        columnMapping.put("jenisSoal", "jenisSoal");
+        columnMapping.put("opsi", "opsi");
+        columnMapping.put("pasangan", "pasangan");
+        columnMapping.put("jawabanBenar", "jawabanBenar");
+        columnMapping.put("toleransiTypo", "toleransiTypo");
+        columnMapping.put("createdAt", "createdAt");
+        columnMapping.put("soalUjian", "soalUjian");
+        columnMapping.put("taksonomi", "taksonomi");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
+
+        List<BankSoal> bankSoalList = client.getDataListByColumn(tableBankSoal.toString(), columnMapping, "acp",
+                "idAcp",
+                acpId, BankSoal.class, size);
+        return bankSoalList;
+    }
+
+    public List<BankSoal> findBankSoalByAtp(String atpId, int size) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+        Map<String, String> columnMapping = new HashMap<>();
+
+        columnMapping.put("idBankSoal", "idBankSoal");
+        columnMapping.put("idSoalUjian", "idSoalUjian");
+        columnMapping.put("namaUjian", "namaUjian");
+        columnMapping.put("pertanyaan", "pertanyaan");
+        columnMapping.put("bobot", "bobot");
+        columnMapping.put("jenisSoal", "jenisSoal");
+        columnMapping.put("opsi", "opsi");
+        columnMapping.put("pasangan", "pasangan");
+        columnMapping.put("jawabanBenar", "jawabanBenar");
+        columnMapping.put("toleransiTypo", "toleransiTypo");
+        columnMapping.put("createdAt", "createdAt");
+        columnMapping.put("soalUjian", "soalUjian");
+        columnMapping.put("taksonomi", "taksonomi");
+        columnMapping.put("mapel", "mapel");
+        columnMapping.put("tahunAjaran", "tahunAjaran");
+        columnMapping.put("semester", "semester");
+        columnMapping.put("kelas", "kelas");
+        columnMapping.put("elemen", "elemen");
+        columnMapping.put("acp", "acp");
+        columnMapping.put("atp", "atp");
+        columnMapping.put("konsentrasiKeahlianSekolah", "konsentrasiKeahlianSekolah");
+        columnMapping.put("school", "school");
+
+        List<BankSoal> bankSoalList = client.getDataListByColumn(tableBankSoal.toString(), columnMapping, "atp",
+                "idAtp",
+                atpId, BankSoal.class, size);
+        return bankSoalList;
+    }
+
+    public void updateNamaElemenByElemenId(String elemenId, String newNamaElemen) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+
+        // Get all BankSoal records that reference this elemen
+        List<BankSoal> bankSoalList = findBankSoalByElemen(elemenId, 1000); // Use large size to get all records
+
+        // Update nama elemen for each BankSoal record
+        for (BankSoal bankSoal : bankSoalList) {
+            if (bankSoal.getIdBankSoal() != null) {
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "elemen", "namaElemen", newNamaElemen);
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "detail", "updated_by",
+                        "System_Cascade_Update");
+            }
+        }
+    }
+
+    public void updateNamaAcpByAcpId(String acpId, String newNamaAcp) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+
+        // Get all BankSoal records that reference this ACP
+        List<BankSoal> bankSoalList = findBankSoalByAcp(acpId, 1000); // Use large size to get all records
+
+        // Update nama ACP for each BankSoal record
+        for (BankSoal bankSoal : bankSoalList) {
+            if (bankSoal.getIdBankSoal() != null) {
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "acp", "namaAcp", newNamaAcp);
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "detail", "updated_by",
+                        "System_Cascade_Update");
+            }
+        }
+    }
+
+    public void updateNamaAtpByAtpId(String atpId, String newNamaAtp) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+
+        // Get all BankSoal records that reference this ATP
+        List<BankSoal> bankSoalList = findBankSoalByAtp(atpId, 1000); // Use large size to get all records
+
+        // Update nama ATP for each BankSoal record
+        for (BankSoal bankSoal : bankSoalList) {
+            if (bankSoal.getIdBankSoal() != null) {
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "atp", "namaAtp", newNamaAtp);
+                client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "detail", "updated_by",
+                        "System_Cascade_Update");
+            }
+        }
+    }
+
 }
