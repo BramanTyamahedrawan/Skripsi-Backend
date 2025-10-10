@@ -327,33 +327,13 @@ public class BankSoalService {
                 throw new IllegalArgumentException("Jenis bankSoal tidak dikenali: " + bankSoalRequest.getJenisSoal());
         }
 
-        // Save updated bank soal
-        BankSoal savedBankSoal = bankSoalRepository.save(updatedBankSoal);
+        // Update bank soal using proper update method
+        BankSoal savedBankSoal = bankSoalRepository.update(bankSoalId, updatedBankSoal);
 
-        // Handle cascade updates to SoalUjian if BankSoal fields changed
-        try {
-            if (soalUjianResponse != null) {
-                // Check if key fields changed and cascade to SoalUjian
-                boolean shouldCascade = !existingBankSoal.getNamaUjian().equals(bankSoalRequest.getNamaUjian()) ||
-                        !existingBankSoal.getPertanyaan().equals(bankSoalRequest.getPertanyaan()) ||
-                        !existingBankSoal.getBobot().equals(bankSoalRequest.getBobot()) ||
-                        !existingBankSoal.getJenisSoal().equals(bankSoalRequest.getJenisSoal());
-
-                if (shouldCascade) {
-                    System.out.println("Cascading BankSoal update to SoalUjian: " + soalUjianResponse.getIdSoalUjian());
-                    soalUjianRepository.updateBankSoalInfoByBankSoalId(
-                            bankSoalId,
-                            bankSoalRequest.getNamaUjian(),
-                            bankSoalRequest.getPertanyaan(),
-                            bankSoalRequest.getBobot(),
-                            bankSoalRequest.getJenisSoal());
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error during cascade update to SoalUjian: " + e.getMessage());
-            e.printStackTrace();
-            // Continue execution - cascade failure shouldn't fail the main update
-        }
+        // Note: BankSoal updates do NOT cascade to SoalUjian as per business
+        // requirements
+        // This maintains data integrity by keeping the original SoalUjian as the source
+        // of truth
 
         return savedBankSoal;
     }

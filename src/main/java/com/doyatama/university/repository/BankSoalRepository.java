@@ -375,6 +375,141 @@ public class BankSoalRepository {
         return bankSoal.getIdBankSoal() != null;
     }
 
+    public BankSoal update(String bankSoalId, BankSoal bankSoal) throws IOException {
+        HBaseCustomClient client = new HBaseCustomClient(conf);
+        TableName tableBankSoal = TableName.valueOf(tableName);
+        String tableNameStr = tableBankSoal.toString();
+
+        // First delete existing detail records (opsi, pasangan, jawabanBenar) to avoid
+        // orphaned data
+        deleteExistingDetailsBankSoal(client, tableNameStr, bankSoalId);
+
+        // Update main info
+        updateMainInfoBankSoal(client, tableBankSoal, bankSoalId, bankSoal);
+
+        // Update relationships
+        updateRelationshipsBankSoal(client, tableBankSoal, bankSoalId, bankSoal);
+
+        // Save question details based on type
+        switch (bankSoal.getJenisSoal().toUpperCase()) {
+            case "PG":
+            case "MULTI":
+                savePilihanGanda(client, tableBankSoal, bankSoalId, bankSoal);
+                break;
+
+            case "COCOK":
+                saveCocokkan(client, tableBankSoal, bankSoalId, bankSoal);
+                break;
+
+            case "ISIAN":
+                saveIsian(client, tableBankSoal, bankSoalId, bankSoal);
+                break;
+        }
+
+        client.insertRecord(tableBankSoal, bankSoalId, "detail", "updated_by", "System_Update");
+        return bankSoal;
+    }
+
+    private void deleteExistingDetailsBankSoal(HBaseCustomClient client, String tableName, String rowKey)
+            throws IOException {
+        // Delete existing question-specific details to avoid conflicts
+        try {
+            // Delete opsi (for PG/MULTI) - stored in main column family
+            client.deleteRecordByColumn(tableName, rowKey, "main", "opsi");
+
+            // Delete pasangan (for COCOK) - stored in main column family
+            client.deleteRecordByColumn(tableName, rowKey, "main", "pasangan");
+
+            // Delete jawabanBenar (for all types) - stored in main column family
+            client.deleteRecordByColumn(tableName, rowKey, "main", "jawabanBenar");
+
+            // Delete toleransiTypo (for ISIAN) - stored in main column family
+            client.deleteRecordByColumn(tableName, rowKey, "main", "toleransiTypo");
+        } catch (Exception e) {
+            // Ignore errors if columns don't exist
+            System.out.println("Some question-specific columns may not exist during update: " + e.getMessage());
+        }
+    }
+
+    private void updateMainInfoBankSoal(HBaseCustomClient client, TableName table, String rowKey, BankSoal bankSoal) {
+        client.insertRecord(table, rowKey, "main", "idBankSoal", bankSoal.getIdBankSoal());
+        client.insertRecord(table, rowKey, "main", "idSoalUjian", bankSoal.getIdSoalUjian());
+        client.insertRecord(table, rowKey, "main", "namaUjian", bankSoal.getNamaUjian());
+        client.insertRecord(table, rowKey, "main", "pertanyaan", bankSoal.getPertanyaan());
+        client.insertRecord(table, rowKey, "main", "bobot", bankSoal.getBobot());
+        client.insertRecord(table, rowKey, "main", "jenisSoal", bankSoal.getJenisSoal());
+        client.insertRecord(table, rowKey, "main", "createdAt", bankSoal.getCreatedAt().toString());
+    }
+
+    private void updateRelationshipsBankSoal(HBaseCustomClient client, TableName table, String rowKey,
+            BankSoal bankSoal) throws IOException {
+        // Update SoalUjian relationship
+        if (bankSoal.getSoalUjian() != null) {
+            client.insertRecord(table, rowKey, "soalUjian", "idSoalUjian", bankSoal.getSoalUjian().getIdSoalUjian());
+            client.insertRecord(table, rowKey, "soalUjian", "namaUjian", bankSoal.getSoalUjian().getNamaUjian());
+            client.insertRecord(table, rowKey, "soalUjian", "pertanyaan", bankSoal.getSoalUjian().getPertanyaan());
+            client.insertRecord(table, rowKey, "soalUjian", "bobot", bankSoal.getSoalUjian().getBobot());
+            client.insertRecord(table, rowKey, "soalUjian", "jenisSoal", bankSoal.getSoalUjian().getJenisSoal());
+            client.insertRecord(table, rowKey, "soalUjian", "createdAt",
+                    bankSoal.getSoalUjian().getCreatedAt().toString());
+        }
+
+        // Update other relationships
+        if (bankSoal.getTahunAjaran() != null) {
+            client.insertRecord(table, rowKey, "tahunAjaran", "idTahun", bankSoal.getTahunAjaran().getIdTahun());
+            client.insertRecord(table, rowKey, "tahunAjaran", "tahunAjaran",
+                    bankSoal.getTahunAjaran().getTahunAjaran());
+        }
+
+        if (bankSoal.getSemester() != null) {
+            client.insertRecord(table, rowKey, "semester", "idSemester", bankSoal.getSemester().getIdSemester());
+            client.insertRecord(table, rowKey, "semester", "namaSemester", bankSoal.getSemester().getNamaSemester());
+        }
+
+        if (bankSoal.getKelas() != null) {
+            client.insertRecord(table, rowKey, "kelas", "idKelas", bankSoal.getKelas().getIdKelas());
+            client.insertRecord(table, rowKey, "kelas", "namaKelas", bankSoal.getKelas().getNamaKelas());
+        }
+
+        if (bankSoal.getMapel() != null) {
+            client.insertRecord(table, rowKey, "mapel", "idMapel", bankSoal.getMapel().getIdMapel());
+            client.insertRecord(table, rowKey, "mapel", "name", bankSoal.getMapel().getName());
+        }
+
+        if (bankSoal.getElemen() != null) {
+            client.insertRecord(table, rowKey, "elemen", "idElemen", bankSoal.getElemen().getIdElemen());
+            client.insertRecord(table, rowKey, "elemen", "namaElemen", bankSoal.getElemen().getNamaElemen());
+        }
+
+        if (bankSoal.getAcp() != null) {
+            client.insertRecord(table, rowKey, "acp", "idAcp", bankSoal.getAcp().getIdAcp());
+            client.insertRecord(table, rowKey, "acp", "namaAcp", bankSoal.getAcp().getNamaAcp());
+        }
+
+        if (bankSoal.getAtp() != null) {
+            client.insertRecord(table, rowKey, "atp", "idAtp", bankSoal.getAtp().getIdAtp());
+            client.insertRecord(table, rowKey, "atp", "namaAtp", bankSoal.getAtp().getNamaAtp());
+        }
+
+        if (bankSoal.getTaksonomi() != null) {
+            client.insertRecord(table, rowKey, "taksonomi", "idTaksonomi", bankSoal.getTaksonomi().getIdTaksonomi());
+            client.insertRecord(table, rowKey, "taksonomi", "namaTaksonomi",
+                    bankSoal.getTaksonomi().getNamaTaksonomi());
+        }
+
+        if (bankSoal.getKonsentrasiKeahlianSekolah() != null) {
+            client.insertRecord(table, rowKey, "konsentrasiKeahlianSekolah", "idKonsentrasiSekolah",
+                    bankSoal.getKonsentrasiKeahlianSekolah().getIdKonsentrasiSekolah());
+            client.insertRecord(table, rowKey, "konsentrasiKeahlianSekolah", "namaKonsentrasiSekolah",
+                    bankSoal.getKonsentrasiKeahlianSekolah().getNamaKonsentrasiSekolah());
+        }
+
+        if (bankSoal.getSchool() != null) {
+            client.insertRecord(table, rowKey, "school", "idSchool", bankSoal.getSchool().getIdSchool());
+            client.insertRecord(table, rowKey, "school", "nameSchool", bankSoal.getSchool().getNameSchool());
+        }
+    }
+
     public List<BankSoal> findBankSoalByElemen(String elemenId, int size) throws IOException {
         HBaseCustomClient client = new HBaseCustomClient(conf);
         TableName tableBankSoal = TableName.valueOf(tableName);
@@ -563,12 +698,20 @@ public class BankSoalRepository {
     }
 
     public void updateSoalUjianInfoBySoalUjianId(String soalUjianId, String namaUjian, String pertanyaan, String bobot,
-            String jenisSoal, String toleransiTypo) throws IOException {
+            String jenisSoal, String toleransiTypo, Map<String, String> opsi,
+            Map<String, String> pasangan, List<String> jawabanBenar) throws IOException {
+        System.out.println("=== BankSoalRepository.updateSoalUjianInfoBySoalUjianId started ===");
+        System.out.println("SoalUjianId: " + soalUjianId);
+        System.out.println("Opsi: " + (opsi != null ? opsi.size() + " items" : "null"));
+        System.out.println("Pasangan: " + (pasangan != null ? pasangan.size() + " items" : "null"));
+        System.out.println("JawabanBenar: " + (jawabanBenar != null ? jawabanBenar.size() + " items" : "null"));
+
         HBaseCustomClient client = new HBaseCustomClient(conf);
         TableName tableBankSoal = TableName.valueOf(tableName);
 
         // Get all BankSoal records that reference this SoalUjian
         List<BankSoal> bankSoalList = findBankSoalBySoalUjian(soalUjianId, 1000); // Use large size to get all records
+        System.out.println("Found " + bankSoalList.size() + " BankSoal records to update");
 
         // Update SoalUjian info for each BankSoal record
         for (BankSoal bankSoal : bankSoalList) {
@@ -586,6 +729,10 @@ public class BankSoalRepository {
                 if (jenisSoal != null) {
                     client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "jenisSoal", jenisSoal);
                 }
+                if (toleransiTypo != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "toleransiTypo",
+                            toleransiTypo);
+                }
 
                 // Update in soalUjian nested object as well
                 if (namaUjian != null) {
@@ -599,6 +746,46 @@ public class BankSoalRepository {
                 }
                 if (jenisSoal != null) {
                     client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "jenisSoal", jenisSoal);
+                }
+                if (toleransiTypo != null) {
+                    client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "toleransiTypo",
+                            toleransiTypo);
+                }
+
+                // Update opsi (for PG and MULTI questions)
+                if (opsi != null) {
+                    try {
+                        String opsiJson = objectMapper.writeValueAsString(opsi);
+                        client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "opsi", opsiJson);
+                        client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "opsi", opsiJson);
+                    } catch (JsonProcessingException e) {
+                        System.err.println("Error serializing opsi: " + e.getMessage());
+                    }
+                }
+
+                // Update pasangan (for COCOK questions)
+                if (pasangan != null) {
+                    try {
+                        String pasanganJson = objectMapper.writeValueAsString(pasangan);
+                        client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "pasangan", pasanganJson);
+                        client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "pasangan",
+                                pasanganJson);
+                    } catch (JsonProcessingException e) {
+                        System.err.println("Error serializing pasangan: " + e.getMessage());
+                    }
+                }
+
+                // Update jawabanBenar
+                if (jawabanBenar != null) {
+                    try {
+                        String jawabanJson = objectMapper.writeValueAsString(jawabanBenar);
+                        client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "main", "jawabanBenar",
+                                jawabanJson);
+                        client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "soalUjian", "jawabanBenar",
+                                jawabanJson);
+                    } catch (JsonProcessingException e) {
+                        System.err.println("Error serializing jawabanBenar: " + e.getMessage());
+                    }
                 }
 
                 client.insertRecord(tableBankSoal, bankSoal.getIdBankSoal(), "detail", "updated_by",
