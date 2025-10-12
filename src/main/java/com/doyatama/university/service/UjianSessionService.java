@@ -83,7 +83,39 @@ public class UjianSessionService {
         UjianSession existingSession = ujianSessionRepository.findActiveSessionByUjianAndPeserta(
                 request.getIdUjian(), request.getIdPeserta());
         if (existingSession != null) {
-            throw new BadRequestException("Peserta sudah memiliki session aktif untuk ujian ini");
+            // Allow resume if session is not submitted and time is still available
+            if (!existingSession.getIsSubmitted() && isSessionStillValid(existingSession)) {
+                logger.info("Resuming existing session: {} for participant: {}",
+                        existingSession.getSessionId(), request.getIdPeserta());
+
+                // Update session metadata and keep alive time
+                Map<String, Object> metadata = existingSession.getSessionMetadata();
+                if (metadata == null)
+                    metadata = new HashMap<>();
+                metadata.put("resumedAt", Instant.now().toString());
+                int currentResumeCount = metadata.get("resumeCount") != null
+                        ? Integer.parseInt(metadata.get("resumeCount").toString())
+                        : 0;
+                metadata.put("resumeCount", currentResumeCount + 1);
+                existingSession.setSessionMetadata(metadata);
+                // Update keep alive time in metadata since lastKeepAlive might not exist
+                metadata.put("lastKeepAlive", Instant.now().toString());
+                existingSession.setUpdatedAt(Instant.now());
+
+                // Recalculate time remaining
+                Integer actualTimeRemaining = calculateActualTimeRemaining(existingSession);
+                existingSession.setTimeRemaining(actualTimeRemaining);
+
+                // Save updated session
+                UjianSession updatedSession = ujianSessionRepository.save(existingSession);
+                logger.info("Session resumed successfully: {}", updatedSession.getSessionId());
+                return updatedSession;
+            } else {
+                // Session expired or already submitted
+                String reason = existingSession.getIsSubmitted() ? "Session sudah di-submit"
+                        : "Waktu ujian telah habis";
+                throw new BadRequestException("Tidak dapat melanjutkan ujian: " + reason);
+            }
         }
 
         // Check attempt limits
@@ -447,10 +479,23 @@ public class UjianSessionService {
             // Check existing active session
             UjianSession existingSession = getActiveSession(idUjian, idPeserta);
             if (existingSession != null) {
-                validation.put("canStart", false);
-                validation.put("reason", "Sudah memiliki session aktif");
-                validation.put("existingSessionId", existingSession.getSessionId());
-                return validation;
+                // If session exists but is still valid, allow resume
+                if (!existingSession.getIsSubmitted() && isSessionStillValid(existingSession)) {
+                    validation.put("canStart", true);
+                    validation.put("reason", "Dapat melanjutkan ujian yang sudah dimulai");
+                    validation.put("hasExistingSession", true);
+                    validation.put("existingSessionId", existingSession.getSessionId());
+                    validation.put("timeRemaining", calculateActualTimeRemaining(existingSession));
+                    validation.put("currentSoalIndex", existingSession.getCurrentSoalIndex());
+                    validation.put("answeredQuestions", existingSession.getAnsweredQuestions());
+                    return validation;
+                } else {
+                    validation.put("canStart", false);
+                    validation.put("reason",
+                            existingSession.getIsSubmitted() ? "Ujian sudah diselesaikan" : "Waktu ujian telah habis");
+                    validation.put("existingSessionId", existingSession.getSessionId());
+                    return validation;
+                }
             }
 
             // Check attempt limits
@@ -944,6 +989,33 @@ public class UjianSessionService {
         int totalDurationSeconds = session.getUjian().getDurasiMenit() * 60;
 
         return Math.max(0, totalDurationSeconds - (int) elapsedSeconds);
+    }
+
+    /**
+     * Check if session is still valid for resume (time remaining > 0 and not
+     * expired)
+     */
+    private boolean isSessionStillValid(UjianSession session) {
+        try {
+            // Check if session has time remaining
+            Integer timeRemaining = calculateActualTimeRemaining(session);
+            if (timeRemaining == null || timeRemaining <= 0) {
+                return false;
+            }
+
+            // Check ujian end time if set
+            if (session.getUjian() != null && session.getUjian().getWaktuSelesaiOtomatis() != null) {
+                Instant now = Instant.now();
+                if (now.isAfter(session.getUjian().getWaktuSelesaiOtomatis())) {
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            logger.warn("Error checking session validity: {}", e.getMessage());
+            return false;
+        }
     }
 
     private Instant calculateEstimatedEndTime(UjianSession session) {

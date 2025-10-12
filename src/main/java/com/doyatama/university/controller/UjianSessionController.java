@@ -54,6 +54,75 @@ public class UjianSessionController {
     // ==================== SESSION MANAGEMENT ====================
 
     /**
+     * Resume or Start ujian session - Support untuk melanjutkan ujian yang terputus
+     */
+    @PostMapping("/resume-or-start")
+    public ResponseEntity<?> resumeOrStartUjianSession(
+            @Valid @RequestBody UjianSessionRequest.StartSessionRequest request,
+            @CurrentUser UserPrincipal currentUser) throws IOException {
+        try {
+            logger.debug(
+                    "Resume/Start ujian session for user: " + currentUser.getId() + " ujian: " + request.getIdUjian());
+
+            // Set peserta ID from current user
+            request.setIdPeserta(currentUser.getId());
+
+            // First check if there's existing session
+            UjianSession existingSession = ujianSessionService.getActiveSession(request.getIdUjian(),
+                    currentUser.getId());
+
+            UjianSession session;
+            boolean isResumed = false;
+
+            if (existingSession != null && !existingSession.getIsSubmitted()) {
+                // Try to start (which will resume if valid)
+                session = ujianSessionService.startSession(request, currentUser.getSchoolId());
+                isResumed = true;
+            } else {
+                // Create new session
+                session = ujianSessionService.startSession(request, currentUser.getSchoolId());
+                isResumed = false;
+            }
+
+            if (session == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Gagal memulai session ujian");
+                errorResponse.put("data", null);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            }
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("sessionId", session.getSessionId());
+            responseData.put("idSession", session.getIdSession());
+            responseData.put("timeRemaining", session.getTimeRemaining());
+            responseData.put("currentSoalIndex", session.getCurrentSoalIndex());
+            responseData.put("totalQuestions", session.getTotalQuestions());
+            responseData.put("attemptNumber", session.getAttemptNumber());
+            responseData.put("startTime", session.getStartTime());
+            responseData.put("isResumed", isResumed);
+            responseData.put("answers", session.getAnswers());
+            responseData.put("answeredQuestions", session.getAnsweredQuestions());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("statusCode", 200);
+            response.put("message", isResumed ? "Ujian berhasil dilanjutkan dari session sebelumnya"
+                    : "Session ujian baru berhasil dimulai");
+            response.put("content", responseData);
+
+            return ResponseEntity.ok().body(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Error resume/start", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Terjadi kesalahan sistem: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Start ujian session - Memulai session ujian untuk peserta
      */
     @PostMapping("/start")

@@ -13,6 +13,7 @@ import com.doyatama.university.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -38,9 +39,10 @@ public class UjianAnalysisController {
     // ==================== CRUD OPERATIONS ====================
 
     /**
-     * Get all analysis with pagination and filtering
+     * Get all analysis with pagination and filtering - HANYA OPERATOR & TEACHER
      */
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_OPERATOR') or hasRole('ROLE_TEACHER')")
     public PagedResponse<UjianAnalysis> getAllAnalysis(
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
@@ -52,9 +54,10 @@ public class UjianAnalysisController {
     }
 
     /**
-     * Get analysis by ujian ID
+     * Get analysis by ujian ID - HANYA OPERATOR & TEACHER
      */
     @GetMapping("/ujian/{ujianId}")
+    @PreAuthorize("hasRole('ROLE_OPERATOR') or hasRole('ROLE_TEACHER')")
     public PagedResponse<UjianAnalysis> getAnalysisByUjian(
             @PathVariable String ujianId,
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
@@ -66,9 +69,10 @@ public class UjianAnalysisController {
     }
 
     /**
-     * Get analysis by type
+     * Get analysis by type - HANYA OPERATOR & TEACHER
      */
     @GetMapping("/type/{analysisType}")
+    @PreAuthorize("hasRole('ROLE_OPERATOR') or hasRole('ROLE_TEACHER')")
     public PagedResponse<UjianAnalysis> getAnalysisByType(
             @PathVariable String analysisType,
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
@@ -80,9 +84,10 @@ public class UjianAnalysisController {
     }
 
     /**
-     * Get single analysis by ID
+     * Get single analysis by ID - HANYA OPERATOR & TEACHER
      */
     @GetMapping("/{analysisId}")
+    @PreAuthorize("hasRole('ROLE_OPERATOR') or hasRole('ROLE_TEACHER')")
     public DefaultResponse<UjianAnalysis> getAnalysisById(@PathVariable String analysisId) throws IOException {
         return ujianAnalysisService.getAnalysisById(analysisId);
     }
@@ -109,9 +114,10 @@ public class UjianAnalysisController {
     // ==================== ANALYSIS GENERATION ====================
 
     /**
-     * Generate comprehensive analysis
+     * Generate comprehensive analysis - HANYA OPERATOR & TEACHER
      */
     @PostMapping("/generate")
+    @PreAuthorize("hasRole('ROLE_OPERATOR') or hasRole('ROLE_TEACHER')")
     public ResponseEntity<?> generateAnalysis(
             @Valid @RequestBody UjianAnalysisRequest.GenerateAnalysisRequest request,
             @CurrentUser UserPrincipal currentUser) throws IOException {
@@ -325,9 +331,10 @@ public class UjianAnalysisController {
     // ==================== ANALYSIS STATISTICS ====================
 
     /**
-     * Get analysis statistics for dashboard
+     * Get analysis statistics for dashboard - HANYA OPERATOR & TEACHER
      */
     @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ROLE_OPERATOR') or hasRole('ROLE_TEACHER')")
     public ResponseEntity<?> getAnalysisStatistics(@CurrentUser UserPrincipal currentUser) throws IOException {
         try {
             String schoolId = currentUser.getSchoolId();

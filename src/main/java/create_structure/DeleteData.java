@@ -12,22 +12,20 @@ public class DeleteData {
         Configuration conf = HBaseConfiguration.create();
         HBaseCustomClient client = new HBaseCustomClient(conf);
 
-        // TableName tableMapels = TableName.valueOf("mapels");
-        // client.truncateTable(tableMapels, conf);
+         TableName tableHasilUjian = TableName.valueOf("hasil_ujian");
+         client.truncateTable(tableHasilUjian, conf);
 
-        // TableName tableElemen = TableName.valueOf("elemen");
-        // client.truncateTable(tableElemen, conf);
-        //
-        // TableName tableAcp = TableName.valueOf("acp");
-        // client.truncateTable(tableAcp, conf);
-        //
-        // TableName tableAtp = TableName.valueOf("atp");
-        // client.truncateTable(tableAtp, conf);
+         TableName tableUjianAnalysis = TableName.valueOf("ujian_analysis");
+         client.truncateTable(tableUjianAnalysis, conf);
 
-        // TableName tableSoalUjian = TableName.valueOf("soalUjian");
-        // client.truncateTable(tableSoalUjian, conf);
- TableName tableAcp = TableName.valueOf("acp");
-         client.truncateTable(tableAcp, conf);
+         TableName tableUjian = TableName.valueOf("ujian");
+         client.truncateTable(tableUjian, conf);
+
+         TableName tableCheat = TableName.valueOf("cheat_detection");
+         client.truncateTable(tableCheat, conf);
+
+         TableName tableSession = TableName.valueOf("ujian_session");
+         client.truncateTable(tableSession, conf);
 
     }
 }

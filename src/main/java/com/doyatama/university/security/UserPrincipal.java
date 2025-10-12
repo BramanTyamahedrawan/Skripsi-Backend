@@ -3,9 +3,11 @@ package com.doyatama.university.security;
 import com.doyatama.university.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 public class UserPrincipal implements UserDetails {
@@ -29,7 +31,8 @@ public class UserPrincipal implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(String id, String name, String username, String schoolId, String schoolName, String email, String password,
+    public UserPrincipal(String id, String name, String username, String schoolId, String schoolName, String email,
+            String password,
             String roles) {
         this.id = id;
         this.name = name;
@@ -39,6 +42,30 @@ public class UserPrincipal implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles = roles;
+
+        // Convert role ID to GrantedAuthority - CRITICAL FIX
+        String roleName;
+        switch (roles) {
+            case "1":
+                roleName = "ROLE_ADMINISTRATOR";
+                break;
+            case "2":
+                roleName = "ROLE_OPERATOR";
+                break;
+            case "3":
+                roleName = "ROLE_TEACHER";
+                break;
+            case "4":
+                roleName = "ROLE_DUDI";
+                break;
+            case "5":
+                roleName = "ROLE_STUDENT";
+                break;
+            default:
+                roleName = "ROLE_STUDENT"; // Default role
+        }
+
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority(roleName));
     }
 
     public static UserPrincipal create(User user) {
